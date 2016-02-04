@@ -9,7 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#define GLSL(src) "version 150 core\n" #src
+#define GLSL(src) "#version 150 core\n" #src
 
 int main(int argc, char * argv[]) {
 
@@ -64,7 +64,7 @@ int main(int argc, char * argv[]) {
 	const char* vertexSource = GLSL(
 		in vec2 position;
 		
-		int main()
+		void main()
 		{
 			gl_Position = vec4(position, 0.0, 1.0);
 		}	
@@ -89,6 +89,23 @@ int main(int argc, char * argv[]) {
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
 	glCompileShader(fragmentShader);
+
+	// Check if it works
+	/*
+	GLint status;
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
+	if (status == GL_TRUE)
+		printf("%s", "Works?");
+	else
+		printf("%s", "NO?");
+	*/
+
+	// Print error message
+	/*
+	char buffer[512];
+	glGetShaderInfoLog(vertexShader, 512, NULL, buffer);
+	printf("%s", buffer);
+	*/
 
 	// Combining the Vertex and Fragment Shader
 	GLuint shaderProgram = glCreateProgram();
