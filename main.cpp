@@ -10,6 +10,9 @@ int main()
 	// Open a new Window
 	sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "SFML Window", sf::Style::Fullscreen, settings);
 
+	// Get the screen resolution
+	sf::VideoMode res = sf::VideoMode::getDesktopMode();
+
 	// Load the Font
 	sf::Font font;
 	if (!font.loadFromFile("CALIBRI.TTF"))
@@ -46,11 +49,12 @@ int main()
 		// Text Test
 		sf::Text text;
 		text.setFont(font);
-		text.setString("Hello World");
+		//text.setString("Hello World");
 		text.setCharacterSize(24); // In Pixels
 		text.setColor(sf::Color::Red);
 		text.setStyle(sf::Text::Bold | sf::Text::Underlined);
-		//window.draw(text);
+		text.setString(res.width + "x" + res.height);
+		window.draw(text);
 
 		// Shapes
 
