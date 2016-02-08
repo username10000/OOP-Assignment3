@@ -5,7 +5,7 @@ int main()
 {
 	// Window Settings
 	sf::ContextSettings settings;
-	settings.antialiasingLevel = 8;
+	settings.antialiasingLevel = 2;
 
 	// Open a new Window
 	sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "SFML Window", sf::Style::Fullscreen, settings);
@@ -90,7 +90,7 @@ int main()
 		triangle[0].color = sf::Color::Red;
 		triangle[1].color = sf::Color::Blue;
 		triangle[2].color = sf::Color::Green;
-		window.draw(triangle);
+		//window.draw(triangle);
 
 
 		/* --------------- Draw --------------- */
