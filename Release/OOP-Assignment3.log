@@ -1,7 +1,0 @@
-﻿  main.cpp
-main.cpp(66): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
-main.cpp(92): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
-  Generating code
-  All 67 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
-  Finished generating code
-  OOP-Assignment3.vcxproj -> C:\Users\Jean-Luc Picard\Documents\GitHub\OOP-Assignment3\Release\OOP-Assignment3.exe
