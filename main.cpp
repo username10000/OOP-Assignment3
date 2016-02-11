@@ -1,15 +1,19 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <Game.h>
 
 int main()
 {
-	/* --------------- Variables --------------- */
-	int keys[512] = { 0 };
-	/* --------------- Variables --------------- */
+	Game *game = new Game();
 
+	// Run the game
+	while (!game -> getStop()) {
+		game -> update();
+		game -> render();
+	}
 
 	/* --------------- Window Setup --------------- */
-	
+	/*
 	// Window Settings
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 2;
@@ -19,17 +23,20 @@ int main()
 
 	// Open a new Window
 	sf::RenderWindow window(screen, "SFML Window", sf::Style::Fullscreen, settings);
-
+	*/
 	/* --------------- Window Settings --------------- */
 
 	// Load the Font
+	/*
 	sf::Font font;
 	if (!font.loadFromFile("OpenSans-Regular.ttf"))
 		return EXIT_FAILURE;
 
 	// Rendering Loop
 	while (window.isOpen()) {
+	*/
 		/* --------------- Events --------------- */
+	/*
 		sf::Event event;
 		while (window.pollEvent(event)) {
 			switch (event.type) {
@@ -51,13 +58,16 @@ int main()
 					break;
 			}
 		}
+		*/
 		/* --------------- Events --------------- */
 
 		// Clear the Window
-		window.clear(sf::Color::Black);
+		//window.clear(sf::Color::Black);
 
 		/* --------------- Draw --------------- */
-
+		
+		//game.update();
+		//game.render();
 
 		/* --------------- Draw --------------- */
 
@@ -110,8 +120,8 @@ int main()
 		*/
 
 		// End the Frame
-		window.display();
-	}
+		//window.display();
+	//}
 
 	return 0;
 }
