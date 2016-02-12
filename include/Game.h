@@ -3,6 +3,7 @@
 
 // Dependencies
 #include <SFML/Graphics.hpp>
+#include <memory>
 #include <AstroObject.h>
 #include <Sun.h>
 
@@ -15,7 +16,7 @@ class Game {
 		sf::Font font;
 		int keys[512] = { 0 };
 		int stop;
-		std::vector<AstroObject*> astro;
+		std::vector<std::unique_ptr<AstroObject>> astro;
 		Sun sun;
 	public:
 		Game();

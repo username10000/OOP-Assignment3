@@ -15,7 +15,7 @@ Game::Game() {
 
 	stop = 0;
 
-	
+	astro.push_back(std::unique_ptr<AstroObject>(new Sun(screen.width / 2, screen.height / 2, 500, sf::Color(255, 255, 0))));
 }
 
 Game::~Game() {
@@ -65,7 +65,11 @@ void Game::render() {
 
 	//Sun sun(screen.width / 2, screen.height / 2, 100, sf::Color(255, 255, 0));
 	//window.draw(sun.getShape());
-	sun.render(window);
+
+	for (int i = 0; i < astro.size(); i++) {
+		astro[i] -> render(window);
+	}
+	//sun.render(window);
 
 	/* --------------- Draw --------------- */
 
