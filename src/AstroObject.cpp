@@ -1,6 +1,6 @@
 #include <AstroObject.h>
 
-AstroObject::AstroObject(float x, float y, float _radius, sf::Color _colour) : GameObject(x, y) {
+AstroObject::AstroObject(long long x, long long y, float _radius, sf::Color _colour) : GameObject(x, y) {
 	radius = _radius;
 	_colour = colour;
 }
@@ -17,8 +17,3 @@ sf::Color AstroObject::getColour() {
 float AstroObject::getRadius() {
 	return radius;
 }
-
-/*
-void AstroObject::getShape() {
-}
-*/

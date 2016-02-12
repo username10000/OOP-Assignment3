@@ -8,15 +8,17 @@
 // GameObject
 class GameObject {
 	private:
-		sf::Vector2f position;
+		sf::Vector2<long long> position;
+		sf::Vector2f screenPosition;
 	public:
-		GameObject(float x, float y);
+		GameObject(long long x, long long y);
 		GameObject();
-		float getX();
-		float getY();
-		sf::Vector2f getPosition();
+		long long getX();
+		long long getY();
+		sf::Vector2<long long> getPosition();
 		virtual void update() = 0;
-		virtual void render(sf::RenderWindow &window) = 0;
+		virtual void render(sf::RenderWindow &window, sf::Vector2<long long> view, sf::VideoMode screen) = 0;
+		void setScreenPosition(float x, float y);
 };
 
 #endif

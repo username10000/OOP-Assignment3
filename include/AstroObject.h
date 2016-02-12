@@ -12,11 +12,10 @@ class AstroObject : public GameObject {
 		float mass;
 		sf::Color colour;
 	public:
-		AstroObject(float x, float y, float _radius, sf::Color _colour);
+		AstroObject(long long x, long long y, float _radius, sf::Color _colour);
 		AstroObject();
 		virtual void update() = 0;
-		virtual void render(sf::RenderWindow &window) = 0;
-		//virtual void getShape();
+		virtual void render(sf::RenderWindow &window, sf::Vector2<long long> view, sf::VideoMode screen) = 0;
 		sf::Color getColour();
 		float getRadius();
 };

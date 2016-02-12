@@ -2,10 +2,12 @@
 #define GAME_H
 
 // Dependencies
+#include <iostream>
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <AstroObject.h>
 #include <Sun.h>
+#include <SolarSystem.h>
 
 // Game
 class Game {
@@ -17,7 +19,8 @@ class Game {
 		int keys[512] = { 0 };
 		int stop;
 		std::vector<std::unique_ptr<AstroObject>> astro;
-		Sun sun;
+		SolarSystem solarSystem;
+		sf::Vector2<long long> view;
 	public:
 		Game();
 		~Game();

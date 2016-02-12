@@ -1,6 +1,6 @@
 #include <GameObject.h>
 
-GameObject::GameObject(float x, float y) {
+GameObject::GameObject(long long x, long long y) {
 	position.x = x;
 	position.y = y;
 }
@@ -10,17 +10,19 @@ GameObject::GameObject() {
 	position.y = 0;
 }
 
-float GameObject::getX() {
+long long GameObject::getX() {
 	return position.x;
 }
 
-float GameObject::getY() {
+long long GameObject::getY() {
 	return position.y;
 }
 
-sf::Vector2f GameObject::getPosition() {
+sf::Vector2<long long> GameObject::getPosition() {
 	return position;
 }
 
-//void GameObject::update() {}
-//void GameObject::render() {}
+void GameObject::setScreenPosition(float x, float y) {
+	screenPosition.x = x;
+	screenPosition.y = y;
+}

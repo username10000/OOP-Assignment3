@@ -1,5 +1,4 @@
 #include <iostream>
-#include <SFML/Graphics.hpp>
 #include <Game.h>
 
 int main()
@@ -10,6 +9,7 @@ int main()
 	while (!game -> getStop()) {
 		game -> update();
 		game -> render();
+		
 	}
 
 	/* --------------- Window Setup --------------- */
