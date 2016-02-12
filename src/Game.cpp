@@ -14,6 +14,8 @@ Game::Game() {
 	font.loadFromFile("OpenSans-Regular.ttf");
 
 	stop = 0;
+
+	
 }
 
 Game::~Game() {
@@ -61,7 +63,9 @@ void Game::render() {
 
 	/* --------------- Draw --------------- */
 
-
+	//Sun sun(screen.width / 2, screen.height / 2, 100, sf::Color(255, 255, 0));
+	//window.draw(sun.getShape());
+	sun.render(window);
 
 	/* --------------- Draw --------------- */
 

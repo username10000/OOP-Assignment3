@@ -5,6 +5,11 @@ GameObject::GameObject(float x, float y) {
 	position.y = y;
 }
 
+GameObject::GameObject() {
+	position.x = 0;
+	position.y = 0;
+}
+
 float GameObject::getX() {
 	return position.x;
 }
@@ -16,3 +21,6 @@ float GameObject::getY() {
 sf::Vector2f GameObject::getPosition() {
 	return position;
 }
+
+//void GameObject::update() {}
+//void GameObject::render() {}
