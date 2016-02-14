@@ -18,6 +18,14 @@ long long GameObject::getY() {
 	return position.y;
 }
 
+void GameObject::setX(long long x) {
+	position.x = x;
+}
+
+void GameObject::setY(long long y) {
+	position.y = y;
+}
+
 sf::Vector2<long long> GameObject::getPosition() {
 	return position;
 }

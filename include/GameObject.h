@@ -15,6 +15,8 @@ class GameObject {
 		GameObject();
 		long long getX();
 		long long getY();
+		void setX(long long x);
+		void setY(long long y);
 		sf::Vector2<long long> getPosition();
 		virtual void update() = 0;
 		virtual void render(sf::RenderWindow &window, sf::Vector2<long long> view, sf::VideoMode screen) = 0;

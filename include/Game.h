@@ -5,6 +5,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <memory>
+#include <math.h>
 #include <AstroObject.h>
 #include <Sun.h>
 #include <Planet.h>
@@ -27,6 +28,7 @@ class Game {
 		~Game();
 		void events();
 		int getStop();
+		float dist(long long x1, long long y1, long long x2, long long y2);
 		void update();
 		void render();
 };

@@ -10,7 +10,12 @@ Planet::Planet() : Planet(0, 0, 100, sf::Color(255, 255, 0)) {
 }
 
 void Planet::update() {
-
+	float acceleration = getForce() / getMass();
+	sf::Vector2f velocity = getVelocity();
+	setAcceleration(acceleration);
+	addVelocity(acceleration, acceleration);
+	setX(getX() + velocity.x);
+	setY(getY() + velocity.y);
 }
 
 void Planet::render(sf::RenderWindow &window, sf::Vector2<long long> view, sf::VideoMode screen) {

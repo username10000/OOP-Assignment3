@@ -16,12 +16,12 @@ Game::Game() {
 	stop = 0;
 
 	// Set View Position
-	view.x = 500;
+	view.x = 0;
 	view.y = 0;
 
 	// Create the Astronomical Objects
 	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 500, sf::Color(255, 255, 0))));
-	astro.push_back(std::unique_ptr<AstroObject>(new Planet(-1000, 0, 50, sf::Color(0, 0, 255))));
+	astro.push_back(std::unique_ptr<AstroObject>(new Planet(-510, 510, 50, sf::Color(0, 0, 255))));
 }
 
 Game::~Game() {
@@ -30,6 +30,13 @@ Game::~Game() {
 
 int Game::getStop() {
 	return stop;
+}
+
+float Game::dist(long long x1, long long y1, long long x2, long long y2) {
+	float X = pow(x1 - x2, 2);
+	float Y = pow(y1 - y2, 2);
+
+	return sqrt(X + Y);
 }
 
 void Game::events() {
@@ -66,6 +73,11 @@ void Game::events() {
 void Game::update() {
 	// Check Events
 	events();
+
+	// Apply Force
+	for (int i = 1; i < astro.size(); i++) {
+		astro[i]->setForce(astro[0]->getMass() * astro[i]->getMass() / pow(dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()), 2));
+	}
 }
 
 void Game::render() {
@@ -76,6 +88,7 @@ void Game::render() {
 	/* --------------- Draw --------------- */
 
 	for (int i = 0; i < astro.size(); i++) {
+		astro[i] -> update();
 		astro[i] -> render(window, view, screen);
 	}
 
