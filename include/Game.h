@@ -23,6 +23,7 @@ class Game {
 		std::vector<std::unique_ptr<AstroObject>> astro;
 		SolarSystem solarSystem;
 		sf::Vector2<long long> view;
+		float ppm;
 	public:
 		Game();
 		~Game();

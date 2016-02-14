@@ -16,9 +16,12 @@ void Planet::update() {
 	addVelocity(acceleration, acceleration);
 	setX(getX() + velocity.x);
 	setY(getY() + velocity.y);
+	std::cout << velocity.x << " " << velocity.y << std::endl;
 }
 
+/*
 void Planet::render(sf::RenderWindow &window, sf::Vector2<long long> view, sf::VideoMode screen) {
 	circle.setPosition((screen.width / 2) + (getX() - view.x) - getRadius(), (screen.height / 2) + (getY() - view.y) - getRadius());
 	window.draw(circle);
 }
+*/

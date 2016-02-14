@@ -13,7 +13,7 @@ class Planet : public AstroObject {
 		Planet(long long x, long long y, float _radius, sf::Color _colour);
 		Planet();
 		void update();
-		void render(sf::RenderWindow &window, sf::Vector2<long long> view, sf::VideoMode screen);
+		//void render(sf::RenderWindow &window, sf::Vector2<long long> view, sf::VideoMode screen);
 };
 
 #endif

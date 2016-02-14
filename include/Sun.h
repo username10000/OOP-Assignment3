@@ -7,12 +7,12 @@
 // Sun
 class Sun : public AstroObject {
 	private:
-		sf::CircleShape circle;
+		//sf::CircleShape circle;
 	public:
 		Sun(long long x, long long y, float _radius, sf::Color _colour);
 		Sun();
 		void update();
-		void render(sf::RenderWindow &window, sf::Vector2<long long> view, sf::VideoMode screen);
+		//void render(sf::RenderWindow &window, sf::Vector2<long long> view, sf::VideoMode screen);
 };
 
 #endif

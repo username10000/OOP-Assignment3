@@ -21,7 +21,10 @@ Game::Game() {
 
 	// Create the Astronomical Objects
 	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 500, sf::Color(255, 255, 0))));
-	astro.push_back(std::unique_ptr<AstroObject>(new Planet(-510, 510, 50, sf::Color(0, 0, 255))));
+	astro.push_back(std::unique_ptr<AstroObject>(new Planet(-10000, 700, 50, sf::Color(0, 0, 255))));
+
+	// Pixels Per Meter
+	ppm = 1;
 }
 
 Game::~Game() {
@@ -64,6 +67,11 @@ void Game::events() {
 			view.x += (int)(event.mouseButton.x - screen.width / 2);
 			view.y += (int)(event.mouseButton.y - screen.height / 2);
 			break;
+		case sf::Event::MouseWheelMoved:
+			ppm -= event.mouseWheel.delta;
+			if (ppm < 1)
+				ppm = 1;
+			break;
 		default:
 			break;
 		}
@@ -76,7 +84,7 @@ void Game::update() {
 
 	// Apply Force
 	for (int i = 1; i < astro.size(); i++) {
-		astro[i]->setForce(astro[0]->getMass() * astro[i]->getMass() / pow(dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()), 2));
+		astro[i] -> setForce(astro[0] -> getG() * astro[0] -> getMass() * astro[i] -> getMass() / pow(dist(astro[0] -> getX(), astro[0] -> getY(), astro[i] -> getX(), astro[i] -> getY()), 2));
 	}
 }
 
@@ -89,7 +97,7 @@ void Game::render() {
 
 	for (int i = 0; i < astro.size(); i++) {
 		astro[i] -> update();
-		astro[i] -> render(window, view, screen);
+		astro[i] -> render(window, view, screen, ppm);
 	}
 
 	/* --------------- Draw --------------- */

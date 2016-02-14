@@ -2,9 +2,13 @@
 
 AstroObject::AstroObject(long long x, long long y, float _radius, sf::Color _colour) : GameObject(x, y) {
 	radius = _radius;
-	_colour = colour;
+	colour = _colour;
 	mass = (float)(_radius * 9.3);
 	force = acceleration = velocity.x = velocity.y = 0;
+	circle.setRadius(_radius);
+	circle.setPointCount(100);
+	circle.setFillColor(colour);
+	G = 0.6;
 }
 
 AstroObject::AstroObject() : AstroObject(0, 0, 100, sf::Color(255, 255, 0)) {
@@ -32,6 +36,10 @@ sf::Vector2f AstroObject::getVelocity() {
 	return velocity;
 }
 
+float AstroObject::getG() {
+	return G;
+}
+
 void AstroObject::setForce(float _force) {
 	force = _force;
 }
@@ -43,4 +51,10 @@ void AstroObject::setAcceleration(float _acceleration) {
 void AstroObject::addVelocity(float x, float y) {
 	velocity.x += x;
 	velocity.y += y;
+}
+
+void AstroObject::render(sf::RenderWindow &window, sf::Vector2<long long> view, sf::VideoMode screen, float ppm) {
+	circle.setPosition((screen.width / 2) + (getX() - view.x) / ppm - getRadius() / ppm, (screen.height / 2) + (getY() - view.y) / ppm - getRadius() / ppm);
+	circle.setRadius(getRadius() / ppm);
+	window.draw(circle);
 }
