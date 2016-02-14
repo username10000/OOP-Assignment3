@@ -21,6 +21,7 @@ Game::Game() {
 
 	// Create the Astronomical Objects
 	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 500, sf::Color(255, 255, 0))));
+	astro.push_back(std::unique_ptr<AstroObject>(new Planet(-1000, 0, 50, sf::Color(0, 0, 255))));
 }
 
 Game::~Game() {

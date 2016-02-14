@@ -7,6 +7,7 @@
 #include <memory>
 #include <AstroObject.h>
 #include <Sun.h>
+#include <Planet.h>
 #include <SolarSystem.h>
 
 // Game
