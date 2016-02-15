@@ -10,9 +10,14 @@ Game::Game() {
 	// Open a new Window
 	window.create(screen, "SFML Window", sf::Style::Fullscreen, settings);
 
+	//window.setFramerateLimit(30);
+
+	//window.setVerticalSyncEnabled(true);
+
 	// Open Font
 	font.loadFromFile("OpenSans-Regular.ttf");
 
+	// Unset the stop program variable
 	stop = 0;
 
 	// Set View Position
@@ -21,10 +26,13 @@ Game::Game() {
 
 	// Create the Astronomical Objects
 	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 500, sf::Color(255, 255, 0))));
-	astro.push_back(std::unique_ptr<AstroObject>(new Planet(-10000, 700, 50, sf::Color(0, 0, 255))));
+	astro.push_back(std::unique_ptr<AstroObject>(new Planet(-1000, 700, 50, sf::Color(0, 0, 255))));
 
 	// Pixels Per Meter
 	ppm = 1;
+
+	frameRate.setFont(font);
+	frameRate.setString("0");
 }
 
 Game::~Game() {
@@ -78,13 +86,49 @@ void Game::events() {
 	}
 }
 
+void Game::keyPressed() {
+	// +
+	if (keys[68]) {
+		ppm += 0.01;
+	}
+	// -
+	if (keys[67]) {
+		ppm -= 0.01;
+		if (ppm <= 0)
+			ppm = 0.01;
+	}
+}
+
 void Game::update() {
 	// Check Events
 	events();
 
-	// Apply Force
-	for (int i = 1; i < astro.size(); i++) {
-		astro[i] -> setForce(astro[0] -> getG() * astro[0] -> getMass() * astro[i] -> getMass() / pow(dist(astro[0] -> getX(), astro[0] -> getY(), astro[i] -> getX(), astro[i] -> getY()), 2));
+	// Get FrameRate
+	if (clock.getElapsedTime().asSeconds() >= 1) {
+		clock.restart();
+		frameRate.setString(std::to_string(frames + 1));
+		frames = 0;
+	}
+	else
+	{
+		frames++;
+	}
+
+	// *** Not working
+	if (frameTime.getElapsedTime().asSeconds() > 0.01) {
+		// Check Keyboard Presses
+		keyPressed();
+
+		// Apply Force
+		for (int i = 1; i < astro.size(); i++) {
+			astro[i]->setForce(astro[0]->getG() * astro[0]->getMass() * astro[i]->getMass() / pow(dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()), 2));
+		}
+
+		// Update all the objects
+		for (int i = 0; i < astro.size(); i++) {
+			astro[i]->update();
+		}
+		frameTime.restart();
 	}
 }
 
@@ -92,13 +136,15 @@ void Game::render() {
 	// Clear the Window
 	window.clear(sf::Color::Black);
 
-
 	/* --------------- Draw --------------- */
 
 	for (int i = 0; i < astro.size(); i++) {
-		astro[i] -> update();
+		//astro[i] -> update();
 		astro[i] -> render(window, view, screen, ppm);
 	}
+
+	// Draw the frameRate
+	window.draw(frameRate);
 
 	/* --------------- Draw --------------- */
 

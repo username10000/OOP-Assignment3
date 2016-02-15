@@ -24,12 +24,17 @@ class Game {
 		SolarSystem solarSystem;
 		sf::Vector2<long long> view;
 		float ppm;
+		int frames;
+		sf::Clock clock;
+		sf::Clock frameTime;
+		sf::Text frameRate;
 	public:
 		Game();
 		~Game();
 		void events();
 		int getStop();
 		float dist(long long x1, long long y1, long long x2, long long y2);
+		void keyPressed();
 		void update();
 		void render();
 };

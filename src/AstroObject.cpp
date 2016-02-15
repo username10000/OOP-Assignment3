@@ -8,7 +8,7 @@ AstroObject::AstroObject(long long x, long long y, float _radius, sf::Color _col
 	circle.setRadius(_radius);
 	circle.setPointCount(100);
 	circle.setFillColor(colour);
-	G = 0.6;
+	G = 2;
 }
 
 AstroObject::AstroObject() : AstroObject(0, 0, 100, sf::Color(255, 255, 0)) {
