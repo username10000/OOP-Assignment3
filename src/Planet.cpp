@@ -4,6 +4,7 @@ Planet::Planet(long long x, long long y, float _radius, sf::Color _colour) : Ast
 	circle.setRadius(_radius);
 	circle.setPointCount(100);
 	circle.setFillColor(_colour);
+	addVelocity(2, 0);
 }
 
 Planet::Planet() : Planet(0, 0, 100, sf::Color(255, 255, 0)) {
@@ -12,11 +13,13 @@ Planet::Planet() : Planet(0, 0, 100, sf::Color(255, 255, 0)) {
 void Planet::update() {
 	float acceleration = getForce() / getMass();
 	sf::Vector2f velocity = getVelocity();
+	sf::Vector2f direction = getDirection();
 	setAcceleration(acceleration);
-	addVelocity(acceleration, acceleration);
-	setX(getX() + 1);
-	setY(getY() + 1);
-	//std::cout << velocity.x << " " << velocity.y << std::endl;
+	addVelocity(direction.x * acceleration, direction.y * acceleration);
+	setX(getX() + velocity.x);
+	setY(getY() + velocity.y);
+	std::cout << velocity.x << " " << velocity.y << std::endl;
+	//std::cout << getDirection().x << " " << getDirection().y << std::endl;
 }
 
 /*

@@ -8,7 +8,9 @@ AstroObject::AstroObject(long long x, long long y, float _radius, sf::Color _col
 	circle.setRadius(_radius);
 	circle.setPointCount(100);
 	circle.setFillColor(colour);
-	G = 2;
+	direction.x = 1;
+	direction.y = 1;
+	G = 0.4;
 }
 
 AstroObject::AstroObject() : AstroObject(0, 0, 100, sf::Color(255, 255, 0)) {
@@ -51,6 +53,15 @@ void AstroObject::setAcceleration(float _acceleration) {
 void AstroObject::addVelocity(float x, float y) {
 	velocity.x += x;
 	velocity.y += y;
+}
+
+sf::Vector2f AstroObject::getDirection() {
+	return direction;
+}
+
+void AstroObject::setDirection(float x, float y) {
+	direction.x = x;
+	direction.y = y;
 }
 
 void AstroObject::render(sf::RenderWindow &window, sf::Vector2<long long> view, sf::VideoMode screen, float ppm) {

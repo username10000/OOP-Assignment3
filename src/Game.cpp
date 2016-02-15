@@ -10,7 +10,7 @@ Game::Game() {
 	// Open a new Window
 	window.create(screen, "SFML Window", sf::Style::Fullscreen, settings);
 
-	//window.setFramerateLimit(30);
+	//window.setFramerateLimit(60);
 
 	//window.setVerticalSyncEnabled(true);
 
@@ -26,7 +26,7 @@ Game::Game() {
 
 	// Create the Astronomical Objects
 	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 500, sf::Color(255, 255, 0))));
-	astro.push_back(std::unique_ptr<AstroObject>(new Planet(-1000, 700, 50, sf::Color(0, 0, 255))));
+	astro.push_back(std::unique_ptr<AstroObject>(new Planet(-1000, 1000, 50, sf::Color(0, 0, 255))));
 
 	// Pixels Per Meter
 	ppm = 1;
@@ -115,21 +115,31 @@ void Game::update() {
 	}
 
 	// *** Not working
-	if (frameTime.getElapsedTime().asSeconds() > 0.01) {
+	//if (frameTime.getElapsedTime().asSeconds() > 0.01) {
 		// Check Keyboard Presses
 		keyPressed();
 
 		// Apply Force
 		for (int i = 1; i < astro.size(); i++) {
 			astro[i]->setForce(astro[0]->getG() * astro[0]->getMass() * astro[i]->getMass() / pow(dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()), 2));
+			float x, y;
+			if (astro[0]->getX() < astro[i]->getX())
+				x = -1;
+			else
+				x = 1;
+			if (astro[0]->getY() < astro[i]->getY())
+				y = -1;
+			else
+				y = 1;
+			astro[i]->setDirection(x, y);
 		}
 
 		// Update all the objects
 		for (int i = 0; i < astro.size(); i++) {
 			astro[i]->update();
 		}
-		frameTime.restart();
-	}
+		//frameTime.restart();
+	//}
 }
 
 void Game::render() {

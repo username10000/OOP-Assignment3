@@ -15,6 +15,7 @@ class AstroObject : public GameObject {
 		float acceleration;
 		float G;
 		sf::Vector2f velocity;
+		sf::Vector2f direction;
 		sf::Color colour;
 		sf::CircleShape circle;
 	public:
@@ -31,6 +32,8 @@ class AstroObject : public GameObject {
 		void setForce(float _force);
 		void setAcceleration(float _acceleration);
 		void addVelocity(float x, float y);
+		sf::Vector2f getDirection();
+		void setDirection(float x, float y);
 };
 
 #endif
