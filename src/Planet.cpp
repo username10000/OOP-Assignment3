@@ -4,7 +4,7 @@ Planet::Planet(long long x, long long y, float _radius, sf::Color _colour) : Ast
 	circle.setRadius(_radius);
 	circle.setPointCount(100);
 	circle.setFillColor(_colour);
-	addVelocity(2, 0);
+	addVelocity(1.9, 0);
 }
 
 Planet::Planet() : Planet(0, 0, 100, sf::Color(255, 255, 0)) {

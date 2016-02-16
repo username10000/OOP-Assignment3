@@ -10,7 +10,7 @@ Game::Game() {
 	// Open a new Window
 	window.create(screen, "SFML Window", sf::Style::Fullscreen, settings);
 
-	//window.setFramerateLimit(60);
+	window.setFramerateLimit(60);
 
 	//window.setVerticalSyncEnabled(true);
 
