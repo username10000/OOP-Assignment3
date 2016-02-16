@@ -9,10 +9,10 @@ class Sun : public AstroObject {
 	private:
 		//sf::CircleShape circle;
 	public:
-		Sun(long long x, long long y, float _radius, sf::Color _colour);
+		Sun(double x, double y, float _radius, sf::Color _colour);
 		Sun();
 		void update();
-		//void render(sf::RenderWindow &window, sf::Vector2<long long> view, sf::VideoMode screen);
+		//void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen);
 };
 
 #endif

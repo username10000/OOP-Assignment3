@@ -1,6 +1,6 @@
 #include <AstroObject.h>
 
-AstroObject::AstroObject(long long x, long long y, float _radius, sf::Color _colour) : GameObject(x, y) {
+AstroObject::AstroObject(double x, double y, float _radius, sf::Color _colour) : GameObject(x, y) {
 	radius = _radius;
 	colour = _colour;
 	mass = (float)(_radius * 9.3);
@@ -10,7 +10,7 @@ AstroObject::AstroObject(long long x, long long y, float _radius, sf::Color _col
 	circle.setFillColor(colour);
 	direction.x = 1;
 	direction.y = 1;
-	G = 1;
+	G = 0.6;
 }
 
 AstroObject::AstroObject() : AstroObject(0, 0, 100, sf::Color(255, 255, 0)) {
@@ -64,7 +64,7 @@ void AstroObject::setDirection(float x, float y) {
 	direction.y = y;
 }
 
-void AstroObject::render(sf::RenderWindow &window, sf::Vector2<long long> view, sf::VideoMode screen, float ppm) {
+void AstroObject::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {
 	circle.setPosition((screen.width / 2) + (getX() - view.x) / ppm - getRadius() / ppm, (screen.height / 2) + (getY() - view.y) / ppm - getRadius() / ppm);
 	circle.setRadius(getRadius() / ppm);
 	window.draw(circle);

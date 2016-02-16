@@ -3,6 +3,7 @@
 
 // Dependencies
 #include <iostream>
+#include <stdlib.h>
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <math.h>
@@ -22,18 +23,23 @@ class Game {
 		int stop;
 		std::vector<std::unique_ptr<AstroObject>> astro;
 		SolarSystem solarSystem;
-		sf::Vector2<long long> view;
+		sf::Vector2<double> view;
 		float ppm;
 		int frames;
 		sf::Clock clock;
 		sf::Clock frameTime;
 		sf::Text frameRate;
+		float dt;
+		float accumulator;
 	public:
 		Game();
 		~Game();
 		void events();
 		int getStop();
-		float dist(long long x1, long long y1, long long x2, long long y2);
+		float dist(double x1, double y1, double x2, double y2);
+		float semiMajorAxis(int i);
+		float eccentricityVector(int i);
+		float apoapsis(int i);
 		void keyPressed();
 		void update();
 		void render();

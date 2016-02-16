@@ -7,11 +7,11 @@
 // SolarSystem
 class SolarSystem {
 	private:
-		long long radius;
+		double radius;
 	public:
-		SolarSystem(long long _radius);
+		SolarSystem(double _radius);
 		SolarSystem();
-		long long getRadius();
+		double getRadius();
 };
 
 #endif

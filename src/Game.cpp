@@ -10,7 +10,11 @@ Game::Game() {
 	// Open a new Window
 	window.create(screen, "SFML Window", sf::Style::Fullscreen, settings);
 
-	window.setFramerateLimit(60);
+	// Frame Count
+	float fps = 120;
+	dt = 1 / fps;
+
+	//window.setFramerateLimit(30);
 
 	//window.setVerticalSyncEnabled(true);
 
@@ -26,13 +30,27 @@ Game::Game() {
 
 	// Create the Astronomical Objects
 	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 500, sf::Color(255, 255, 0))));
-	astro.push_back(std::unique_ptr<AstroObject>(new Planet(-1000, 1000, 50, sf::Color(0, 0, 255))));
+	astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, 2000, 50, sf::Color(0, 0, 255))));
+
+	for (int i = 2; i < 4; i++) {
+		float rDist = rand() % (2000 - 1000 + 1) + 1000;
+		float rR = rand() % (100 - 50 + 1) + 50;
+		astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, apoapsis(i - 1) + rDist, rR, sf::Color(rand() % 256 , rand() % 256 , rand() % 256))));
+	}
+
+	// Initial Velocity for the Planets
+	int i = 1;
+	for (int i = 1; i < 4; i++) {
+		astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / (dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()) - astro[0]->getRadius() - astro[i]->getRadius())), 0);
+	}
 
 	// Pixels Per Meter
 	ppm = 1;
 
 	frameRate.setFont(font);
 	frameRate.setString("0");
+
+	accumulator = 0;
 }
 
 Game::~Game() {
@@ -43,9 +61,9 @@ int Game::getStop() {
 	return stop;
 }
 
-float Game::dist(long long x1, long long y1, long long x2, long long y2) {
-	float X = pow(x1 - x2, 2);
-	float Y = pow(y1 - y2, 2);
+float Game::dist(double x1, double y1, double x2, double y2) {
+	float X = pow(x2 - x1, 2);
+	float Y = pow(y2 - y1, 2);
 
 	return sqrt(X + Y);
 }
@@ -72,18 +90,75 @@ void Game::events() {
 			break;
 		case sf::Event::MouseButtonPressed:
 			// Change View
-			view.x += (int)(event.mouseButton.x - screen.width / 2);
-			view.y += (int)(event.mouseButton.y - screen.height / 2);
+			view.x += (int)(event.mouseButton.x - screen.width / 2) * ppm;
+			view.y += (int)(event.mouseButton.y - screen.height / 2) * ppm;
 			break;
 		case sf::Event::MouseWheelMoved:
 			ppm -= event.mouseWheel.delta;
-			if (ppm < 1)
-				ppm = 1;
+			if (ppm <= 0)
+				ppm = 0.1f;
 			break;
 		default:
 			break;
 		}
 	}
+}
+
+float Game::semiMajorAxis(int i) {
+	// Distance from Sun to Planet
+	float r = dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY());
+
+	// Sun Mass
+	float m1 = astro[0]->getMass();
+
+	// Planet Mass
+	float m2 = astro[i]->getMass();
+
+	// G
+	float G = astro[0]->getG();
+
+	// Relative Orbital Speed
+	float v = sqrt(G * (m1 + m2) / r);
+
+	// Standard Gravitational Parameter
+	float u = r * pow(v, 2);
+
+	// Specific Orbital Energy
+	float E = (pow(v, 2) / 2) - (u / r);
+
+	// Semi-Major Axis
+	float a = - u / 2 * E;
+
+	return a;
+}
+
+float Game::eccentricityVector(int i) {
+	// Distance from Sun to Planet
+	float r = dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY());
+
+	// Sun Mass
+	float m1 = astro[0]->getMass();
+
+	// Planet Mass
+	float m2 = astro[i]->getMass();
+
+	// G
+	float G = astro[0]->getG();
+
+	// Relative Orbital Speed
+	float v = sqrt(G * (m1 + m2) / r);
+
+	// Standard Gravitational Parameter
+	float u = r * pow(v, 2);
+
+	// Eccentricity Vector
+	float e = (pow(v, 2) * r / u) - ((r * v) * v / u) - (r / abs(r));
+
+	return e;
+}
+
+float Game::apoapsis(int i) {
+	return semiMajorAxis(i) * (1 + abs(eccentricityVector(i)));
 }
 
 void Game::keyPressed() {
@@ -114,14 +189,26 @@ void Game::update() {
 		frames++;
 	}
 
-	// *** Not working
-	//if (frameTime.getElapsedTime().asSeconds() > 0.01) {
-		// Check Keyboard Presses
+	// Add time to the accumulator
+	accumulator += frameTime.getElapsedTime().asSeconds();
+	frameTime.restart();
+
+	// Reset the accumulator if it's too big
+	if (accumulator > 0.2f)
+		accumulator = 0.2f;
+
+	// Run Update when the accumualtor is bigger than delta time
+	while (accumulator > dt) {
+
+		// *** Not working
+		//if (frameTime.getElapsedTime().asSeconds() > 0.01) {
+			// Check Keyboard Presses
 		keyPressed();
 
 		// Apply Force
 		for (int i = 1; i < astro.size(); i++) {
 			astro[i]->setForce(astro[0]->getG() * astro[0]->getMass() * astro[i]->getMass() / pow(dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()), 2));
+			//astro[i]->setForce(20);
 			float x, y;
 			if (astro[0]->getX() < astro[i]->getX())
 				x = -1;
@@ -139,7 +226,9 @@ void Game::update() {
 			astro[i]->update();
 		}
 		//frameTime.restart();
+		accumulator -= dt;
 	//}
+	}
 }
 
 void Game::render() {
@@ -148,6 +237,18 @@ void Game::render() {
 
 	/* --------------- Draw --------------- */
 
+	/*
+	float rad = apoapsis(1) / ppm;
+	sf::CircleShape circle;
+	circle.setRadius(rad);
+	circle.setPointCount(100);
+	//circle.setFillColor(sf::Color(100, 250, 50));
+	circle.setOutlineThickness(2);
+	circle.setOutlineColor(sf::Color(255, 255, 255));
+	circle.setPosition(screen.width / 2 - rad, screen.height / 2 - rad);
+	window.draw(circle);
+	*/
+
 	for (int i = 0; i < astro.size(); i++) {
 		//astro[i] -> update();
 		astro[i] -> render(window, view, screen, ppm);
@@ -155,6 +256,7 @@ void Game::render() {
 
 	// Draw the frameRate
 	window.draw(frameRate);
+
 
 	/* --------------- Draw --------------- */
 
