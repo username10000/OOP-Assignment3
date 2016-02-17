@@ -11,10 +11,10 @@ Game::Game() {
 	window.create(screen, "SFML Window", sf::Style::Fullscreen, settings);
 
 	// Frame Count
-	float fps = 120;
+	float fps = 60;
 	dt = 1 / fps;
 
-	//window.setFramerateLimit(30);
+	window.setFramerateLimit(60);
 
 	//window.setVerticalSyncEnabled(true);
 
@@ -249,9 +249,27 @@ void Game::render() {
 	window.draw(circle);
 	*/
 
+
+	// Star Field
+	/*
+	for (int i = 1; i < screen.width; i++) {
+		for (int j = 1; j < screen.height; j++) {
+			if ((i * j) % 100000 == 0) {
+				sf::CircleShape star(2);
+				star.setFillColor(sf::Color::White);
+				star.setPosition(i, j);
+				window.draw(star);
+			}
+		}
+	}
+	*/
+
 	for (int i = 0; i < astro.size(); i++) {
-		//astro[i] -> update();
-		astro[i] -> render(window, view, screen, ppm);
+		if (astro[i]->getX() + astro[i]->getRadius() > view.x - screen.width / 2 * ppm &&
+			astro[i]->getX() - astro[i]->getRadius() < view.x + screen.width / 2 * ppm &&
+			astro[i]->getY() + astro[i]->getRadius() > view.y - screen.height / 2 * ppm &&
+			astro[i]->getY() - astro[i]->getRadius() < view.y + screen.height / 2 * ppm)
+				astro[i] -> render(window, view, screen, ppm);
 	}
 
 	// Draw the frameRate

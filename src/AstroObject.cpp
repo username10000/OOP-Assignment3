@@ -6,7 +6,7 @@ AstroObject::AstroObject(double x, double y, float _radius, sf::Color _colour) :
 	mass = (float)(_radius * 9.3);
 	force = acceleration = velocity.x = velocity.y = 0;
 	circle.setRadius(_radius);
-	circle.setPointCount(100);
+	circle.setPointCount(50);
 	circle.setFillColor(colour);
 	direction.x = 1;
 	direction.y = 1;
