@@ -8,7 +8,7 @@ Game::Game() {
 	screen = sf::VideoMode::getDesktopMode();
 
 	// Open a new Window
-	window.create(screen, "SFML Window", sf::Style::Fullscreen, settings);
+	window.create(screen, "SFML Window", sf::Style::None, settings); //sf::Style::Fullscreen
 
 	// Frame Count
 	float fps = 60;
