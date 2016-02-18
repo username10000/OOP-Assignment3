@@ -251,7 +251,7 @@ void Game::render() {
 
 
 	// Star Field
-	/*
+	
 	for (int i = 1; i < screen.width; i++) {
 		for (int j = 1; j < screen.height; j++) {
 			if ((i * j) % 100000 == 0) {
@@ -262,7 +262,18 @@ void Game::render() {
 			}
 		}
 	}
+
+	/*
+	sf::Texture texture;
+	if (!texture.loadFromFile("E3.png"))
+		stop = 0;
+	sf::Sprite sprite;
+	sprite.setTexture(texture);
+	sprite.setPosition(100, 100);
+	sprite.setScale(sf::Vector2f(10.0f, 10.0f));
+	window.draw(sprite);
 	*/
+
 
 	for (int i = 0; i < astro.size(); i++) {
 		if (astro[i]->getX() + astro[i]->getRadius() > view.x - screen.width / 2 * ppm &&
