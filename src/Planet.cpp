@@ -18,7 +18,7 @@ void Planet::update() {
 	addVelocity(direction.x * acceleration, direction.y * acceleration);
 	setX(getX() + velocity.x);
 	setY(getY() + velocity.y);
-	std::cout << getX() << " " << getY() << std::endl;
+	//std::cout << getX() << " " << getY() << std::endl;
 	//std::cout << velocity.x << " " << velocity.y << std::endl;
 	//std::cout << getDirection().x << " " << getDirection().y << std::endl;
 }

@@ -11,6 +11,7 @@
 #include <Sun.h>
 #include <Planet.h>
 #include <SolarSystem.h>
+#include <Ship.h>
 
 // Game
 class Game {
@@ -22,6 +23,7 @@ class Game {
 		int keys[512] = { 0 };
 		int stop;
 		std::vector<std::unique_ptr<AstroObject>> astro;
+		std::vector<std::unique_ptr<Ship>> ships;
 		SolarSystem solarSystem;
 		sf::Vector2<double> view;
 		float ppm;
@@ -41,6 +43,7 @@ class Game {
 		float eccentricityVector(int i);
 		float apoapsis(int i);
 		void keyPressed();
+		float map(float v, float lmin, float lmax, float rmin, float rmax);
 		void update();
 		void render();
 };

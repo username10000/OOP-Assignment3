@@ -44,6 +44,9 @@ Game::Game() {
 		astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / (dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()) - astro[0]->getRadius() - astro[i]->getRadius())), 0);
 	}
 
+	// Add ships
+	ships.push_back(std::unique_ptr<Ship>(new Ship(0, 0, screen.width / 2, screen.height / 2)));
+
 	// Pixels Per Meter
 	ppm = 1;
 
@@ -87,6 +90,7 @@ void Game::events() {
 		case sf::Event::KeyReleased:
 			// Unset the released key
 			keys[event.key.code] = 0;
+			//std::cout << event.key.code << " ";
 			break;
 		case sf::Event::MouseButtonPressed:
 			// Change View
@@ -166,12 +170,47 @@ void Game::keyPressed() {
 	if (keys[68]) {
 		ppm += 0.01;
 	}
+
 	// -
 	if (keys[67]) {
 		ppm -= 0.01;
 		if (ppm <= 0)
 			ppm = 0.01;
 	}
+
+	// W
+	if (keys[22]) {
+		ships[0]->addVelocity();
+	}
+
+	// S
+	if (keys[18]) {
+		ships[0]->subVelocity();
+	}
+
+	// A
+	if (keys[0]) {
+		ships[0]->addRotation(-0.05);
+	}
+
+	// D
+	if (keys[3]) {
+		ships[0]->addRotation(0.05);
+	}
+
+	// SPACE
+	if (keys[57]) {
+		ships[0]->resetRotation();
+	}
+}
+
+float Game::map(float v, float lmin, float lmax, float rmin, float rmax) {
+	float leftRange = lmax - lmin;
+	float rightRange = rmax - rmin;
+
+	float leftPercentage = (v - lmin) / leftRange;
+	
+	return rmin + (leftPercentage * rightRange);
 }
 
 void Game::update() {
@@ -225,6 +264,16 @@ void Game::update() {
 		for (int i = 0; i < astro.size(); i++) {
 			astro[i]->update();
 		}
+
+		// Update the ships
+		for (int i = 0; i < ships.size(); i++) {
+			ships[0]->update();
+		}
+
+		// Update the view
+		view.x = ships[0] -> getX();
+		view.y = ships[0] -> getY();
+
 		//frameTime.restart();
 		accumulator -= dt;
 	//}
@@ -270,7 +319,7 @@ void Game::render() {
 	sf::Sprite sprite;
 	sprite.setTexture(texture);
 	sprite.setPosition(100, 100);
-	sprite.setScale(sf::Vector2f(10.0f, 10.0f));
+	//sprite.setScale(sf::Vector2f(10.0f, 10.0f));
 	window.draw(sprite);
 	*/
 
@@ -281,6 +330,10 @@ void Game::render() {
 			astro[i]->getY() + astro[i]->getRadius() > view.y - screen.height / 2 * ppm &&
 			astro[i]->getY() - astro[i]->getRadius() < view.y + screen.height / 2 * ppm)
 				astro[i] -> render(window, view, screen, ppm);
+	}
+
+	for (int i = 0; i < ships.size(); i++) {
+		ships[i] -> render(window, view, screen, ppm);
 	}
 
 	// Draw the frameRate
