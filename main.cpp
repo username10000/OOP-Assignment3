@@ -1,6 +1,8 @@
 #include <iostream>
 #include <Game.h>
 
+float map(float, float, float, float, float);
+
 int main()
 {
 	Game *game = new Game();
@@ -124,4 +126,13 @@ int main()
 	//}
 
 	return 0;
+}
+
+float map(float v, float lmin, float lmax, float rmin, float rmax) {
+	float leftRange = lmax - lmin;
+	float rightRange = rmax - rmin;
+
+	float leftPercentage = (v - lmin) / leftRange;
+
+	return rmin + (leftPercentage * rightRange);
 }

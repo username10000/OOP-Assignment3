@@ -44,8 +44,12 @@ Game::Game() {
 		astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / (dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()) - astro[0]->getRadius() - astro[i]->getRadius())), 0);
 	}
 
-	// Add ships
+	// Add Ships
 	ships.push_back(std::unique_ptr<Ship>(new Ship(0, 0, screen.width / 2, screen.height / 2)));
+
+	// Add Velocity Vector
+	velocityVector = std::unique_ptr<VelocityVector>(new VelocityVector(screen));
+	//*velocityVector = std::unique_ptr<VelocityVector>(new VelocityVector(screen));
 
 	// Pixels Per Meter
 	ppm = 1;
@@ -204,15 +208,6 @@ void Game::keyPressed() {
 	}
 }
 
-float Game::map(float v, float lmin, float lmax, float rmin, float rmax) {
-	float leftRange = lmax - lmin;
-	float rightRange = rmax - rmin;
-
-	float leftPercentage = (v - lmin) / leftRange;
-	
-	return rmin + (leftPercentage * rightRange);
-}
-
 void Game::update() {
 	// Check Events
 	events();
@@ -274,6 +269,9 @@ void Game::update() {
 		view.x = ships[0] -> getX();
 		view.y = ships[0] -> getY();
 
+		// Velocity Vector - Fix
+		velocityVector->update(ships[0]->getVelocity());
+
 		//frameTime.restart();
 		accumulator -= dt;
 	//}
@@ -284,23 +282,10 @@ void Game::render() {
 	// Clear the Window
 	window.clear(sf::Color::Black);
 
+
 	/* --------------- Draw --------------- */
 
-	/*
-	float rad = apoapsis(1) / ppm;
-	sf::CircleShape circle;
-	circle.setRadius(rad);
-	circle.setPointCount(100);
-	//circle.setFillColor(sf::Color(100, 250, 50));
-	circle.setOutlineThickness(2);
-	circle.setOutlineColor(sf::Color(255, 255, 255));
-	circle.setPosition(screen.width / 2 - rad, screen.height / 2 - rad);
-	window.draw(circle);
-	*/
-
-
-	// Star Field
-	
+	// Star Field - WIP
 	for (int i = 1; i < screen.width; i++) {
 		for (int j = 1; j < screen.height; j++) {
 			if ((i * j) % 100000 == 0) {
@@ -312,18 +297,7 @@ void Game::render() {
 		}
 	}
 
-	/*
-	sf::Texture texture;
-	if (!texture.loadFromFile("E3.png"))
-		stop = 0;
-	sf::Sprite sprite;
-	sprite.setTexture(texture);
-	sprite.setPosition(100, 100);
-	//sprite.setScale(sf::Vector2f(10.0f, 10.0f));
-	window.draw(sprite);
-	*/
-
-
+	// Astronomical Object
 	for (int i = 0; i < astro.size(); i++) {
 		if (astro[i]->getX() + astro[i]->getRadius() > view.x - screen.width / 2 * ppm &&
 			astro[i]->getX() - astro[i]->getRadius() < view.x + screen.width / 2 * ppm &&
@@ -332,9 +306,13 @@ void Game::render() {
 				astro[i] -> render(window, view, screen, ppm);
 	}
 
+	// Ships
 	for (int i = 0; i < ships.size(); i++) {
 		ships[i] -> render(window, view, screen, ppm);
 	}
+
+	// Velocity Vector
+	velocityVector -> render(window);
 
 	// Draw the frameRate
 	window.draw(frameRate);
