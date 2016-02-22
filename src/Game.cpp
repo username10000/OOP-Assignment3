@@ -29,18 +29,20 @@ Game::Game() {
 	view.y = 0;
 
 	// Create the Astronomical Objects
-	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 500, sf::Color(255, 255, 0))));
-	astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, 2000, 50, sf::Color(0, 0, 255))));
+	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 1900, sf::Color(255, 255, 0))));
+	astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, 10000, 500, sf::Color(0, 0, 255))));
 
+	/*
 	for (int i = 2; i < 4; i++) {
-		float rDist = rand() % (2000 - 1000 + 1) + 1000;
+		float rDist = rand() % (100000 - 50000 + 1) + 50000;
 		float rR = rand() % (100 - 50 + 1) + 50;
 		astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, apoapsis(i - 1) + rDist, rR, sf::Color(rand() % 256 , rand() % 256 , rand() % 256))));
 	}
+	*/
 
 	// Initial Velocity for the Planets
 	int i = 1;
-	for (int i = 1; i < 4; i++) {
+	for (int i = 1; i < astro.size(); i++) {
 		astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / (dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()) - astro[0]->getRadius() - astro[i]->getRadius())), 0);
 	}
 
@@ -253,6 +255,22 @@ void Game::update() {
 			else
 				y = 1;
 			astro[i]->setDirection(x, y);
+		}
+
+		// Apply force to the ship
+		for (int i = 1; i < astro.size(); i++) {
+			ships[0]->addForce(astro[i]->getG() * astro[i]->getMass() * ships[0]->getMass() / pow(dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()), 2));
+			
+			float x, y;
+			if (astro[i]->getX() < ships[0]->getX())
+				x = -1;
+			else
+				x = 1;
+			if (astro[i]->getY() < ships[0]->getY())
+				y = -1;
+			else
+				y = 1;
+			ships[0]->setDirection(x, y);
 		}
 
 		// Update all the objects

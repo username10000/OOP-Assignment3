@@ -12,10 +12,10 @@ Planet::Planet() : Planet(0, 0, 100, sf::Color(255, 255, 0)) {
 
 void Planet::update() {
 	float acceleration = getForce() / getMass();
-	sf::Vector2f velocity = getVelocity();
 	sf::Vector2f direction = getDirection();
 	setAcceleration(acceleration);
 	addVelocity(direction.x * acceleration, direction.y * acceleration);
+	sf::Vector2f velocity = getVelocity();
 	setX(getX() + velocity.x);
 	setY(getY() + velocity.y);
 	//std::cout << getX() << " " << getY() << std::endl;

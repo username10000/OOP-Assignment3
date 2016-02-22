@@ -3,12 +3,14 @@
 
 // Dependencies
 #include <SFML/Graphics.hpp>
+#include <cmath>
 
 // Velocity Vector
 class VelocityVector {
 	private:
 		float size;
 		float offset;
+		float speed;
 		sf::RectangleShape rectangle;
 		sf::Vertex line[2];
 		sf::Vertex point;
