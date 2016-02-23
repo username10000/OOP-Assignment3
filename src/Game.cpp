@@ -47,7 +47,7 @@ Game::Game() {
 	}
 
 	// Add Ships
-	ships.push_back(std::unique_ptr<Ship>(new Ship(0, 0, screen.width / 2, screen.height / 2)));
+	ships.push_back(std::unique_ptr<Ship>(new Ship(10000, 10000, screen.width / 2, screen.height / 2)));
 
 	// Add Velocity Vector
 	velocityVector = std::unique_ptr<VelocityVector>(new VelocityVector(screen));
