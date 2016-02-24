@@ -47,7 +47,7 @@ Game::Game() {
 	}
 
 	// Add Ships
-	ships.push_back(std::unique_ptr<Ship>(new Ship(10000, 10000, screen.width / 2, screen.height / 2)));
+	ships.push_back(std::unique_ptr<Ship>(new Ship(5000, 10000, screen.width / 2, screen.height / 2)));
 
 	// Add Velocity Vector
 	velocityVector = std::unique_ptr<VelocityVector>(new VelocityVector(screen));
@@ -261,11 +261,13 @@ void Game::update() {
 		for (int i = 1; i < astro.size(); i++) {
 			ships[0]->addForce(astro[i]->getG() * astro[i]->getMass() * ships[0]->getMass() / pow(dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()), 2));
 			
-			// Angle between the Ship and the Planets
+			// Angle between the Ship and the Planets ******** theta is wrong if y is too small
 			float theta = atan2(ships[0] -> getY() - astro[1] -> getY(), ships[0] -> getX() - astro[1] -> getX());
 			theta = theta >= 0 ? theta : theta + 2 * PI;
 
-			ships[0] -> setDirection(sin(theta), -cos(theta));
+			ships[0]->setDirection(-cos(theta), -sin(theta));
+			//std::cout << theta << " cos: " << cos(theta) << " sin: " << sin(theta) << std::endl;
+			std::cout << theta * 180 / PI << " " << ships[0]->getY() - astro[1]->getY() << " " << ships[0]->getX() - astro[1]->getX() << std::endl;
 
 			//std::cout << theta * 180 / PI << std::endl;
 

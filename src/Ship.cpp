@@ -12,8 +12,8 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 	rotation = angle = 0;
 	force = acceleration = 0;
 	direction.x = direction.y = 0;
-	mass = 40 * 9.3;
-	speed = 0.5;
+	mass = 0.00000040 * 9.3;
+	speed = 0.1;
 }
 
 Ship::Ship() : Ship(0, 0, 0, 0) {
