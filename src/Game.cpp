@@ -261,13 +261,15 @@ void Game::update() {
 		for (int i = 1; i < astro.size(); i++) {
 			ships[0]->addForce(astro[i]->getG() * astro[i]->getMass() * ships[0]->getMass() / pow(dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()), 2));
 			
-			// Angle between the Ship and the Planets ******** theta is wrong if y is too small
-			float theta = atan2(ships[0] -> getY() - astro[1] -> getY(), ships[0] -> getX() - astro[1] -> getX());
+			// Angle between the Ship and the Planets
+			float dy = ships[0]->getY() - astro[1]->getY();
+			float dx = ships[0]->getX() - astro[1]->getX();
+			float theta = atan2(dy, dx);
 			theta = theta >= 0 ? theta : theta + 2 * PI;
 
 			ships[0]->setDirection(-cos(theta), -sin(theta));
 			//std::cout << theta << " cos: " << cos(theta) << " sin: " << sin(theta) << std::endl;
-			std::cout << theta * 180 / PI << " " << ships[0]->getY() - astro[1]->getY() << " " << ships[0]->getX() - astro[1]->getX() << std::endl;
+			//std::cout << theta << " " << dy << " " << dx << std::endl;
 
 			//std::cout << theta * 180 / PI << std::endl;
 
