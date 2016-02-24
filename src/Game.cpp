@@ -261,7 +261,16 @@ void Game::update() {
 		for (int i = 1; i < astro.size(); i++) {
 			ships[0]->addForce(astro[i]->getG() * astro[i]->getMass() * ships[0]->getMass() / pow(dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()), 2));
 			
-			float x, y;
+			// Angle between the Ship and the Planets
+			float theta = atan2(ships[0] -> getY() - astro[1] -> getY(), ships[0] -> getX() - astro[1] -> getX());
+			theta = theta >= 0 ? theta : theta + 2 * PI;
+
+			ships[0] -> setDirection(sin(theta), -cos(theta));
+
+			//std::cout << theta * 180 / PI << std::endl;
+
+			// Change direction using atan2
+			/*float x, y;
 			if (astro[i]->getX() < ships[0]->getX())
 				x = -1;
 			else
@@ -270,7 +279,7 @@ void Game::update() {
 				y = -1;
 			else
 				y = 1;
-			ships[0]->setDirection(x, y);
+			ships[0]->setDirection(x, y);*/
 		}
 
 		// Update all the objects

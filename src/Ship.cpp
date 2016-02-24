@@ -12,7 +12,7 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 	rotation = angle = 0;
 	force = acceleration = 0;
 	direction.x = direction.y = 0;
-	mass = 1 * 9.3;
+	mass = 40 * 9.3;
 	speed = 0.5;
 }
 
@@ -72,9 +72,10 @@ sf::Vector2f Ship::getDirection() {
 }
 
 void Ship::setDirection(float x, float y) {
-	direction.x += x;
-	direction.y += y;
+	direction.x = x;
+	direction.y = y;
 
+	/*
 	if (direction.x > 1)
 		direction.x = 1;
 	if (direction.x < -1)
@@ -83,11 +84,12 @@ void Ship::setDirection(float x, float y) {
 		direction.y = 1;
 	if (direction.y < -1)
 		direction.y = -1;
+	*/
 }
 
 void Ship::update() {
-	//setX(getX() + velocity.x);
-	//setY(getY() + velocity.y);
+	setX(getX() + velocity.x);
+	setY(getY() + velocity.y);
 	
 	sprite.rotate(rotation);
 	angle += rotation;
