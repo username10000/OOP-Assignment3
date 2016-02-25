@@ -47,7 +47,10 @@ Game::Game() {
 	}
 
 	// Add Ships
-	ships.push_back(std::unique_ptr<Ship>(new Ship(5000, 10000, screen.width / 2, screen.height / 2)));
+	ships.push_back(std::unique_ptr<Ship>(new Ship(2500, 10000, screen.width / 2, screen.height / 2)));
+
+	ships[0]->addVelocity(0, sqrt(astro[1]->getG() * astro[1]->getMass() / (dist(astro[1]->getX(), astro[1]->getY(), ships[0]->getX(), ships[0]->getY()))));
+	std::cout << ships[0]->getVelocity().x << " " << ships[0]->getVelocity().y << std::endl;
 
 	// Add Velocity Vector
 	velocityVector = std::unique_ptr<VelocityVector>(new VelocityVector(screen));
@@ -234,14 +237,14 @@ void Game::update() {
 		accumulator = 0.2f;
 
 	// Run Update when the accumualtor is bigger than delta time
-	while (accumulator > dt) {
+	while (accumulator >= dt) {
 
 		// *** Not working
 		//if (frameTime.getElapsedTime().asSeconds() > 0.01) {
 			// Check Keyboard Presses
 		keyPressed();
 
-		// Apply Force
+		// Apply Force to the Planets
 		for (int i = 1; i < astro.size(); i++) {
 			astro[i]->setForce(astro[0]->getG() * astro[0]->getMass() * astro[i]->getMass() / pow(dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()), 2));
 			//astro[i]->setForce(20);
@@ -260,10 +263,11 @@ void Game::update() {
 		// Apply force to the ship
 		for (int i = 1; i < astro.size(); i++) {
 			ships[0]->addForce(astro[i]->getG() * astro[i]->getMass() * ships[0]->getMass() / pow(dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()), 2));
+			//ships[0]->addForce(astro[i]->getG() * astro[i]->getMass() * ships[0]->getMass() / 1000000);
 			
 			// Angle between the Ship and the Planets
-			float dy = ships[0]->getY() - astro[1]->getY();
-			float dx = ships[0]->getX() - astro[1]->getX();
+			float dy = ships[0]->getY() - astro[i]->getY();
+			float dx = ships[0]->getX() - astro[i]->getX();
 			float theta = atan2(dy, dx);
 			theta = theta >= 0 ? theta : theta + 2 * PI;
 
