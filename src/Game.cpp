@@ -49,8 +49,8 @@ Game::Game() {
 	// Add Ships
 	ships.push_back(std::unique_ptr<Ship>(new Ship(2500, 10000, screen.width / 2, screen.height / 2)));
 
-	ships[0]->addVelocity(0, sqrt(astro[1]->getG() * astro[1]->getMass() / (dist(astro[1]->getX(), astro[1]->getY(), ships[0]->getX(), ships[0]->getY()))));
-	std::cout << ships[0]->getVelocity().x << " " << ships[0]->getVelocity().y << std::endl;
+	//ships[0]->addVelocity(0, sqrt(astro[1]->getG() * astro[1]->getMass() / (dist(astro[1]->getX(), astro[1]->getY(), ships[0]->getX(), ships[0]->getY()))));
+	//std::cout << ships[0]->getVelocity().x << " " << ships[0]->getVelocity().y << std::endl;
 
 	// Add Velocity Vector
 	velocityVector = std::unique_ptr<VelocityVector>(new VelocityVector(screen));
@@ -260,6 +260,7 @@ void Game::update() {
 			astro[i]->setDirection(x, y);
 		}
 
+		ships[0]->setForce(0);
 		// Apply force to the ship
 		for (int i = 1; i < astro.size(); i++) {
 			ships[0]->addForce(astro[i]->getG() * astro[i]->getMass() * ships[0]->getMass() / pow(dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()), 2));
@@ -289,6 +290,8 @@ void Game::update() {
 				y = 1;
 			ships[0]->setDirection(x, y);*/
 		}
+
+		std::cout << Formula::relativeOrbitalSpeed(astro[1]->getG(), astro[1]->getMass(), ships[0]->getMass(), dist(astro[1]->getX(), astro[1]->getY(), ships[0]->getX(), ships[0]->getY())) << std::endl;
 
 		// Update all the objects
 		for (int i = 0; i < astro.size(); i++) {

@@ -7,6 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <math.h>
+#include <Formula.h>
 #include <AstroObject.h>
 #include <Sun.h>
 #include <Planet.h>

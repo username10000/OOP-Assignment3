@@ -12,8 +12,8 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 	rotation = angle = 0;
 	force = acceleration = 0;
 	direction.x = direction.y = 0;
-	mass = 0.00000000000040 * 9.3;
-	speed = 0.1;
+	mass = 0.00000000000000000000040 * 9.3;
+	speed = 0.01;
 }
 
 Ship::Ship() : Ship(0, 0, 0, 0) {
@@ -105,6 +105,7 @@ void Ship::update() {
 	sf::Vector2f velocity = getVelocity();
 	setX(getX() + velocity.x);
 	setY(getY() + velocity.y);
+	//std::cout << acceleration << std::endl;
 }
 
 void Ship::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {

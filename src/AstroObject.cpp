@@ -10,7 +10,7 @@ AstroObject::AstroObject(double x, double y, float _radius, sf::Color _colour) :
 	circle.setFillColor(colour);
 	direction.x = 1;
 	direction.y = 1;
-	G = 0.00667;
+	G = 0.667;
 }
 
 AstroObject::AstroObject() : AstroObject(0, 0, 100, sf::Color(255, 255, 0)) {
