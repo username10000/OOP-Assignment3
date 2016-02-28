@@ -10,10 +10,10 @@
 class AstroObject : public GameObject {
 	private:
 		float radius;
-		float mass;
-		float force;
+		double mass;
+		double force;
 		float acceleration;
-		float G;
+		double G;
 		sf::Vector2<double> velocity;
 		sf::Vector2<double> direction;
 		sf::Color colour;
@@ -25,11 +25,11 @@ class AstroObject : public GameObject {
 		virtual void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);
 		sf::Color getColour();
 		float getRadius();
-		float getMass();
-		float getForce();
-		float getG();
+		double getMass();
+		double getForce();
+		double getG();
 		sf::Vector2<double> getVelocity();
-		void setForce(float _force);
+		void setForce(double _force);
 		void setAcceleration(float _acceleration);
 		void addVelocity(double x, double y);
 		sf::Vector2<double> getDirection();

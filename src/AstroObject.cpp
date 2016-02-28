@@ -4,7 +4,8 @@ AstroObject::AstroObject(double x, double y, float _radius, sf::Color _colour) :
 	radius = _radius;
 	colour = _colour;
 	mass = (float)(_radius * 9.3);
-	force = acceleration = velocity.x = velocity.y = 0;
+	force = velocity.x = velocity.y = 0;
+	acceleration = 0;
 	circle.setRadius(_radius);
 	circle.setPointCount(50);
 	circle.setFillColor(colour);
@@ -26,11 +27,11 @@ float AstroObject::getRadius() {
 	return radius;
 }
 
-float AstroObject::getMass() {
+double AstroObject::getMass() {
 	return mass;
 }
 
-float AstroObject::getForce() {
+double AstroObject::getForce() {
 	return force;
 }
 
@@ -38,11 +39,11 @@ sf::Vector2<double> AstroObject::getVelocity() {
 	return velocity;
 }
 
-float AstroObject::getG() {
+double AstroObject::getG() {
 	return G;
 }
 
-void AstroObject::setForce(float _force) {
+void AstroObject::setForce(double _force) {
 	force = _force;
 }
 
@@ -65,7 +66,7 @@ void AstroObject::setDirection(double x, double y) {
 }
 
 void AstroObject::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {
-	circle.setPosition((screen.width / 2) + (getX() - view.x) / ppm - getRadius() / ppm, (screen.height / 2) + (getY() - view.y) / ppm - getRadius() / ppm);
+	circle.setPosition((float)((screen.width / 2) + (getX() - view.x) / ppm - getRadius() / ppm), (float)((screen.height / 2) + (getY() - view.y) / ppm - getRadius() / ppm));
 	circle.setRadius(getRadius() / ppm);
 	window.draw(circle);
 }

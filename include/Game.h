@@ -42,9 +42,9 @@ class Game {
 		void events();
 		int getStop();
 		double dist(double x1, double y1, double x2, double y2);
-		float semiMajorAxis(int i);
-		float eccentricityVector(int i);
-		float apoapsis(int i);
+		//float semiMajorAxis(int i);
+		//float eccentricityVector(int i);
+		//float apoapsis(int i);
 		void keyPressed();
 		//float map(float v, float lmin, float lmax, float rmin, float rmax);
 		void update();

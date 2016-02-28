@@ -30,7 +30,7 @@ Game::Game() {
 
 	// Create the Astronomical Objects
 	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 1900, sf::Color(255, 255, 0))));
-	astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, 10000, 500, sf::Color(0, 0, 255))));
+	astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, 100000, 500, sf::Color(0, 0, 255))));
 
 	/*
 	for (int i = 2; i < 4; i++) {
@@ -47,7 +47,7 @@ Game::Game() {
 	}
 
 	// Add Ships
-	ships.push_back(std::unique_ptr<Ship>(new Ship(2500, 10000, (float)(screen.width / 2), (float)(screen.height / 2))));
+	ships.push_back(std::unique_ptr<Ship>(new Ship(2500, 100000, (float)(screen.width / 2), (float)(screen.height / 2))));
 
 	//ships[0]->addVelocity(0, sqrt(astro[1]->getG() * astro[1]->getMass() / (dist(astro[1]->getX(), astro[1]->getY(), ships[0]->getX(), ships[0]->getY()))));
 	//std::cout << ships[0]->getVelocity().x << " " << ships[0]->getVelocity().y << std::endl;
@@ -117,6 +117,7 @@ void Game::events() {
 	}
 }
 
+/*
 float Game::semiMajorAxis(int i) {
 	// Distance from Sun to Planet
 	float r = dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY());
@@ -173,18 +174,29 @@ float Game::eccentricityVector(int i) {
 float Game::apoapsis(int i) {
 	return semiMajorAxis(i) * (1 + abs(eccentricityVector(i)));
 }
+*/
 
 void Game::keyPressed() {
 	// +
 	if (keys[68]) {
-		ppm += 0.01;
+		float s = 1;
+		// Increase Zoom Speed
+		if (keys[37]) {
+			s = 100;
+		}
+		ppm += (float)(0.01 * s);
 	}
 
 	// -
 	if (keys[67]) {
-		ppm -= 0.01;
+		float s = 1;
+		// Increase Zoom Speed
+		if (keys[37]) {
+			s = 100;
+		}
+		ppm -= (float)(0.01 * s);
 		if (ppm <= 0)
-			ppm = 0.01;
+			ppm = 0.01f;
 	}
 
 	// W
@@ -199,12 +211,12 @@ void Game::keyPressed() {
 
 	// A
 	if (keys[0]) {
-		ships[0]->addRotation(-0.05);
+		ships[0]->addRotation(-0.05f);
 	}
 
 	// D
 	if (keys[3]) {
-		ships[0]->addRotation(0.05);
+		ships[0]->addRotation(0.05f);
 	}
 
 	// SPACE
@@ -245,9 +257,18 @@ void Game::update() {
 		keyPressed();
 
 		// Apply Force to the Planets
-		for (int i = 1; i < astro.size(); i++) {
+		for (unsigned int i = 1; i < astro.size(); i++) {
 			astro[i]->setForce(astro[0]->getG() * astro[0]->getMass() * astro[i]->getMass() / pow(dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()), 2));
 			//astro[i]->setForce(20);
+
+			// Angle between the Sun and the Planets
+			float dy = astro[i] -> getY() - astro[0] -> getY();
+			float dx = astro[i] -> getX() - astro[0] -> getX();
+			float theta = atan2(dy, dx);
+			theta = theta >= 0 ? theta : theta + 2 * PI;
+			astro[i] -> setDirection(-cos(theta), -sin(theta));
+
+			/*
 			float x, y;
 			if (astro[0]->getX() < astro[i]->getX())
 				x = -1;
@@ -258,40 +279,43 @@ void Game::update() {
 			else
 				y = 1;
 			astro[i]->setDirection(x, y);
+			*/
 		}
 
 		ships[0]->setForce(0);
 		// Apply force to the ship
 		for (int i = 1; i < astro.size(); i++) {
-			ships[0]->addForce(astro[i]->getG() * astro[i]->getMass() * ships[0]->getMass() / pow(dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()), 2));
-			//ships[0]->addForce(astro[i]->getG() * astro[i]->getMass() * ships[0]->getMass() / 1000000);
-			
-			// Angle between the Ship and the Planets
-			float dy = ships[0]->getY() - astro[i]->getY();
-			float dx = ships[0]->getX() - astro[i]->getX();
-			float theta = atan2(dy, dx);
-			theta = theta >= 0 ? theta : theta + 2 * PI;
+			if (dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()) < astro[i]->getRadius() * 10) {
+				ships[0]->addForce(astro[i]->getG() * astro[i]->getMass() * ships[0]->getMass() / pow(dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()), 2));
+				//ships[0]->addForce(astro[i]->getG() * astro[i]->getMass() * ships[0]->getMass() / 1000000);
 
-			ships[0]->setDirection(-cos(theta), -sin(theta));
-			//std::cout << theta << " cos: " << cos(theta) << " sin: " << sin(theta) << std::endl;
-			//std::cout << theta << " " << dy << " " << dx << std::endl;
+				// Angle between the Ship and the Planets
+				float dy = ships[0]->getY() - astro[i]->getY();
+				float dx = ships[0]->getX() - astro[i]->getX();
+				float theta = atan2(dy, dx);
+				theta = theta >= 0 ? theta : theta + 2 * PI;
 
-			//std::cout << theta * 180 / PI << std::endl;
+				ships[0]->setDirection(-cos(theta), -sin(theta));
+				//std::cout << theta << " cos: " << cos(theta) << " sin: " << sin(theta) << std::endl;
+				//std::cout << theta << " " << dy << " " << dx << std::endl;
 
-			// Change direction using atan2
-			/*float x, y;
-			if (astro[i]->getX() < ships[0]->getX())
-				x = -1;
-			else
-				x = 1;
-			if (astro[i]->getY() < ships[0]->getY())
-				y = -1;
-			else
-				y = 1;
-			ships[0]->setDirection(x, y);*/
+				//std::cout << theta * 180 / PI << std::endl;
+
+				// Change direction using atan2
+				/*float x, y;
+				if (astro[i]->getX() < ships[0]->getX())
+					x = -1;
+				else
+					x = 1;
+				if (astro[i]->getY() < ships[0]->getY())
+					y = -1;
+				else
+					y = 1;
+				ships[0]->setDirection(x, y);*/
+			}
 		}
 
-		std::cout << Formula::relativeOrbitalSpeed(astro[1]->getG(), astro[1]->getMass(), ships[0]->getMass(), dist(astro[1]->getX(), astro[1]->getY(), ships[0]->getX(), ships[0]->getY())) << std::endl;
+		//std::cout << Formula::relativeOrbitalSpeed(astro[1]->getG(), astro[1]->getMass(), ships[0]->getMass(), dist(astro[1]->getX(), astro[1]->getY(), ships[0]->getX(), ships[0]->getY())) << std::endl;
 
 		// Update all the objects
 		for (int i = 0; i < astro.size(); i++) {
