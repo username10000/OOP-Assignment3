@@ -32,13 +32,13 @@ Game::Game() {
 	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 1900, sf::Color(255, 255, 0))));
 	astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, 100000, 500, sf::Color(0, 0, 255))));
 
-	/*
+	
 	for (int i = 2; i < 4; i++) {
 		float rDist = rand() % (100000 - 50000 + 1) + 50000;
-		float rR = rand() % (100 - 50 + 1) + 50;
-		astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, apoapsis(i - 1) + rDist, rR, sf::Color(rand() % 256 , rand() % 256 , rand() % 256))));
+		float rR = rand() % (500 - 250 + 1) + 250;
+		astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, dist(astro[0]->getX(), astro[0]->getY(), astro[i - 1] -> getX(), astro[i - 1]->getY()) + rDist, rR, sf::Color(rand() % 256 , rand() % 256 , rand() % 256))));
 	}
-	*/
+	
 
 	// Initial Velocity for the Planets
 	int i = 1;
@@ -48,6 +48,8 @@ Game::Game() {
 
 	// Add Ships
 	ships.push_back(std::unique_ptr<Ship>(new Ship(2500, 100000, (float)(screen.width / 2), (float)(screen.height / 2))));
+
+	//std::cout << ships[0]
 
 	//ships[0]->addVelocity(0, sqrt(astro[1]->getG() * astro[1]->getMass() / (dist(astro[1]->getX(), astro[1]->getY(), ships[0]->getX(), ships[0]->getY()))));
 	//std::cout << ships[0]->getVelocity().x << " " << ships[0]->getVelocity().y << std::endl;
@@ -202,11 +204,13 @@ void Game::keyPressed() {
 	// W
 	if (keys[22]) {
 		ships[0]->addVelocity();
+		ships[0]->setAccelerating(true);
 	}
 
 	// S
 	if (keys[18]) {
 		ships[0]->subVelocity();
+		ships[0]->setAccelerating(true);
 	}
 
 	// A
@@ -251,6 +255,7 @@ void Game::update() {
 	// Run Update when the accumualtor is bigger than delta time
 	while (accumulator >= dt) {
 
+		ships[0]->setAccelerating(false);
 		// *** Not working
 		//if (frameTime.getElapsedTime().asSeconds() > 0.01) {
 			// Check Keyboard Presses
@@ -284,7 +289,7 @@ void Game::update() {
 
 		ships[0]->setForce(0);
 		// Apply force to the ship
-		for (int i = 1; i < astro.size(); i++) {
+		for (int i = 0; i < astro.size(); i++) {
 			if (dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()) < astro[i]->getRadius() * 10) {
 				ships[0]->addForce(astro[i]->getG() * astro[i]->getMass() * ships[0]->getMass() / pow(dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()), 2));
 				//ships[0]->addForce(astro[i]->getG() * astro[i]->getMass() * ships[0]->getMass() / 1000000);

@@ -13,6 +13,8 @@ class Ship : public GameObject {
 	private:
 		sf::Texture texture;
 		sf::Sprite sprite;
+		sf::Texture shipTexture[3];
+		sf::Sprite ship[3];
 		sf::Vector2<double> velocity;
 		sf::Vector2<double> direction;
 		float force;
@@ -21,6 +23,9 @@ class Ship : public GameObject {
 		float rotation;
 		float angle;
 		float speed;
+		bool accelerating;
+		int spriteNo;
+		sf::Clock lastChange;
 	public:
 		Ship(double x, double y, float screenX, float screenY);
 		Ship();
@@ -37,6 +42,7 @@ class Ship : public GameObject {
 		void addForce(double f);
 		sf::Vector2<double> getDirection();
 		void setDirection(double x, double y);
+		void setAccelerating(bool a);
 		void update();
 		void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);
 };
