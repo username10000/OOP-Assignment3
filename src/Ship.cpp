@@ -120,7 +120,7 @@ void Ship::update() {
 	if (angle <= -360)
 		angle += 360;
 
-	// Change sprite
+	// Animate Sprite
 	if (accelerating) {
 		if (spriteNo == 0) {
 			spriteNo = 1;

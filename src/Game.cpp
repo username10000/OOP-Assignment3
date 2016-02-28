@@ -264,7 +264,6 @@ void Game::update() {
 		// Apply Force to the Planets
 		for (unsigned int i = 1; i < astro.size(); i++) {
 			astro[i]->setForce(astro[0]->getG() * astro[0]->getMass() * astro[i]->getMass() / pow(dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()), 2));
-			//astro[i]->setForce(20);
 
 			// Angle between the Sun and the Planets
 			float dy = astro[i] -> getY() - astro[0] -> getY();
@@ -272,19 +271,6 @@ void Game::update() {
 			float theta = atan2(dy, dx);
 			theta = theta >= 0 ? theta : theta + 2 * PI;
 			astro[i] -> setDirection(-cos(theta), -sin(theta));
-
-			/*
-			float x, y;
-			if (astro[0]->getX() < astro[i]->getX())
-				x = -1;
-			else
-				x = 1;
-			if (astro[0]->getY() < astro[i]->getY())
-				y = -1;
-			else
-				y = 1;
-			astro[i]->setDirection(x, y);
-			*/
 		}
 
 		ships[0]->setForce(0);
@@ -292,31 +278,13 @@ void Game::update() {
 		for (int i = 0; i < astro.size(); i++) {
 			if (dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()) < astro[i]->getRadius() * 10) {
 				ships[0]->addForce(astro[i]->getG() * astro[i]->getMass() * ships[0]->getMass() / pow(dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()), 2));
-				//ships[0]->addForce(astro[i]->getG() * astro[i]->getMass() * ships[0]->getMass() / 1000000);
 
 				// Angle between the Ship and the Planets
 				float dy = ships[0]->getY() - astro[i]->getY();
 				float dx = ships[0]->getX() - astro[i]->getX();
 				float theta = atan2(dy, dx);
 				theta = theta >= 0 ? theta : theta + 2 * PI;
-
 				ships[0]->setDirection(-cos(theta), -sin(theta));
-				//std::cout << theta << " cos: " << cos(theta) << " sin: " << sin(theta) << std::endl;
-				//std::cout << theta << " " << dy << " " << dx << std::endl;
-
-				//std::cout << theta * 180 / PI << std::endl;
-
-				// Change direction using atan2
-				/*float x, y;
-				if (astro[i]->getX() < ships[0]->getX())
-					x = -1;
-				else
-					x = 1;
-				if (astro[i]->getY() < ships[0]->getY())
-					y = -1;
-				else
-					y = 1;
-				ships[0]->setDirection(x, y);*/
 			}
 		}
 
