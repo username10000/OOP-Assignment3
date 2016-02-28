@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <SFML/Graphics.hpp>
 #include <memory>
-#include <math.h>
+#include <cmath>
 #include <Formula.h>
 #include <AstroObject.h>
 #include <Sun.h>
@@ -41,7 +41,7 @@ class Game {
 		~Game();
 		void events();
 		int getStop();
-		float dist(double x1, double y1, double x2, double y2);
+		double dist(double x1, double y1, double x2, double y2);
 		float semiMajorAxis(int i);
 		float eccentricityVector(int i);
 		float apoapsis(int i);

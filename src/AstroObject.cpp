@@ -34,7 +34,7 @@ float AstroObject::getForce() {
 	return force;
 }
 
-sf::Vector2f AstroObject::getVelocity() {
+sf::Vector2<double> AstroObject::getVelocity() {
 	return velocity;
 }
 
@@ -50,16 +50,16 @@ void AstroObject::setAcceleration(float _acceleration) {
 	acceleration = _acceleration;
 }
 
-void AstroObject::addVelocity(float x, float y) {
+void AstroObject::addVelocity(double x, double y) {
 	velocity.x += x;
 	velocity.y += y;
 }
 
-sf::Vector2f AstroObject::getDirection() {
+sf::Vector2<double> AstroObject::getDirection() {
 	return direction;
 }
 
-void AstroObject::setDirection(float x, float y) {
+void AstroObject::setDirection(double x, double y) {
 	direction.x = x;
 	direction.y = y;
 }

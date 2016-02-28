@@ -25,7 +25,7 @@ void Ship::addVelocity() {
 	velocity.y += -cos(angle * PI / 180) * speed;
 }
 
-void Ship::addVelocity(float x, float y) {
+void Ship::addVelocity(double x, double y) {
 	velocity.x += x;
 	velocity.y += y;
 }
@@ -35,7 +35,7 @@ void Ship::subVelocity() {
 	velocity.y -= -cos(angle * PI / 180) * speed;
 }
 
-sf::Vector2f Ship::getVelocity() {
+sf::Vector2<double> Ship::getVelocity() {
 	return velocity;
 }
 
@@ -59,19 +59,19 @@ float Ship::getForce() {
 	return force;
 }
 
-void Ship::setForce(float f) {
+void Ship::setForce(double f) {
 	force = f;
 }
 
-void Ship::addForce(float f) {
+void Ship::addForce(double f) {
 	force += f;
 }
 
-sf::Vector2f Ship::getDirection() {
+sf::Vector2<double> Ship::getDirection() {
 	return direction;
 }
 
-void Ship::setDirection(float x, float y) {
+void Ship::setDirection(double x, double y) {
 	direction.x = x;
 	direction.y = y;
 
@@ -99,10 +99,10 @@ void Ship::update() {
 	
 	// Force
 	float acceleration = getForce() / getMass();
-	sf::Vector2f direction = getDirection();
+	sf::Vector2<double> direction = getDirection();
 	//setAcceleration(acceleration);
 	addVelocity(direction.x * acceleration, direction.y * acceleration);
-	sf::Vector2f velocity = getVelocity();
+	sf::Vector2<double> velocity = getVelocity();
 	setX(getX() + velocity.x);
 	setY(getY() + velocity.y);
 	//std::cout << acceleration << std::endl;

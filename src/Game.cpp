@@ -42,12 +42,12 @@ Game::Game() {
 
 	// Initial Velocity for the Planets
 	int i = 1;
-	for (int i = 1; i < astro.size(); i++) {
-		astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / (dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()) - astro[0]->getRadius() - astro[i]->getRadius())), 0);
+	for (unsigned int i = 1; i < astro.size(); i++) {
+		astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())), 0);
 	}
 
 	// Add Ships
-	ships.push_back(std::unique_ptr<Ship>(new Ship(2500, 10000, screen.width / 2, screen.height / 2)));
+	ships.push_back(std::unique_ptr<Ship>(new Ship(2500, 10000, (float)(screen.width / 2), (float)(screen.height / 2))));
 
 	//ships[0]->addVelocity(0, sqrt(astro[1]->getG() * astro[1]->getMass() / (dist(astro[1]->getX(), astro[1]->getY(), ships[0]->getX(), ships[0]->getY()))));
 	//std::cout << ships[0]->getVelocity().x << " " << ships[0]->getVelocity().y << std::endl;
@@ -73,9 +73,9 @@ int Game::getStop() {
 	return stop;
 }
 
-float Game::dist(double x1, double y1, double x2, double y2) {
-	float X = pow(x2 - x1, 2);
-	float Y = pow(y2 - y1, 2);
+double Game::dist(double x1, double y1, double x2, double y2) {
+	double X = pow(x2 - x1, 2);
+	double Y = pow(y2 - y1, 2);
 
 	return sqrt(X + Y);
 }

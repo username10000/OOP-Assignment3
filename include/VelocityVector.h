@@ -17,8 +17,8 @@ class VelocityVector {
 		sf::VideoMode screen;
 	public:
 		VelocityVector(sf::VideoMode screen);
-		float map(float v, float lmin, float lmax, float rmin, float rmax);
-		void update(sf::Vector2f velocity);
+		double map(double v, double lmin, double lmax, double rmin, double rmax);
+		void update(sf::Vector2<double> velocity);
 		void render(sf::RenderWindow &window);
 };
 

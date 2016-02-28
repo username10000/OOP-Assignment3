@@ -3,7 +3,7 @@
 VelocityVector::VelocityVector(sf::VideoMode _screen) {
 	screen = _screen;
 
-	size = screen.height / 5;
+	size = (float)(screen.height / 5);
 	offset = 10;
 
 	speed = 0;
@@ -21,29 +21,29 @@ VelocityVector::VelocityVector(sf::VideoMode _screen) {
 	point.color = sf::Color::Red;
 }
 
-float VelocityVector::map(float v, float lmin, float lmax, float rmin, float rmax) {
+double VelocityVector::map(double v, double lmin, double lmax, double rmin, double rmax) {
 	if (v < lmin)
 		v = lmin;
 
 	if (v > lmax)
 		v = lmax;
 
-	float leftRange = lmax - lmin;
-	float rightRange = rmax - rmin;
+	double leftRange = lmax - lmin;
+	double rightRange = rmax - rmin;
 
-	float leftPercentage = (v - lmin) / leftRange;
+	double leftPercentage = (v - lmin) / leftRange;
 
 	return rmin + (leftPercentage * rightRange);
 }
 
-void VelocityVector::update(sf::Vector2f velocity) {
-	float x, y;
-	x = map(velocity.x, -10, 10, screen.width - size - offset, screen.width - offset);
-	y = map(velocity.y, -10, 10, screen.height - size - offset, screen.height - offset);
+void VelocityVector::update(sf::Vector2<double> velocity) {
+	double x, y;
+	x = map(velocity.x, -5, 5, screen.width - size - offset, screen.width - offset);
+	y = map(velocity.y, -5, 5, screen.height - size - offset, screen.height - offset);
 
-	line[1] = sf::Vertex(sf::Vector2f(x, y));
+	line[1] = sf::Vertex(sf::Vector2f((float)x, (float)y));
 
-	speed = sqrt(pow(velocity.x, 2) + pow(velocity.y, 2));
+	speed = (float)sqrt(pow(velocity.x, 2) + pow(velocity.y, 2));
 	//line[1] = sf::Vertex(sf::Vector2f(screen.width - size / 2 - offset + velocity.x, screen.height - size / 2 - offset + velocity.y));
 }
 
@@ -51,5 +51,4 @@ void VelocityVector::render(sf::RenderWindow &window) {
 	window.draw(rectangle);
 	window.draw(line, 2, sf::Lines);
 	window.draw(&point, 1, sf::Points);
-	
 }
