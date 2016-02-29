@@ -151,9 +151,9 @@ void Ship::update() {
 
 void Ship::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {
 	for (int i = 0; i < 3; i++) {
-		ship[i].setScale(1 / ppm, 1 / ppm);
+		ship[i].setScale(0.5 / ppm, 0.5 / ppm);
 	}
-	sprite.setScale(1 / ppm, 1 / ppm);
+	//sprite.setScale(1 / ppm, 1 / ppm);
 	window.draw(ship[spriteNo]);
 	//window.draw(sprite);
 }

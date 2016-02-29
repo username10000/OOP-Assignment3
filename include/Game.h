@@ -34,6 +34,7 @@ class Game {
 		sf::Clock clock;
 		sf::Clock frameTime;
 		sf::Text frameRate;
+		sf::Text distance;
 		float dt;
 		float accumulator;
 	public:

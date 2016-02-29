@@ -12,6 +12,7 @@ AstroObject::AstroObject(double x, double y, float _radius, sf::Color _colour) :
 	direction.x = 1;
 	direction.y = 1;
 	G = 0.667;
+	strcpy(name, "");
 }
 
 AstroObject::AstroObject() : AstroObject(0, 0, 100, sf::Color(255, 255, 0)) {
@@ -63,6 +64,10 @@ sf::Vector2<double> AstroObject::getDirection() {
 void AstroObject::setDirection(double x, double y) {
 	direction.x = x;
 	direction.y = y;
+}
+
+void AstroObject::setName(char n[]) {
+	strncpy_s(name, n, 30);
 }
 
 void AstroObject::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {

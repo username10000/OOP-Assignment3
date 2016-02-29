@@ -18,6 +18,7 @@ class AstroObject : public GameObject {
 		sf::Vector2<double> direction;
 		sf::Color colour;
 		sf::CircleShape circle;
+		char name[31];
 	public:
 		AstroObject(double x, double y, float _radius, sf::Color _colour);
 		AstroObject();
@@ -34,6 +35,7 @@ class AstroObject : public GameObject {
 		void addVelocity(double x, double y);
 		sf::Vector2<double> getDirection();
 		void setDirection(double x, double y);
+		void setName(char n[]);
 };
 
 #endif

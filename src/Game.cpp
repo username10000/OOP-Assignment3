@@ -32,7 +32,6 @@ Game::Game() {
 	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 1900, sf::Color(255, 255, 0))));
 	astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, 100000, 500, sf::Color(0, 0, 255))));
 
-	
 	for (int i = 2; i < 4; i++) {
 		float rDist = rand() % (100000 - 50000 + 1) + 50000;
 		float rR = rand() % (500 - 250 + 1) + 250;
@@ -63,6 +62,11 @@ Game::Game() {
 
 	frameRate.setFont(font);
 	frameRate.setString("0");
+
+	distance.setFont(font);
+	distance.scale(0.5, 0.5);
+	distance.setOrigin(distance.getLocalBounds().width / 2, distance.getLocalBounds().height / 2);
+	distance.setString("0");
 
 	accumulator = 0;
 }
@@ -266,13 +270,45 @@ void Game::update() {
 			astro[i]->setForce(astro[0]->getG() * astro[0]->getMass() * astro[i]->getMass() / pow(dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()), 2));
 
 			// Angle between the Sun and the Planets
-			float dy = astro[i] -> getY() - astro[0] -> getY();
-			float dx = astro[i] -> getX() - astro[0] -> getX();
+			float dy = astro[i]->getY() - astro[0]->getY();
+			float dx = astro[i]->getX() - astro[0]->getX();
 			float theta = atan2(dy, dx);
 			theta = theta >= 0 ? theta : theta + 2 * PI;
-			astro[i] -> setDirection(-cos(theta), -sin(theta));
+			astro[i]->setDirection(-cos(theta), -sin(theta));
 		}
 
+		// Find the closest Planet
+		double minDist = DBL_MAX;
+		int z = 0;
+
+		for (int i = 0; i < astro.size(); i++) {
+			if (dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()) < minDist) {
+				minDist = dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY());
+				z = i;
+			}
+		}
+
+		// Apply force to the Ship
+		ships[0]->setForce(astro[z]->getG() * astro[z]->getMass() * ships[0]->getMass() / pow(dist(astro[z]->getX(), astro[z]->getY(), ships[0]->getX(), ships[0]->getY()), 2));
+
+		// Angle between the Ship and the Planets
+		float dy = ships[0]->getY() - astro[z]->getY();
+		float dx = ships[0]->getX() - astro[z]->getX();
+		float theta = atan2(dy, dx);
+		theta = theta >= 0 ? theta : theta + 2 * PI;
+		ships[0]->setDirection(-cos(theta), -sin(theta));
+
+		// Set distance to nearest Object
+		int distFromCentre = (int)dist(astro[z]->getX(), astro[z]->getY(), ships[0]->getX(), ships[0]->getY()) - (int)astro[z]->getRadius();
+		if (distFromCentre < screen.height / 2 * ppm) {
+			distance.setString("");
+		} else {
+			char d[10];
+			sprintf(d, "%d m", distFromCentre);
+			distance.setString(d);
+			distance.setPosition(screen.width / 2 + -cos(theta) * screen.height / 2 * 9 / 10, screen.height / 2 + -sin(theta) * screen.height / 2 * 9 / 10);
+		}
+		/*
 		ships[0]->setForce(0);
 		// Apply force to the ship
 		for (int i = 0; i < astro.size(); i++) {
@@ -287,6 +323,7 @@ void Game::update() {
 				ships[0]->setDirection(-cos(theta), -sin(theta));
 			}
 		}
+		*/
 
 		//std::cout << Formula::relativeOrbitalSpeed(astro[1]->getG(), astro[1]->getMass(), ships[0]->getMass(), dist(astro[1]->getX(), astro[1]->getY(), ships[0]->getX(), ships[0]->getY())) << std::endl;
 
@@ -351,6 +388,9 @@ void Game::render() {
 
 	// Draw the frameRate
 	window.draw(frameRate);
+
+	// Distance to nearest Object
+	window.draw(distance);
 
 
 	/* --------------- Draw --------------- */
