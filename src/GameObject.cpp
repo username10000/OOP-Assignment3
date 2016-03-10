@@ -18,6 +18,14 @@ double GameObject::getY() {
 	return position.y;
 }
 
+double GameObject::getOldX() {
+	return oldPosition.x;
+}
+
+double GameObject::getOldY() {
+	return oldPosition.y;
+}
+
 void GameObject::setX(double x) {
 	position.x = x;
 }
@@ -25,6 +33,15 @@ void GameObject::setX(double x) {
 void GameObject::setY(double y) {
 	position.y = y;
 }
+
+void GameObject::setOldX(double x) {
+	oldPosition.x = x;
+}
+
+void GameObject::setOldY(double y) {
+	oldPosition.y = y;
+}
+
 
 sf::Vector2<double> GameObject::getPosition() {
 	return position;

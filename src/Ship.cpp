@@ -152,6 +152,8 @@ void Ship::update() {
 	//setAcceleration(acceleration);
 	addVelocity(direction.x * acceleration, direction.y * acceleration);
 	sf::Vector2<double> velocity = getVelocity();
+	setOldX(getX());
+	setOldY(getY());
 	setX(getX() + velocity.x);
 	setY(getY() + velocity.y);
 	//std::cout << acceleration << std::endl;

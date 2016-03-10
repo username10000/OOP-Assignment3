@@ -238,14 +238,26 @@ void Game::keyPressed() {
 void Game::collisions() {
 	for (int i = 0; i < astro.size(); i++) {
 		for (int j = 0; j < ships.size(); j++) {
-			if (dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) < astro[i] -> getRadius() ) { // + ships[j] -> getRadius()
-				float dy = astro[i]->getY() - astro[0]->getY();
-				float dx = astro[i]->getX() - astro[0]->getX();
+			if (dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) < astro[i] -> getRadius() + 20 * 0.25) { // + ships[j] -> getRadius()
+				float dy = astro[i]->getY() - ships[j]->getY();
+				float dx = astro[i]->getX() - ships[j]->getX();
 				float theta = atan2(dy, dx);
 				theta = theta >= 0 ? theta : theta + 2 * PI;
 				ships[j]->resetVelocity();
-				ships[j]->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() )); // + ships[j]->getRadius()
-				ships[j]->setY(astro[i]->getY() - sin(theta) * (astro[i]->getRadius() )); // + ships[j]->getRadius()
+				ships[j]->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() + 20 * 0.25)); // + ships[j]->getRadius()
+				ships[j]->setY(astro[i]->getY() - sin(theta) * (astro[i]->getRadius() + 20 * 0.25)); // + ships[j]->getRadius()
+				//ships[j]->setX(ships[j]->getOldX());
+				//ships[j]->setY(ships[j]->getOldY());
+
+				//// Apply force to the Ship
+				//ships[0]->setForce(astro[i]->getG() * astro[i]->getMass() * ships[j]->getMass() / pow(dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()), 2));
+
+				//// Angle between the Ship and the Planets
+				//float dy = ships[j]->getY() - astro[i]->getY();
+				//float dx = ships[j]->getX() - astro[i]->getX();
+				//float theta = atan2(dy, dx);
+				//theta = theta >= 0 ? theta : theta + 2 * PI;
+				//ships[j]->setDirection(cos(theta), sin(theta));
 			}
 		}
 	}
@@ -355,7 +367,7 @@ void Game::update() {
 			ships[0]->update();
 		}
 
-		//collisions();
+		collisions();
 
 		// Update the view
 		view.x = ships[0] -> getX();
