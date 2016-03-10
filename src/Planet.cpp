@@ -18,7 +18,7 @@ void Planet::update() {
 	sf::Vector2<double> velocity = getVelocity();
 	setX(getX() + velocity.x);
 	setY(getY() + velocity.y);
-	
+
 	//std::cout << getX() << " " << getY() << std::endl;
 	//std::cout << velocity.x << " " << velocity.y << std::endl;
 	//std::cout << getDirection().x << " " << getDirection().y << std::endl;

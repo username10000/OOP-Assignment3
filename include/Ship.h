@@ -32,6 +32,7 @@ class Ship : public GameObject {
 		void addVelocity();
 		void addVelocity(double x, double y);
 		void subVelocity();
+		void resetVelocity();
 		sf::Vector2<double> getVelocity();
 		void addRotation(float x);
 		void resetRotation();
@@ -43,6 +44,7 @@ class Ship : public GameObject {
 		sf::Vector2<double> getDirection();
 		void setDirection(double x, double y);
 		void setAccelerating(bool a);
+		float getRadius();
 		void update();
 		void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);
 };

@@ -60,9 +60,11 @@ Game::Game() {
 	// Pixels Per Meter
 	ppm = 1;
 
+	// FrameRate Settings
 	frameRate.setFont(font);
 	frameRate.setString("0");
 
+	// Distance Indicator
 	distance.setFont(font);
 	distance.scale(0.5, 0.5);
 	distance.setOrigin(distance.getLocalBounds().width / 2, distance.getLocalBounds().height / 2);
@@ -233,6 +235,22 @@ void Game::keyPressed() {
 	}
 }
 
+void Game::collisions() {
+	for (int i = 0; i < astro.size(); i++) {
+		for (int j = 0; j < ships.size(); j++) {
+			if (dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) < astro[i] -> getRadius() ) { // + ships[j] -> getRadius()
+				float dy = astro[i]->getY() - astro[0]->getY();
+				float dx = astro[i]->getX() - astro[0]->getX();
+				float theta = atan2(dy, dx);
+				theta = theta >= 0 ? theta : theta + 2 * PI;
+				ships[j]->resetVelocity();
+				ships[j]->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() )); // + ships[j]->getRadius()
+				ships[j]->setY(astro[i]->getY() - sin(theta) * (astro[i]->getRadius() )); // + ships[j]->getRadius()
+			}
+		}
+	}
+}
+
 void Game::update() {
 	// Check Events
 	events();
@@ -336,6 +354,8 @@ void Game::update() {
 		for (int i = 0; i < ships.size(); i++) {
 			ships[0]->update();
 		}
+
+		//collisions();
 
 		// Update the view
 		view.x = ships[0] -> getX();

@@ -4,6 +4,7 @@
 // Dependencies
 #include <SFML/Graphics.hpp>
 #include <AstroObject.h>
+#include <Ship.h>
 
 // Planet
 class Planet : public AstroObject {

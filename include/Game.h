@@ -47,6 +47,7 @@ class Game {
 		//float eccentricityVector(int i);
 		//float apoapsis(int i);
 		void keyPressed();
+		void collisions();
 		//float map(float v, float lmin, float lmax, float rmin, float rmax);
 		void update();
 		void render();

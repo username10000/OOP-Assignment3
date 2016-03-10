@@ -16,8 +16,8 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 	ship[1].setTexture(shipTexture[1]);
 	ship[2].setTexture(shipTexture[2]);
 	for (int i = 0; i < 3; i++) {
-		ship[i].setPosition(screenX - 20, screenY - 20);
-		ship[i].setOrigin(20, 20);
+		ship[i].setPosition(screenX - ship[i].getGlobalBounds().width / 2, screenY - ship[i].getGlobalBounds().width / 2);
+		ship[i].setOrigin(ship[i].getGlobalBounds().width / 2, ship[i].getGlobalBounds().width / 2);
 	}
 
 	velocity.x = velocity.y = 0;
@@ -108,6 +108,14 @@ void Ship::setAccelerating(bool a) {
 	accelerating = a;
 }
 
+void Ship::resetVelocity() {
+	velocity.x = velocity.y = 0;
+}
+
+float Ship::getRadius() {
+	return ship[0].getGlobalBounds().width * sqrt(2);
+}
+
 void Ship::update() {
 	for (int i = 0; i < 3; i++) {
 		ship[i].rotate(rotation);
@@ -151,7 +159,7 @@ void Ship::update() {
 
 void Ship::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {
 	for (int i = 0; i < 3; i++) {
-		ship[i].setScale(0.5 / ppm, 0.5 / ppm);
+		ship[i].setScale(0.25 / ppm, 0.25 / ppm);
 	}
 	//sprite.setScale(1 / ppm, 1 / ppm);
 	window.draw(ship[spriteNo]);
