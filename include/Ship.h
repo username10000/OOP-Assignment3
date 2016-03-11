@@ -23,7 +23,10 @@ class Ship : public GameObject {
 		float rotation;
 		float angle;
 		float speed;
+		//float angleToPlanet;
 		bool accelerating;
+		//bool landed;
+		//int planet;
 		int spriteNo;
 		sf::Clock lastChange;
 	public:
@@ -43,8 +46,15 @@ class Ship : public GameObject {
 		void addForce(double f);
 		sf::Vector2<double> getDirection();
 		void setDirection(double x, double y);
+		bool getAccelerating();
 		void setAccelerating(bool a);
 		float getRadius();
+		//bool getLanded();
+		//float getAngleToPlanet();
+		//void setAngleToPlanet(float t);
+		//void setLanded(bool l);
+		//int getPlanet();
+		//void setPlanet(int p);
 		void update();
 		void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);
 };

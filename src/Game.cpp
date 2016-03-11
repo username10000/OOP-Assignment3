@@ -211,12 +211,14 @@ void Game::keyPressed() {
 	if (keys[22]) {
 		ships[0]->addVelocity();
 		ships[0]->setAccelerating(true);
+		//ships[0]->setLanded(false);
 	}
 
 	// S
 	if (keys[18]) {
 		ships[0]->subVelocity();
 		ships[0]->setAccelerating(true);
+		//ships[0]->setLanded(false);
 	}
 
 	// A
@@ -238,14 +240,27 @@ void Game::keyPressed() {
 void Game::collisions() {
 	for (int i = 0; i < astro.size(); i++) {
 		for (int j = 0; j < ships.size(); j++) {
+			//if (ships[j]->getLanded() && ships[j]->getPlanet() == i) {
+			//	float theta = ships[j]->getAngleToPlanet();
+			//	ships[j]->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() + 20 * 0.25));
+			//	ships[j]->setY(astro[i]->getY() - sin(theta) * (astro[i]->getRadius() + 20 * 0.25));
+			//	ships[j]->resetVelocity();
+			//	sf::Vector2<double> v = astro[i]->getVelocity();
+			//	ships[j]->addVelocity(v.x, v.y);
+			//} else
 			if (dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) < astro[i] -> getRadius() + 20 * 0.25) { // + ships[j] -> getRadius()
 				float dy = astro[i]->getY() - ships[j]->getY();
 				float dx = astro[i]->getX() - ships[j]->getX();
 				float theta = atan2(dy, dx);
 				theta = theta >= 0 ? theta : theta + 2 * PI;
 				ships[j]->resetVelocity();
+				sf::Vector2<double> v = astro[i]->getVelocity();
+				ships[j]->addVelocity(v.x, v.y);
 				ships[j]->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() + 20 * 0.25)); // + ships[j]->getRadius()
 				ships[j]->setY(astro[i]->getY() - sin(theta) * (astro[i]->getRadius() + 20 * 0.25)); // + ships[j]->getRadius()
+				//ships[j]->setAngleToPlanet(theta);
+				//ships[j]->setLanded(true);
+				//ships[j]->setPlanet(i);
 				//ships[j]->setX(ships[j]->getOldX());
 				//ships[j]->setY(ships[j]->getOldY());
 

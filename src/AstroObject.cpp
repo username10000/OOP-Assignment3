@@ -73,5 +73,6 @@ void AstroObject::setName(char n[]) {
 void AstroObject::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {
 	circle.setPosition((float)((screen.width / 2) + (getX() - view.x) / ppm - getRadius() / ppm), (float)((screen.height / 2) + (getY() - view.y) / ppm - getRadius() / ppm));
 	circle.setRadius(getRadius() / ppm);
+	//circle.setScale(getRadius() / ppm, getRadius() / ppm);
 	window.draw(circle);
 }
