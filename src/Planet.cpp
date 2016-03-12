@@ -1,9 +1,9 @@
 #include <Planet.h>
 
 Planet::Planet(double x, double y, float _radius, sf::Color _colour) : AstroObject(x, y, _radius, _colour) {
-	circle.setRadius(_radius);
-	circle.setPointCount(100);
-	circle.setFillColor(_colour);
+	//circle.setRadius(_radius);
+	//circle.setPointCount(100);
+	//circle.setFillColor(_colour);
 	//addVelocity(1, 0);
 }
 

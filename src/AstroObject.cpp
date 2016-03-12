@@ -7,7 +7,7 @@ AstroObject::AstroObject(double x, double y, float _radius, sf::Color _colour) :
 	force = velocity.x = velocity.y = 0;
 	acceleration = 0;
 	circle.setRadius(_radius);
-	circle.setPointCount(50);
+	circle.setPointCount(100);
 	circle.setFillColor(colour);
 	direction.x = 1;
 	direction.y = 1;
@@ -70,9 +70,15 @@ void AstroObject::setName(char n[]) {
 	strncpy_s(name, n, 30);
 }
 
+sf::FloatRect AstroObject::getBoundingBox() {
+	return circle.getGlobalBounds();
+}
+
 void AstroObject::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {
-	circle.setPosition((float)((screen.width / 2) + (getX() - view.x) / ppm - getRadius() / ppm), (float)((screen.height / 2) + (getY() - view.y) / ppm - getRadius() / ppm));
-	circle.setRadius(getRadius() / ppm);
+	circle.setRadius(getRadius() / (double)ppm);
+	circle.setPosition((double)(((double)screen.width / 2) + (getX() - view.x) / (double)ppm - circle.getRadius()), (double)(((double)screen.height / 2) + (getY() - view.y) / (double)ppm - circle.getRadius()));
+	//std::cout << sqrt(pow(circle.getPosition().x + circle.getRadius() - screen.width / 2, 2) + pow(circle.getPosition().y + circle.getRadius() - screen.height / 2, 2)) << std::endl;
+	//std::cout << circle.getPosition().x << " " << circle.getPosition().y << std::endl;
 	//circle.setScale(getRadius() / ppm, getRadius() / ppm);
 	window.draw(circle);
 }

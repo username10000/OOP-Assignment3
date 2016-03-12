@@ -36,6 +36,7 @@ class AstroObject : public GameObject {
 		sf::Vector2<double> getDirection();
 		void setDirection(double x, double y);
 		void setName(char n[]);
+		sf::FloatRect getBoundingBox();
 };
 
 #endif

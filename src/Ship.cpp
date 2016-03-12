@@ -147,6 +147,10 @@ float Ship::getRadius() {
 //	planet = p;
 //}
 
+sf::FloatRect Ship::getBoundingBox() {
+	return sprite.getGlobalBounds();
+}
+
 void Ship::update() {
 	for (int i = 0; i < 3; i++) {
 		ship[i].rotate(rotation);
@@ -188,11 +192,13 @@ void Ship::update() {
 	setX(getX() + velocity.x);
 	setY(getY() + velocity.y);
 	//std::cout << acceleration << std::endl;
+
+	//std::cout << sprite.getGlobalBounds().width << " " << sprite.getGlobalBounds().height << "    " << sprite.getLocalBounds().width << " " << sprite.getLocalBounds().height << std::endl;
 }
 
 void Ship::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {
 	for (int i = 0; i < 3; i++) {
-		ship[i].setScale(0.15 / ppm, 0.15 / ppm);
+		ship[i].setScale((double)0.15 / ppm, (double)0.15 / ppm);
 	}
 	//sprite.setScale(1 / ppm, 1 / ppm);
 	window.draw(ship[spriteNo]);

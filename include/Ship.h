@@ -49,6 +49,7 @@ class Ship : public GameObject {
 		bool getAccelerating();
 		void setAccelerating(bool a);
 		float getRadius();
+		sf::FloatRect getBoundingBox();
 		//bool getLanded();
 		//float getAngleToPlanet();
 		//void setAngleToPlanet(float t);

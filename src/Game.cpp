@@ -111,8 +111,8 @@ void Game::events() {
 			break;
 		case sf::Event::MouseButtonPressed:
 			// Change View
-			view.x += (int)(event.mouseButton.x - screen.width / 2) * ppm;
-			view.y += (int)(event.mouseButton.y - screen.height / 2) * ppm;
+			//view.x += (int)(event.mouseButton.x - screen.width / 2) * ppm;
+			//view.y += (int)(event.mouseButton.y - screen.height / 2) * ppm;
 			break;
 		case sf::Event::MouseWheelMoved:
 			ppm -= event.mouseWheel.delta;
@@ -249,6 +249,9 @@ void Game::collisions() {
 			//	ships[j]->addVelocity(v.x, v.y);
 			//} else
 			if (dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) < astro[i] -> getRadius() + 20 * 0.25) { // + ships[j] -> getRadius()
+			//sf::FloatRect bB1 = astro[i] -> getBoundingBox();
+			//sf::FloatRect bB2 = ships[j] -> getBoundingBox();
+			//if (bB1.intersects(bB2)) {
 				float dy = astro[i]->getY() - ships[j]->getY();
 				float dx = astro[i]->getX() - ships[j]->getX();
 				float theta = atan2(dy, dx);
@@ -258,6 +261,7 @@ void Game::collisions() {
 				ships[j]->addVelocity(v.x, v.y);
 				ships[j]->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() + 20 * 0.25)); // + ships[j]->getRadius()
 				ships[j]->setY(astro[i]->getY() - sin(theta) * (astro[i]->getRadius() + 20 * 0.25)); // + ships[j]->getRadius()
+				//std::cout << dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) << std::endl;
 				//ships[j]->setAngleToPlanet(theta);
 				//ships[j]->setLanded(true);
 				//ships[j]->setPlanet(i);
@@ -353,6 +357,7 @@ void Game::update() {
 			distance.setString(d);
 			distance.setPosition(screen.width / 2 + -cos(theta) * screen.height / 2 * 9 / 10, screen.height / 2 + -sin(theta) * screen.height / 2 * 9 / 10);
 		}
+
 		/*
 		ships[0]->setForce(0);
 		// Apply force to the ship
@@ -379,7 +384,7 @@ void Game::update() {
 
 		// Update the ships
 		for (int i = 0; i < ships.size(); i++) {
-			ships[0]->update();
+			ships[i]->update();
 		}
 
 		collisions();
