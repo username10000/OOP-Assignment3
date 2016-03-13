@@ -55,6 +55,7 @@ Game::Game() {
 
 	// Add Velocity Vector
 	velocityVector = std::unique_ptr<VelocityVector>(new VelocityVector(screen));
+	velocityVector -> setFont(font);
 	//*velocityVector = std::unique_ptr<VelocityVector>(new VelocityVector(screen));
 
 	// Pixels Per Meter
@@ -248,10 +249,12 @@ void Game::collisions() {
 			//	sf::Vector2<double> v = astro[i]->getVelocity();
 			//	ships[j]->addVelocity(v.x, v.y);
 			//} else
-			if (dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) < astro[i] -> getRadius() + 20 * 0.25) { // + ships[j] -> getRadius()
+			
 			//sf::FloatRect bB1 = astro[i] -> getBoundingBox();
 			//sf::FloatRect bB2 = ships[j] -> getBoundingBox();
 			//if (bB1.intersects(bB2)) {
+			ships[j]->setLanded(false);
+			if (dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) < astro[i]->getRadius() + 20 * 0.15) { // + ships[j] -> getRadius()
 				float dy = astro[i]->getY() - ships[j]->getY();
 				float dx = astro[i]->getX() - ships[j]->getX();
 				float theta = atan2(dy, dx);
@@ -259,8 +262,9 @@ void Game::collisions() {
 				ships[j]->resetVelocity();
 				sf::Vector2<double> v = astro[i]->getVelocity();
 				ships[j]->addVelocity(v.x, v.y);
-				ships[j]->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() + 20 * 0.25)); // + ships[j]->getRadius()
-				ships[j]->setY(astro[i]->getY() - sin(theta) * (astro[i]->getRadius() + 20 * 0.25)); // + ships[j]->getRadius()
+				ships[j]->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() + 20 * 0.15)); // + ships[j]->getRadius()
+				ships[j]->setY(astro[i]->getY() - sin(theta) * (astro[i]->getRadius() + 20 * 0.15)); // + ships[j]->getRadius()
+				ships[j]->setLanded(true);
 				//std::cout << dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) << std::endl;
 				//ships[j]->setAngleToPlanet(theta);
 				//ships[j]->setLanded(true);

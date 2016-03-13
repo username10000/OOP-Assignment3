@@ -25,7 +25,7 @@ class Ship : public GameObject {
 		float speed;
 		//float angleToPlanet;
 		bool accelerating;
-		//bool landed;
+		bool landed;
 		//int planet;
 		int spriteNo;
 		sf::Clock lastChange;
@@ -50,10 +50,10 @@ class Ship : public GameObject {
 		void setAccelerating(bool a);
 		float getRadius();
 		sf::FloatRect getBoundingBox();
-		//bool getLanded();
+		bool getLanded();
+		void setLanded(bool l);
 		//float getAngleToPlanet();
 		//void setAngleToPlanet(float t);
-		//void setLanded(bool l);
 		//int getPlanet();
 		//void setPlanet(int p);
 		void update();

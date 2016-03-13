@@ -19,6 +19,12 @@ VelocityVector::VelocityVector(sf::VideoMode _screen) {
 
 	point = sf::Vertex(sf::Vector2f(screen.width - size / 2 - offset, screen.height - size / 2 - offset));
 	point.color = sf::Color::Red;
+
+	zoom.setFont(font);
+	zoom.setCharacterSize(16);
+	zoom.setOrigin(zoom.getLocalBounds().width / 2, zoom.getLocalBounds().height / 2);
+	zoom.setString("x1");
+	zoom.setPosition(screen.width - offset - 25, screen.height - offset - 25);
 }
 
 double VelocityVector::map(double v, double lmin, double lmax, double rmin, double rmax) {
@@ -36,6 +42,10 @@ double VelocityVector::map(double v, double lmin, double lmax, double rmin, doub
 	return rmin + (leftPercentage * rightRange);
 }
 
+void VelocityVector::setFont(sf::Font font) {
+	this -> font = font;
+}
+
 void VelocityVector::update(sf::Vector2<double> velocity) {
 	double x, y;
 	x = map(velocity.x, -5, 5, screen.width - size - offset, screen.width - offset);
@@ -51,4 +61,5 @@ void VelocityVector::render(sf::RenderWindow &window) {
 	window.draw(rectangle);
 	window.draw(line, 2, sf::Lines);
 	window.draw(&point, 1, sf::Points);
+	window.draw(zoom);
 }

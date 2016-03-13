@@ -30,7 +30,7 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 	accelerating = false;
 	spriteNo = 0;
 
-	//landed = false;
+	landed = false;
 	//angleToPlanet = 0;
 	//planet = -1;
 	//std::cout << sprite.getGlobalBounds().width << " " << sprite.getGlobalBounds().height;
@@ -120,17 +120,17 @@ void Ship::resetVelocity() {
 }
 
 float Ship::getRadius() {
-	return ship[0].getGlobalBounds().width * sqrt(2);
+	return ship[0].getLocalBounds().width * sqrt(2);
 }
 
-//bool Ship::getLanded() {
-//	return landed;
-//}
-//
-//void Ship::setLanded(bool l) {
-//	landed = l;
-//}
-//
+bool Ship::getLanded() {
+	return landed;
+}
+
+void Ship::setLanded(bool l) {
+	landed = l;
+}
+
 //float Ship::getAngleToPlanet() {
 //	return angleToPlanet;
 //}
@@ -193,12 +193,18 @@ void Ship::update() {
 	setY(getY() + velocity.y);
 	//std::cout << acceleration << std::endl;
 
+	if (landed)
+		std::cout << "PLANET" << std::endl;
+	else
+		std::cout << "SPACE" << std::endl;
+
 	//std::cout << sprite.getGlobalBounds().width << " " << sprite.getGlobalBounds().height << "    " << sprite.getLocalBounds().width << " " << sprite.getLocalBounds().height << std::endl;
 }
 
 void Ship::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {
 	for (int i = 0; i < 3; i++) {
 		ship[i].setScale((double)0.15 / ppm, (double)0.15 / ppm);
+		//ship[i].setPosition((double)(((double)screen.width / 2) + (getX() - view.x) / (double)ppm - ship[i].getGlobalBounds().width / 2), (double)(((double)screen.height / 2) + (getY() - view.y) / (double)ppm - ship[i].getGlobalBounds().width / 2));
 	}
 	//sprite.setScale(1 / ppm, 1 / ppm);
 	window.draw(ship[spriteNo]);

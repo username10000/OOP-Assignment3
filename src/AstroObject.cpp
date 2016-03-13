@@ -76,7 +76,7 @@ sf::FloatRect AstroObject::getBoundingBox() {
 
 void AstroObject::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {
 	circle.setRadius(getRadius() / (double)ppm);
-	circle.setPosition((double)(((double)screen.width / 2) + (getX() - view.x) / (double)ppm - circle.getRadius()), (double)(((double)screen.height / 2) + (getY() - view.y) / (double)ppm - circle.getRadius()));
+	circle.setPosition((double)(((double)screen.width / 2) + (getX() - view.x) / (double)ppm - circle.getRadius() - 20), (double)(((double)screen.height / 2) + (getY() - view.y) / (double)ppm - circle.getRadius() - 20));
 	//std::cout << sqrt(pow(circle.getPosition().x + circle.getRadius() - screen.width / 2, 2) + pow(circle.getPosition().y + circle.getRadius() - screen.height / 2, 2)) << std::endl;
 	//std::cout << circle.getPosition().x << " " << circle.getPosition().y << std::endl;
 	//circle.setScale(getRadius() / ppm, getRadius() / ppm);
