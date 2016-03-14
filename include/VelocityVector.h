@@ -2,6 +2,7 @@
 #define VELOCITYVECTOR_H
 
 // Dependencies
+#include <iostream>
 #include <SFML/Graphics.hpp>
 #include <cmath>
 
@@ -11,7 +12,9 @@ class VelocityVector {
 		float size;
 		float offset;
 		float speed;
+		int zoomLevel;
 		sf::RectangleShape rectangle;
+		sf::RectangleShape innerRectangle;
 		sf::Vertex line[2];
 		sf::Vertex point;
 		sf::VideoMode screen;

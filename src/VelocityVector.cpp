@@ -13,6 +13,12 @@ VelocityVector::VelocityVector(sf::VideoMode _screen) {
 	rectangle.setFillColor(sf::Color::Transparent);
 	rectangle.setOutlineThickness(2);
 	rectangle.setOutlineColor(sf::Color::White);
+
+	innerRectangle.setPosition(screen.width - 3 * size / 4 - offset, screen.height - 3 * size / 4 - offset);
+	innerRectangle.setSize(sf::Vector2f(size / 2, size / 2));
+	innerRectangle.setFillColor(sf::Color::Transparent);
+	innerRectangle.setOutlineThickness(1);
+	innerRectangle.setOutlineColor(sf::Color::White);
 	
 	line[0] = sf::Vertex(sf::Vector2f(screen.width - size / 2 - offset, screen.height - size / 2 - offset));
 	line[1] = sf::Vertex(sf::Vector2f(screen.width - size / 2 - offset, screen.height - size / 2 - offset));
@@ -22,9 +28,14 @@ VelocityVector::VelocityVector(sf::VideoMode _screen) {
 
 	zoom.setFont(font);
 	zoom.setCharacterSize(16);
-	zoom.setOrigin(zoom.getLocalBounds().width / 2, zoom.getLocalBounds().height / 2);
+	sf::FloatRect textBounds = zoom.getLocalBounds();
+	zoom.setOrigin((float)zoom.getCharacterSize() / 2, (float)zoom.getCharacterSize() / 2);
+	//zoom.setOrigin(zoom.getLocalBounds().left + zoom.getLocalBounds().width / 2, zoom.getLocalBounds().top + zoom.getLocalBounds().height / 2);
 	zoom.setString("x1");
-	zoom.setPosition(screen.width - offset - 25, screen.height - offset - 25);
+	std::cout << zoom.getCharacterSize();
+	zoom.setPosition(screen.width - size + offset, screen.height - zoom.getCharacterSize() - offset);
+
+	zoomLevel = 1;
 }
 
 double VelocityVector::map(double v, double lmin, double lmax, double rmin, double rmax) {
@@ -48,8 +59,25 @@ void VelocityVector::setFont(sf::Font font) {
 
 void VelocityVector::update(sf::Vector2<double> velocity) {
 	double x, y;
-	x = map(velocity.x, -5, 5, screen.width - size - offset, screen.width - offset);
-	y = map(velocity.y, -5, 5, screen.height - size - offset, screen.height - offset);
+
+	std::cout << velocity.x << " " << velocity.y << std::endl;
+
+	if (velocity.x > 5 * zoomLevel || velocity.y > 5 * zoomLevel || velocity.x < -5 * zoomLevel || velocity.y < -5 * zoomLevel) {
+		zoomLevel *= 2;
+		char zlt[10];
+		sprintf_s(zlt, "x%d", zoomLevel);
+		zoom.setString(zlt);
+	}
+	if ((velocity.x < 5 * (zoomLevel / 2) && velocity.y < 5 * (zoomLevel / 2) && velocity.x > -5 * (zoomLevel / 2) && velocity.y > -5 * (zoomLevel / 2)) 
+		&& (zoomLevel > 1)) {
+		zoomLevel /= 2;
+		char zlt[10];
+		sprintf_s(zlt, "x%d", zoomLevel);
+		zoom.setString(zlt);
+	}
+
+	x = map(velocity.x, -5 * zoomLevel, 5 * zoomLevel, screen.width - size - offset, screen.width - offset);
+	y = map(velocity.y, -5 * zoomLevel, 5 * zoomLevel, screen.height - size - offset, screen.height - offset);
 
 	line[1] = sf::Vertex(sf::Vector2f((float)x, (float)y));
 
@@ -59,6 +87,7 @@ void VelocityVector::update(sf::Vector2<double> velocity) {
 
 void VelocityVector::render(sf::RenderWindow &window) {
 	window.draw(rectangle);
+	window.draw(innerRectangle);
 	window.draw(line, 2, sf::Lines);
 	window.draw(&point, 1, sf::Points);
 	window.draw(zoom);
