@@ -34,6 +34,7 @@ class Ship : public GameObject {
 		Ship();
 		void addVelocity();
 		void addVelocity(double x, double y);
+		void setVelocity(double x, double y);
 		void subVelocity();
 		void resetVelocity();
 		sf::Vector2<double> getVelocity();

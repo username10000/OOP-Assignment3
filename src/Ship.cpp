@@ -50,6 +50,11 @@ void Ship::addVelocity(double x, double y) {
 	velocity.y += y;
 }
 
+void Ship::setVelocity(double x, double y) {
+	velocity.x = x;
+	velocity.y = y;
+}
+
 void Ship::subVelocity() {
 	velocity.x -= sin(angle * PI / 180) * speed;
 	velocity.y -= -cos(angle * PI / 180) * speed;
@@ -193,10 +198,10 @@ void Ship::update() {
 	setY(getY() + velocity.y);
 	//std::cout << acceleration << std::endl;
 
-	if (landed)
-		std::cout << "PLANET" << std::endl;
-	else
-		std::cout << "SPACE" << std::endl;
+	//if (landed)
+	//	std::cout << "PLANET" << std::endl;
+	//else
+	//	std::cout << "SPACE" << std::endl;
 
 	//std::cout << sprite.getGlobalBounds().width << " " << sprite.getGlobalBounds().height << "    " << sprite.getLocalBounds().width << " " << sprite.getLocalBounds().height << std::endl;
 }

@@ -14,6 +14,7 @@
 #include <SolarSystem.h>
 #include <Ship.h>
 #include <VelocityVector.h>
+#include <DistanceToObject.h>
 
 // Game
 class Game {
@@ -27,6 +28,7 @@ class Game {
 		std::vector<std::unique_ptr<AstroObject>> astro;
 		std::vector<std::unique_ptr<Ship>> ships;
 		std::unique_ptr<VelocityVector> velocityVector;
+		std::unique_ptr<DistanceToObject> distanceObject;
 		SolarSystem solarSystem;
 		sf::Vector2<double> view;
 		float ppm;

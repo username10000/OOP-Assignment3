@@ -56,6 +56,9 @@ Game::Game() {
 	// Add Velocity Vector
 	velocityVector = std::unique_ptr<VelocityVector>(new VelocityVector(screen));
 	velocityVector -> setFont(font);
+
+	// Add Distance To Object
+	distanceObject = std::unique_ptr<DistanceToObject>(new DistanceToObject(screen, font));
 	//*velocityVector = std::unique_ptr<VelocityVector>(new VelocityVector(screen));
 
 	// Pixels Per Meter
@@ -241,18 +244,6 @@ void Game::keyPressed() {
 void Game::collisions() {
 	for (int i = 0; i < astro.size(); i++) {
 		for (int j = 0; j < ships.size(); j++) {
-			//if (ships[j]->getLanded() && ships[j]->getPlanet() == i) {
-			//	float theta = ships[j]->getAngleToPlanet();
-			//	ships[j]->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() + 20 * 0.25));
-			//	ships[j]->setY(astro[i]->getY() - sin(theta) * (astro[i]->getRadius() + 20 * 0.25));
-			//	ships[j]->resetVelocity();
-			//	sf::Vector2<double> v = astro[i]->getVelocity();
-			//	ships[j]->addVelocity(v.x, v.y);
-			//} else
-			
-			//sf::FloatRect bB1 = astro[i] -> getBoundingBox();
-			//sf::FloatRect bB2 = ships[j] -> getBoundingBox();
-			//if (bB1.intersects(bB2)) {
 			ships[j]->setLanded(false);
 			if (dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) < astro[i]->getRadius() + 20 * 0.15) { // + ships[j] -> getRadius()
 				float dy = astro[i]->getY() - ships[j]->getY();
@@ -265,22 +256,6 @@ void Game::collisions() {
 				ships[j]->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() + 20 * 0.15)); // + ships[j]->getRadius()
 				ships[j]->setY(astro[i]->getY() - sin(theta) * (astro[i]->getRadius() + 20 * 0.15)); // + ships[j]->getRadius()
 				ships[j]->setLanded(true);
-				//std::cout << dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) << std::endl;
-				//ships[j]->setAngleToPlanet(theta);
-				//ships[j]->setLanded(true);
-				//ships[j]->setPlanet(i);
-				//ships[j]->setX(ships[j]->getOldX());
-				//ships[j]->setY(ships[j]->getOldY());
-
-				//// Apply force to the Ship
-				//ships[0]->setForce(astro[i]->getG() * astro[i]->getMass() * ships[j]->getMass() / pow(dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()), 2));
-
-				//// Angle between the Ship and the Planets
-				//float dy = ships[j]->getY() - astro[i]->getY();
-				//float dx = ships[j]->getX() - astro[i]->getX();
-				//float theta = atan2(dy, dx);
-				//theta = theta >= 0 ? theta : theta + 2 * PI;
-				//ships[j]->setDirection(cos(theta), sin(theta));
 			}
 		}
 	}
@@ -352,15 +327,25 @@ void Game::update() {
 		ships[0]->setDirection(-cos(theta), -sin(theta));
 
 		// Set distance to nearest Object
-		int distFromCentre = (int)dist(astro[z]->getX(), astro[z]->getY(), ships[0]->getX(), ships[0]->getY()) - (int)astro[z]->getRadius();
-		if (distFromCentre < screen.height / 2 * ppm) {
-			distance.setString("");
-		} else {
-			char d[10];
-			sprintf(d, "%d m", distFromCentre);
-			distance.setString(d);
-			distance.setPosition(screen.width / 2 + -cos(theta) * screen.height / 2 * 9 / 10, screen.height / 2 + -sin(theta) * screen.height / 2 * 9 / 10);
-		}
+		int distFromCentre;
+		if (ships[0]->getLanded())
+			distFromCentre = 0;
+		else
+			distFromCentre = (int)dist(astro[z]->getX(), astro[z]->getY(), ships[0]->getX(), ships[0]->getY()) - (int)astro[z]->getRadius() - (int)(20 * 0.15);
+		//if (distFromCentre < screen.height / 2 * ppm) {
+		//	distance.setString("");
+		//} else {
+		//	char d[10];
+		//	sprintf_s(d, "%d m", distFromCentre);
+		//	distance.setString(d);
+		//	distance.setPosition(screen.width / 2 + -cos(theta) * screen.height / 2 * 9 / 10, screen.height / 2 + -sin(theta) * screen.height / 2 * 9 / 10);
+		//}
+
+		// Velocity Vector
+		velocityVector->update(ships[0]->getVelocity());
+
+		// Distance To Object
+		distanceObject->update(theta, distFromCentre);
 
 		/*
 		ships[0]->setForce(0);
@@ -396,9 +381,6 @@ void Game::update() {
 		// Update the view
 		view.x = ships[0] -> getX();
 		view.y = ships[0] -> getY();
-
-		// Velocity Vector - Fix
-		velocityVector->update(ships[0]->getVelocity());
 
 		//frameTime.restart();
 		accumulator -= dt;
@@ -442,11 +424,14 @@ void Game::render() {
 	// Velocity Vector
 	velocityVector -> render(window);
 
+	// Distance To Object
+	distanceObject -> render(window);
+
 	// Draw the frameRate
 	window.draw(frameRate);
 
 	// Distance to nearest Object
-	window.draw(distance);
+	//window.draw(distance);
 
 
 	/* --------------- Draw --------------- */

@@ -60,7 +60,7 @@ void VelocityVector::setFont(sf::Font font) {
 void VelocityVector::update(sf::Vector2<double> velocity) {
 	double x, y;
 
-	std::cout << velocity.x << " " << velocity.y << std::endl;
+	//std::cout << velocity.x << " " << velocity.y << std::endl;
 
 	if (velocity.x > 5 * zoomLevel || velocity.y > 5 * zoomLevel || velocity.x < -5 * zoomLevel || velocity.y < -5 * zoomLevel) {
 		zoomLevel *= 2;
