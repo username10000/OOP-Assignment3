@@ -70,6 +70,10 @@ void AstroObject::setName(char n[]) {
 	strncpy_s(name, n, 30);
 }
 
+void AstroObject::setMass(float m) {
+	mass = m;
+}
+
 sf::FloatRect AstroObject::getBoundingBox() {
 	return circle.getGlobalBounds();
 }

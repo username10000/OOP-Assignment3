@@ -24,7 +24,8 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 	rotation = angle = 0;
 	force = acceleration = 0;
 	direction.x = direction.y = 0;
-	mass = 0.00000000000000000000040 * 9.3;
+	//mass = 0.00000000000000000000040 * 9.3;
+	mass = 1;
 	speed = 0.02;
 
 	accelerating = false;
