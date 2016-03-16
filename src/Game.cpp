@@ -14,6 +14,7 @@ Game::Game() {
 	float fps = 60;
 	dt = 1 / fps;
 
+	// Set framerate limit - maybe temporarily
 	window.setFramerateLimit(60);
 
 	//window.setVerticalSyncEnabled(true);
@@ -28,24 +29,37 @@ Game::Game() {
 	view.x = 0;
 	view.y = 0;
 
+	// Setting the random seed
+	srand(time(NULL));
+
 	// Create the Astronomical Objects
 	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 1900, sf::Color(255, 255, 0))));
-	astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, 100000, 500, sf::Color(0, 0, 255))));
+	//float rae = rand() % 6;
+	//astro.push_back(std::unique_ptr<AstroObject>(new Planet(-cos(rae) * 100000, -sin(rae) * 100000, 500, sf::Color(0, 0, 255))));
+	//astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, 100000, 500, sf::Color(0, 0, 255))));
 
-	for (int i = 2; i < 4; i++) {
-		float rDist = rand() % (100000 - 50000 + 1) + 50000;
-		float rR = rand() % (500 - 250 + 1) + 250;
-		astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, dist(astro[0]->getX(), astro[0]->getY(), astro[i - 1] -> getX(), astro[i - 1]->getY()) + rDist, rR, sf::Color(rand() % 256 , rand() % 256 , rand() % 256))));
+	float rDist = 0;
+	for (int i = 1; i < 4; i++) {
+		//float rDist = rand() % (100000 - 50000 + 1) + 50000;
+		//float rR = rand() % (500 - 250 + 1) + 250;
+		rDist += randomInt(100000, 150000);
+		float rR = randomInt(300, 500);
+		astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
+		astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())), 0);
+		//fastForwardObject(1, randomInt(1000, 10000));
 	}
-	
 
 	// Initial Velocity for the Planets
-	int i = 1;
-	for (unsigned int i = 1; i < astro.size(); i++) {
-		astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())), 0);
-	}
+	//int i = 1;
+	//for (unsigned int i = 1; i < astro.size(); i++) {
+	//	//double vel = sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()));
+	//	//astro[i]->addVelocity(-sin(rae) * vel, -cos(rae));
+	//	astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())), 0);
+	//	fastForwardObject(1, (int)(rand() % (100000 - 1000 + 1) + 1000));
+	//}
 
 	// Add Ships
+	//ships.push_back(std::unique_ptr<Ship>(new Ship(-cos(rae) * 100000 + 500, -sin(rae) * 100000, (float)(screen.width / 2), (float)(screen.height / 2))));
 	ships.push_back(std::unique_ptr<Ship>(new Ship(2500, 100000, (float)(screen.width / 2), (float)(screen.height / 2))));
 
 	//std::cout << ships[0]
@@ -127,6 +141,10 @@ void Game::events() {
 			break;
 		}
 	}
+}
+
+int Game::randomInt(int start, int stop) {
+	return rand() % (stop - start + 1) + start;
 }
 
 /*
@@ -238,6 +256,21 @@ void Game::keyPressed() {
 	// SPACE
 	if (keys[57]) {
 		ships[0]->resetRotation();
+	}
+}
+
+void Game::fastForwardObject(int i, int loops) {
+	for (int j = 0; j < loops; j++) {
+		// Apply Force to the Planet
+		astro[i]->setForce(astro[0]->getG() * astro[0]->getMass() * astro[i]->getMass() / pow(dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()), 2));
+
+		// Angle between the Sun and the Planet
+		float dy = astro[i]->getY() - astro[0]->getY();
+		float dx = astro[i]->getX() - astro[0]->getX();
+		float theta = atan2(dy, dx);
+		theta = theta >= 0 ? theta : theta + 2 * PI;
+		astro[i]->setDirection(-cos(theta), -sin(theta));
+		astro[i]->update();
 	}
 }
 

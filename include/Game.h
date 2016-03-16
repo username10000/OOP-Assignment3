@@ -50,6 +50,8 @@ class Game {
 		//float apoapsis(int i);
 		void keyPressed();
 		void collisions();
+		void fastForwardObject(int i, int loops);
+		int randomInt(int start, int stop);
 		//float map(float v, float lmin, float lmax, float rmin, float rmax);
 		void update();
 		void render();
