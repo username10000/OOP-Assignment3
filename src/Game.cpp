@@ -38,14 +38,34 @@ Game::Game() {
 	//astro.push_back(std::unique_ptr<AstroObject>(new Planet(-cos(rae) * 100000, -sin(rae) * 100000, 500, sf::Color(0, 0, 255))));
 	//astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, 100000, 500, sf::Color(0, 0, 255))));
 
+	noPlanets = randomInt(5, 10);
+
 	float rDist = 0;
-	for (int i = 1; i < 4; i++) {
+	for (int i = 1; i < noPlanets; i++) {
 		//float rDist = rand() % (100000 - 50000 + 1) + 50000;
 		//float rR = rand() % (500 - 250 + 1) + 250;
 		rDist += randomInt(100000, 150000);
 		float rR = randomInt(300, 500);
-		astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
-		astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())), 0);
+		switch (randomInt(1, 4)) {
+			case 1:
+				astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
+				astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())), 0);
+				break;
+			case 2:
+				astro.push_back(std::unique_ptr<AstroObject>(new Planet(rDist, 0, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
+				astro[i]->addVelocity(0, -sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())));
+				break;
+			case 3:
+				astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, -rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
+				astro[i]->addVelocity(-sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())), 0);
+				break;
+			default:
+				astro.push_back(std::unique_ptr<AstroObject>(new Planet(-rDist, 0, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
+				astro[i]->addVelocity(0, sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())));
+				break;
+		}
+		//astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
+		//astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())), 0);
 		//fastForwardObject(1, randomInt(1000, 10000));
 	}
 
@@ -60,7 +80,7 @@ Game::Game() {
 
 	// Add Ships
 	//ships.push_back(std::unique_ptr<Ship>(new Ship(-cos(rae) * 100000 + 500, -sin(rae) * 100000, (float)(screen.width / 2), (float)(screen.height / 2))));
-	ships.push_back(std::unique_ptr<Ship>(new Ship(2500, 100000, (float)(screen.width / 2), (float)(screen.height / 2))));
+	ships.push_back(std::unique_ptr<Ship>(new Ship(astro[1]->getX(), astro[1]->getY() - astro[1]->getRadius(), (float)(screen.width / 2), (float)(screen.height / 2))));
 
 	//std::cout << ships[0]
 

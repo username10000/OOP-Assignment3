@@ -25,6 +25,7 @@ class Game {
 		sf::Font font;
 		int keys[512] = { 0 };
 		int stop;
+		int noPlanets;
 		std::vector<std::unique_ptr<AstroObject>> astro;
 		std::vector<std::unique_ptr<Ship>> ships;
 		std::unique_ptr<VelocityVector> velocityVector;
