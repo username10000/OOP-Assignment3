@@ -109,6 +109,21 @@ Game::Game() {
 	distance.setString("0");
 
 	accumulator = 0;
+
+	for (unsigned int i = 0; i < 200; i++) {
+		stars[i][0] = randomInt(0, screen.width);
+		stars[i][1] = randomInt(0, screen.height);
+		stars[i][2] = randomInt(1, 3);
+	}
+
+	//for (unsigned int i = 0; i < screen.width; i++) {
+	//	for (unsigned int j = 0; j < screen.height; j++) {
+	//		if (randomInt(0, 100) == 50) {
+	//			stars.push_back(std::unique_ptr<sf::CircleShape>(new sf::CircleShape(randomInt(1, 5))));
+	//			stars[stars.size - 1].setPosition(i, j).setFillColor(sf::Color::White);
+	//		}
+	//	}
+	//}
 }
 
 Game::~Game() {
@@ -124,6 +139,21 @@ double Game::dist(double x1, double y1, double x2, double y2) {
 	double Y = pow(y2 - y1, 2);
 
 	return sqrt(X + Y);
+}
+
+double Game::map(double v, double lmin, double lmax, double rmin, double rmax) {
+	if (v < lmin)
+		v = lmin;
+
+	if (v > lmax)
+		v = lmax;
+
+	double leftRange = lmax - lmin;
+	double rightRange = rmax - rmin;
+
+	double leftPercentage = (v - lmin) / leftRange;
+
+	return rmin + (leftPercentage * rightRange);
 }
 
 void Game::events() {
@@ -448,24 +478,31 @@ void Game::render() {
 
 	/* --------------- Draw --------------- */
 
-	// Star Field - WIP
-	for (int i = 1; i < screen.width; i++) {
-		for (int j = 1; j < screen.height; j++) {
-			if ((i * j) % 100000 == 0) {
-				sf::CircleShape star(2);
-				star.setFillColor(sf::Color::White);
-				star.setPosition(i, j);
-				window.draw(star);
+	// Star Field
+	for (unsigned int i = 0; i < 200; i++) {
+		if (ppm < 1) {
+			double newWidth = screen.width * ppm;
+			double newHeight = screen.height * ppm;
+			double hMargin = (screen.width - newWidth) / 2;
+			double vMargin = (screen.height - newHeight) / 2;
+			if (stars[i][0] > hMargin && stars[i][0] < screen.width - hMargin && stars[i][1] > vMargin && stars[i][1] < screen.height - vMargin) {
+				sf::CircleShape c(stars[i][2]);
+				c.setPosition(map(stars[i][0], hMargin, screen.width - hMargin, 0, screen.width) - 20, map(stars[i][1], vMargin, screen.height - vMargin, 0, screen.height) - 20);
+				window.draw(c);
 			}
+		} else {
+			sf::CircleShape c(stars[i][2]);
+			c.setPosition(stars[i][0] - 20, stars[i][1] - 20);
+			window.draw(c);
 		}
 	}
 
 	// Astronomical Object
 	for (int i = 0; i < astro.size(); i++) {
-		if (astro[i]->getX() + astro[i]->getRadius() > view.x - screen.width / 2 * ppm &&
+		/*if (astro[i]->getX() + astro[i]->getRadius() > view.x - screen.width / 2 * ppm &&
 			astro[i]->getX() - astro[i]->getRadius() < view.x + screen.width / 2 * ppm &&
 			astro[i]->getY() + astro[i]->getRadius() > view.y - screen.height / 2 * ppm &&
-			astro[i]->getY() - astro[i]->getRadius() < view.y + screen.height / 2 * ppm)
+			astro[i]->getY() - astro[i]->getRadius() < view.y + screen.height / 2 * ppm)*/
 				astro[i] -> render(window, view, screen, ppm);
 	}
 

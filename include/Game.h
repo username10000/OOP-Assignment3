@@ -28,6 +28,8 @@ class Game {
 		int noPlanets;
 		std::vector<std::unique_ptr<AstroObject>> astro;
 		std::vector<std::unique_ptr<Ship>> ships;
+		int stars[200][3];
+		//std::vector<std::unique_ptr<sf::CircleShape>> stars;
 		std::unique_ptr<VelocityVector> velocityVector;
 		std::unique_ptr<DistanceToObject> distanceObject;
 		SolarSystem solarSystem;
@@ -53,7 +55,7 @@ class Game {
 		void collisions();
 		void fastForwardObject(int i, int loops);
 		int randomInt(int start, int stop);
-		//float map(float v, float lmin, float lmax, float rmin, float rmax);
+		double map(double v, double lmin, double lmax, double rmin, double rmax);
 		void update();
 		void render();
 };
