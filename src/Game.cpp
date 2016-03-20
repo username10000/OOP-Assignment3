@@ -116,14 +116,19 @@ Game::Game() {
 		stars[i][2] = randomInt(1, 3);
 	}
 
-	//for (unsigned int i = 0; i < screen.width; i++) {
-	//	for (unsigned int j = 0; j < screen.height; j++) {
-	//		if (randomInt(0, 100) == 50) {
-	//			stars.push_back(std::unique_ptr<sf::CircleShape>(new sf::CircleShape(randomInt(1, 5))));
-	//			stars[stars.size - 1].setPosition(i, j).setFillColor(sf::Color::White);
-	//		}
-	//	}
-	//}
+	// Menu Flags
+	menu["map"] = false;
+
+	//ppm = dist(0, 0, astro[noPlanets - 1] -> getX(), astro[noPlanets - 1] -> getY()) / (screen.height / 2);
+
+	// Create an Astro Map
+	astroMap = std::unique_ptr<AstroMap>(new AstroMap((float)(dist(0, 0, astro[noPlanets - 1]->getX(), astro[noPlanets - 1]->getY()) / (screen.height / 2)), font));
+	//astroMap->setppm((float)(dist(0, 0, astro[noPlanets - 1]->getX(), astro[noPlanets - 1]->getY()) / (screen.height / 2)));
+
+	astroMap -> setShip(ships[0]->getX(), ships[0]->getY());
+	for (unsigned i = 0; i < astro.size(); i++) {
+		astroMap -> addAstro(astro[i] -> getX(), astro[i] -> getY(), astro[i] -> getColour(), astro[i] -> getRadius());
+	}
 }
 
 Game::~Game() {
@@ -156,6 +161,12 @@ double Game::map(double v, double lmin, double lmax, double rmin, double rmax) {
 	return rmin + (leftPercentage * rightRange);
 }
 
+void Game::disableMenus() {
+	for (auto el = menu.begin(); el != menu.end(); el++) {
+		menu[el->first] = false;
+	}
+}
+
 void Game::events() {
 	sf::Event event;
 	while (window.pollEvent(event)) {
@@ -168,14 +179,18 @@ void Game::events() {
 			// Close the Window if Escape is pressed
 			if (event.key.code == sf::Keyboard::Escape)
 				stop = 1;
+			// M - Open Map
+			if (event.key.code == 12) {
+				menu["map"] = !menu["map"];
+			}
 				//window.close();
 			// Set the pressed key
 			keys[event.key.code] = 1;
+			//std::cout << event.key.code << " ";
 			break;
 		case sf::Event::KeyReleased:
 			// Unset the released key
 			keys[event.key.code] = 0;
-			//std::cout << event.key.code << " ";
 			break;
 		case sf::Event::MouseButtonPressed:
 			// Change View
@@ -183,9 +198,11 @@ void Game::events() {
 			//view.y += (int)(event.mouseButton.y - screen.height / 2) * ppm;
 			break;
 		case sf::Event::MouseWheelMoved:
-			ppm -= event.mouseWheel.delta;
-			if (ppm <= 0)
+			ppm -= event.mouseWheel.delta * 0.05;
+			if (ppm <= 0.1)
 				ppm = 0.1f;
+			if (ppm > 1)
+				ppm = 1;
 			break;
 		default:
 			break;
@@ -465,6 +482,14 @@ void Game::update() {
 		view.x = ships[0] -> getX();
 		view.y = ships[0] -> getY();
 
+		// Update the position of the Astro Object and Ship if the map is opened
+		if (menu["map"]) {
+			for (unsigned i = 0; i < astro.size(); i++) {
+				astroMap->setAstro(i, astro[i] -> getX(), astro[i] -> getY());
+			}
+			astroMap -> setShip(ships[0] -> getX(), ships[0] -> getY());
+		}
+
 		//frameTime.restart();
 		accumulator -= dt;
 	//}
@@ -478,50 +503,59 @@ void Game::render() {
 
 	/* --------------- Draw --------------- */
 
-	// Star Field
-	for (unsigned int i = 0; i < 200; i++) {
-		if (ppm < 1) {
-			double newWidth = screen.width * ppm;
-			double newHeight = screen.height * ppm;
-			double hMargin = (screen.width - newWidth) / 2;
-			double vMargin = (screen.height - newHeight) / 2;
-			if (stars[i][0] > hMargin && stars[i][0] < screen.width - hMargin && stars[i][1] > vMargin && stars[i][1] < screen.height - vMargin) {
+	if (menu["map"]) {
+		// Astro Map
+		astroMap -> render(window, screen);
+
+		// Velocity Vector
+		velocityVector->render(window);
+
+		// Distance To Object
+		distanceObject->render(window);
+	} else {
+		// Star Field
+		for (unsigned int i = 0; i < 200; i++) {
+			if (ppm < 1) {
+				double newWidth = screen.width * ppm;
+				double newHeight = screen.height * ppm;
+				double hMargin = (screen.width - newWidth) / 2;
+				double vMargin = (screen.height - newHeight) / 2;
+				if (stars[i][0] > hMargin && stars[i][0] < screen.width - hMargin && stars[i][1] > vMargin && stars[i][1] < screen.height - vMargin) {
+					sf::CircleShape c(stars[i][2]);
+					c.setPosition(map(stars[i][0], hMargin, screen.width - hMargin, 0, screen.width) - 20, map(stars[i][1], vMargin, screen.height - vMargin, 0, screen.height) - 20);
+					window.draw(c);
+				}
+			}
+			else {
 				sf::CircleShape c(stars[i][2]);
-				c.setPosition(map(stars[i][0], hMargin, screen.width - hMargin, 0, screen.width) - 20, map(stars[i][1], vMargin, screen.height - vMargin, 0, screen.height) - 20);
+				c.setPosition(stars[i][0] - 20, stars[i][1] - 20);
 				window.draw(c);
 			}
-		} else {
-			sf::CircleShape c(stars[i][2]);
-			c.setPosition(stars[i][0] - 20, stars[i][1] - 20);
-			window.draw(c);
 		}
+
+		// Astronomical Object
+		for (int i = 0; i < astro.size(); i++) {
+			/*if (astro[i]->getX() + astro[i]->getRadius() > view.x - screen.width / 2 * ppm &&
+				astro[i]->getX() - astro[i]->getRadius() < view.x + screen.width / 2 * ppm &&
+				astro[i]->getY() + astro[i]->getRadius() > view.y - screen.height / 2 * ppm &&
+				astro[i]->getY() - astro[i]->getRadius() < view.y + screen.height / 2 * ppm)*/
+			astro[i]->render(window, view, screen, ppm);
+		}
+
+		// Ships
+		for (int i = 0; i < ships.size(); i++) {
+			ships[i]->render(window, view, screen, ppm);
+		}
+
+		// Velocity Vector
+		velocityVector->render(window);
+
+		// Distance To Object
+		distanceObject->render(window);
 	}
-
-	// Astronomical Object
-	for (int i = 0; i < astro.size(); i++) {
-		/*if (astro[i]->getX() + astro[i]->getRadius() > view.x - screen.width / 2 * ppm &&
-			astro[i]->getX() - astro[i]->getRadius() < view.x + screen.width / 2 * ppm &&
-			astro[i]->getY() + astro[i]->getRadius() > view.y - screen.height / 2 * ppm &&
-			astro[i]->getY() - astro[i]->getRadius() < view.y + screen.height / 2 * ppm)*/
-				astro[i] -> render(window, view, screen, ppm);
-	}
-
-	// Ships
-	for (int i = 0; i < ships.size(); i++) {
-		ships[i] -> render(window, view, screen, ppm);
-	}
-
-	// Velocity Vector
-	velocityVector -> render(window);
-
-	// Distance To Object
-	distanceObject -> render(window);
 
 	// Draw the frameRate
 	window.draw(frameRate);
-
-	// Distance to nearest Object
-	//window.draw(distance);
 
 
 	/* --------------- Draw --------------- */

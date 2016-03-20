@@ -4,6 +4,7 @@
 // Dependencies
 #include <iostream>
 #include <stdlib.h>
+#include <unordered_map>
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <cmath>
@@ -15,6 +16,7 @@
 #include <Ship.h>
 #include <VelocityVector.h>
 #include <DistanceToObject.h>
+#include <AstroMap.h>
 
 // Game
 class Game {
@@ -28,10 +30,12 @@ class Game {
 		int noPlanets;
 		std::vector<std::unique_ptr<AstroObject>> astro;
 		std::vector<std::unique_ptr<Ship>> ships;
+		std::unordered_map<std::string, bool> menu;
 		int stars[200][3];
 		//std::vector<std::unique_ptr<sf::CircleShape>> stars;
 		std::unique_ptr<VelocityVector> velocityVector;
 		std::unique_ptr<DistanceToObject> distanceObject;
+		std::unique_ptr<AstroMap> astroMap;
 		SolarSystem solarSystem;
 		sf::Vector2<double> view;
 		float ppm;
@@ -42,6 +46,7 @@ class Game {
 		sf::Text distance;
 		float dt;
 		float accumulator;
+		//AstroMap astroMap(0);
 	public:
 		Game();
 		~Game();
@@ -56,6 +61,7 @@ class Game {
 		void fastForwardObject(int i, int loops);
 		int randomInt(int start, int stop);
 		double map(double v, double lmin, double lmax, double rmin, double rmax);
+		void disableMenus();
 		void update();
 		void render();
 };
