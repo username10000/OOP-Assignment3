@@ -123,12 +123,13 @@ Game::Game() {
 
 	// Create an Astro Map
 	astroMap = std::unique_ptr<AstroMap>(new AstroMap((float)(dist(0, 0, astro[noPlanets - 1]->getX(), astro[noPlanets - 1]->getY()) / (screen.height / 2)), font));
-	//astroMap->setppm((float)(dist(0, 0, astro[noPlanets - 1]->getX(), astro[noPlanets - 1]->getY()) / (screen.height / 2)));
-
 	astroMap -> setShip(ships[0]->getX(), ships[0]->getY());
 	for (unsigned i = 0; i < astro.size(); i++) {
-		astroMap -> addAstro(astro[i] -> getX(), astro[i] -> getY(), astro[i] -> getColour(), astro[i] -> getRadius());
+		astroMap -> addAstro(screen, astro[i] -> getX(), astro[i] -> getY(), astro[i] -> getColour(), astro[i] -> getRadius());
 	}
+
+	// Unset the Target Object
+	targetAstro = -1;
 }
 
 Game::~Game() {
@@ -386,11 +387,9 @@ void Game::update() {
 
 	// Run Update when the accumualtor is bigger than delta time
 	while (accumulator >= dt) {
-
 		ships[0]->setAccelerating(false);
-		// *** Not working
-		//if (frameTime.getElapsedTime().asSeconds() > 0.01) {
-			// Check Keyboard Presses
+
+		// Check keyboard presses
 		keyPressed();
 
 		// Apply Force to the Planets
@@ -441,12 +440,6 @@ void Game::update() {
 		//	distance.setPosition(screen.width / 2 + -cos(theta) * screen.height / 2 * 9 / 10, screen.height / 2 + -sin(theta) * screen.height / 2 * 9 / 10);
 		//}
 
-		// Velocity Vector
-		velocityVector->update(ships[0]->getVelocity());
-
-		// Distance To Object
-		distanceObject->update(theta, distFromCentre);
-
 		/*
 		ships[0]->setForce(0);
 		// Apply force to the ship
@@ -476,6 +469,7 @@ void Game::update() {
 			ships[i]->update();
 		}
 
+		// Check collisions
 		collisions();
 
 		// Update the view
@@ -485,10 +479,35 @@ void Game::update() {
 		// Update the position of the Astro Object and Ship if the map is opened
 		if (menu["map"]) {
 			for (unsigned i = 0; i < astro.size(); i++) {
-				astroMap->setAstro(i, astro[i] -> getX(), astro[i] -> getY());
+				astroMap->setAstro(window, screen, i, astro[i] -> getX(), astro[i] -> getY());
 			}
 			astroMap -> setShip(ships[0] -> getX(), ships[0] -> getY());
+			int tempA = astroMap -> getClickedPlanet();
+			if (tempA != -1)
+				targetAstro = tempA;
 		}
+
+		// Setting the info for the target
+		if (targetAstro != -1) {
+			// Distance from Target
+			int distFromTarget = (int)dist(astro[targetAstro]->getX(), astro[targetAstro]->getY(), ships[0]->getX(), ships[0]->getY()) - (int)astro[targetAstro]->getRadius() - (int)(20 * 0.15);
+			distFromTarget = distFromTarget < 0 ? 0 : distFromTarget;
+
+			// Angle between the Ship and the Target
+			dy = ships[0]->getY() - astro[targetAstro]->getY();
+			dx = ships[0]->getX() - astro[targetAstro]->getX();
+			float thetaTarget = atan2(dy, dx);
+			thetaTarget = thetaTarget >= 0 ? thetaTarget : thetaTarget + 2 * PI;
+
+			distanceObject->setTargetDistance(distFromTarget);
+			distanceObject->setTargetAngle(thetaTarget);
+		}
+
+		// Velocity Vector
+		velocityVector->update(ships[0]->getVelocity());
+
+		// Distance To Object
+		distanceObject->update(theta, distFromCentre);
 
 		//frameTime.restart();
 		accumulator -= dt;

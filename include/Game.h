@@ -46,6 +46,7 @@ class Game {
 		sf::Text distance;
 		float dt;
 		float accumulator;
+		int targetAstro;
 		//AstroMap astroMap(0);
 	public:
 		Game();
