@@ -3,6 +3,7 @@
 
 // Dependencies
 #include <iostream>
+#include <fstream>
 #include <stdlib.h>
 #include <unordered_map>
 #include <SFML/Graphics.hpp>
@@ -61,6 +62,7 @@ class Game {
 		void collisions();
 		void fastForwardObject(int i, int loops);
 		int randomInt(int start, int stop);
+		float randomFloat(float start, float stop);
 		double map(double v, double lmin, double lmax, double rmin, double rmax);
 		void disableMenus();
 		void update();

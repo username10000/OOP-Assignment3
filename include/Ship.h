@@ -53,6 +53,7 @@ class Ship : public GameObject {
 		sf::FloatRect getBoundingBox();
 		bool getLanded();
 		void setLanded(bool l);
+		float getAngle();
 		//float getAngleToPlanet();
 		//void setAngleToPlanet(float t);
 		//int getPlanet();

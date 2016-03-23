@@ -35,6 +35,22 @@ DistanceToObject::DistanceToObject(sf::VideoMode _screen, sf::Font _font) {
 	targetText.setPosition(size / 2 + offset, screen.height - size / 2 + distanceText.getCharacterSize() - offset);
 	targetText.setString("0");
 
+	// Settings for the closest name
+	closestName.setFont(font);
+	closestName.setCharacterSize(12);
+	closestName.setColor(sf::Color::Red);
+	closestName.setStyle(sf::Text::Bold);
+	closestName.setPosition(size / 2 + offset, screen.height - size / 2 - distanceText.getCharacterSize() * 3 - offset);
+	closestName.setString("0");
+
+	// Settings for the target name
+	targetName.setFont(font);
+	targetName.setCharacterSize(12);
+	targetName.setColor(sf::Color::Cyan);
+	targetName.setStyle(sf::Text::Bold);
+	targetName.setPosition(size / 2 + offset, screen.height - size / 2 + distanceText.getCharacterSize() * 3 - offset);
+	targetName.setString("0");
+
 	// Initialising the direction line
 	line[0] = sf::Vertex(sf::Vector2f(0, 0), sf::Color::Red);
 	line[1] = sf::Vertex(sf::Vector2f(0, 0), sf::Color::Red);
@@ -50,6 +66,10 @@ DistanceToObject::DistanceToObject(sf::VideoMode _screen, sf::Font _font) {
 	// Initialise the target object
 	targetDistance = -1;
 	targetAngle = 0;
+
+	// Initialise the Ship Direction indication
+	shipDirection.setPointCount(3);
+	shipDirection.setRadius(size / 4 / 8);
 }
 
 void DistanceToObject::setTargetDistance(float d) {
@@ -60,7 +80,11 @@ void DistanceToObject::setTargetAngle(float a) {
 	targetAngle = a;
 }
 
-void DistanceToObject::update(float _angle, float _distance) {
+void DistanceToObject::setTargetName(std::string n) {
+	targetName.setString(n);
+}
+
+void DistanceToObject::update(float _angle, float _distance, std::string _name, float _shipAngle) {
 	angle = _angle;
 	distance = _distance;
 
@@ -68,17 +92,21 @@ void DistanceToObject::update(float _angle, float _distance) {
 	char d[15];
 	sprintf_s(d, "%d KM", (int)distance);
 	distanceText.setString(d);
-	//while (distanceText.getCharacterSize() * strlen(d) > size) {
-	//	distanceText.setCharacterSize(distanceText.getCharacterSize() - 1);
-	//}
-	//while (distanceText.getCharacterSize() * strlen(d) < size) {
-	//	distanceText.setCharacterSize(distanceText.getCharacterSize() + 1);
-	//}
+	// Set the centre of the text
 	distanceText.setOrigin(distanceText.getCharacterSize() * strlen(d) / 4, distanceText.getCharacterSize() / 2);
+
+	// Setting the name of the Object
+	closestName.setOrigin(closestName.getCharacterSize() * _name.size() / 4, closestName.getCharacterSize() / 2);
+	closestName.setString(_name);
 
 	// Setting the coordinates of the direction line
 	line[0] = sf::Vertex(sf::Vector2f(offset + size / 2 - cos(angle) * size / 4, screen.height - size / 2 - offset - sin(angle) * size / 4), sf::Color::Red);
 	line[1] = sf::Vertex(sf::Vector2f(offset + size / 2 - cos(angle) * size / 2, screen.height - size / 2 - offset - sin(angle) * size / 2), sf::Color::Red);
+
+	// Set the angle of the Ship
+	shipAngle = _shipAngle + 3.14159 / 2;
+	shipDirection.setPosition(size / 2 + offset - cos(shipAngle) * (size / 4 + shipDirection.getRadius()), screen.height - size / 2 - offset - sin(shipAngle) * (size / 4 + shipDirection.getRadius()));
+	shipDirection.setRotation(shipAngle * 180 / 3.14159265359 + 23);
 
 	if (targetDistance != -1) {
 		// Creating the string
@@ -86,6 +114,9 @@ void DistanceToObject::update(float _angle, float _distance) {
 		sprintf_s(dA, "%d KM", (int)targetDistance);
 		targetText.setString(dA);
 		targetText.setOrigin(targetText.getCharacterSize() * strlen(dA) / 4, targetText.getCharacterSize() / 2);
+
+		// Set the centre of the text
+		targetName.setOrigin(targetName.getCharacterSize() * targetName.getString().getSize() / 4, targetName.getCharacterSize() / 2);
 
 		// Setting the coordinates of the target line
 		targetLine[0] = sf::Vertex(sf::Vector2f(offset + size / 2 - cos(targetAngle) * size / 4, screen.height - size / 2 - offset - sin(targetAngle) * size / 4), sf::Color::Cyan);
@@ -103,4 +134,8 @@ void DistanceToObject::render(sf::RenderWindow &window) {
 	window.draw(distanceText);
 	if (targetDistance != -1)
 		window.draw(targetText);
+	window.draw(closestName);
+	if (targetDistance != -1)
+		window.draw(targetName);
+	window.draw(shipDirection);
 }

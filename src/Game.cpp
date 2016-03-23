@@ -34,6 +34,10 @@ Game::Game() {
 
 	// Create the Astronomical Objects
 	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 1900, sf::Color(255, 255, 0))));
+	
+	// Set the name of the Sun
+	astro[0]->setName("Sun");
+
 	//float rae = rand() % 6;
 	//astro.push_back(std::unique_ptr<AstroObject>(new Planet(-cos(rae) * 100000, -sin(rae) * 100000, 500, sf::Color(0, 0, 255))));
 	//astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, 100000, 500, sf::Color(0, 0, 255))));
@@ -44,26 +48,60 @@ Game::Game() {
 	for (int i = 1; i < noPlanets; i++) {
 		//float rDist = rand() % (100000 - 50000 + 1) + 50000;
 		//float rR = rand() % (500 - 250 + 1) + 250;
+		
+		// Generate random Distance from the Sun, random Radius and random Orbital Phase
 		rDist += randomInt(100000, 150000);
 		float rR = randomInt(300, 500);
-		switch (randomInt(1, 4)) {
-			case 1:
-				astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
-				astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())), 0);
-				break;
-			case 2:
-				astro.push_back(std::unique_ptr<AstroObject>(new Planet(rDist, 0, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
-				astro[i]->addVelocity(0, -sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())));
-				break;
-			case 3:
-				astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, -rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
-				astro[i]->addVelocity(-sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())), 0);
-				break;
-			default:
-				astro.push_back(std::unique_ptr<AstroObject>(new Planet(-rDist, 0, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
-				astro[i]->addVelocity(0, sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())));
-				break;
+		float angle = randomFloat(0, PI * 2);
+		
+		// Create the Astro Object in the generated position
+		astro.push_back(std::unique_ptr<AstroObject>(new Planet(-cos(angle) * rDist, -sin(angle) * rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
+
+		// Increase the Angle to match the Direction of the Velocity Vector
+		angle += PI / 2;
+
+		// Calculate the Velocity needed to stay in Circular Orbit
+		float aV = sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()));
+	
+		// Set the velocity of the Astro Object
+		astro[i]->addVelocity(-cos(angle) * aV, -sin(angle) * aV);
+
+		// Set the name of the Planets
+		//astro[i]->setName("Planet" + std::to_string(i));
+		std::ifstream f;
+		f.open("Gods.txt");
+		if (f) {
+			std::string n;
+			for (int i = 0; i < randomInt(0, 2500); i++) {
+				f >> n;
+			}
+			int k = 0;
+			do {
+				f >> n;
+				k++;
+			} while (n.size() > 10 && k < 100);
+			f.close();
+			astro[i]->setName(n);
 		}
+
+		//switch (randomInt(1, 4)) {
+		//	case 1:
+		//		astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
+		//		astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())), 0);
+		//		break;
+		//	case 2:
+		//		astro.push_back(std::unique_ptr<AstroObject>(new Planet(rDist, 0, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
+		//		astro[i]->addVelocity(0, -sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())));
+		//		break;
+		//	case 3:
+		//		astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, -rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
+		//		astro[i]->addVelocity(-sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())), 0);
+		//		break;
+		//	default:
+		//		astro.push_back(std::unique_ptr<AstroObject>(new Planet(-rDist, 0, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
+		//		astro[i]->addVelocity(0, sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())));
+		//		break;
+		//}
 		//astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
 		//astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())), 0);
 		//fastForwardObject(1, randomInt(1000, 10000));
@@ -122,7 +160,7 @@ Game::Game() {
 	//ppm = dist(0, 0, astro[noPlanets - 1] -> getX(), astro[noPlanets - 1] -> getY()) / (screen.height / 2);
 
 	// Create an Astro Map
-	astroMap = std::unique_ptr<AstroMap>(new AstroMap((float)(dist(0, 0, astro[noPlanets - 1]->getX(), astro[noPlanets - 1]->getY()) / (screen.height / 2)), font));
+	astroMap = std::unique_ptr<AstroMap>(new AstroMap((float)(dist(0, 0, astro[noPlanets - 1]->getX(), astro[noPlanets - 1]->getY()) / (screen.height / 2.2)), font));
 	astroMap -> setShip(ships[0]->getX(), ships[0]->getY());
 	for (unsigned i = 0; i < astro.size(); i++) {
 		astroMap -> addAstro(screen, astro[i] -> getX(), astro[i] -> getY(), astro[i] -> getColour(), astro[i] -> getRadius());
@@ -213,6 +251,10 @@ void Game::events() {
 
 int Game::randomInt(int start, int stop) {
 	return rand() % (stop - start + 1) + start;
+}
+
+float Game::randomFloat(float start, float stop) {
+	return start + (float)(rand() / (float)(RAND_MAX / (stop - start)));
 }
 
 /*
@@ -431,6 +473,8 @@ void Game::update() {
 			distFromCentre = 0;
 		else
 			distFromCentre = (int)dist(astro[z]->getX(), astro[z]->getY(), ships[0]->getX(), ships[0]->getY()) - (int)astro[z]->getRadius() - (int)(20 * 0.15);
+		distFromCentre = distFromCentre < 0 ? 0 : distFromCentre;
+
 		//if (distFromCentre < screen.height / 2 * ppm) {
 		//	distance.setString("");
 		//} else {
@@ -501,13 +545,14 @@ void Game::update() {
 
 			distanceObject->setTargetDistance(distFromTarget);
 			distanceObject->setTargetAngle(thetaTarget);
+			distanceObject->setTargetName(astro[targetAstro]->getName());
 		}
 
 		// Velocity Vector
 		velocityVector->update(ships[0]->getVelocity());
 
 		// Distance To Object
-		distanceObject->update(theta, distFromCentre);
+		distanceObject->update(theta, distFromCentre, astro[z] -> getName(), ships[0] -> getAngle());
 
 		//frameTime.restart();
 		accumulator -= dt;

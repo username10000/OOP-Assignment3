@@ -25,7 +25,7 @@ void AstroMap::setAstro(sf::RenderWindow &window, sf::VideoMode screen, int p, d
 	//	astro[p].y = y;
 	//}
 	if (p < buttons.size()) {
-		buttons[p] -> setPosition((double)(((double)screen.width / 2) + x / (double)ppm - buttons[p] -> getWidth() / 2 - 20), (double)(((double)screen.height / 2) + y / (double)ppm - buttons[p]->getWidth() / 2 - 20));
+		buttons[p] -> setPosition((double)(((double)screen.width / 2) + x / (double)ppm - buttons[p] -> getWidth() / 4 - 20), (double)(((double)screen.height / 2) + y / (double)ppm - buttons[p]->getWidth() / 4 - 20));
 		buttons[p] -> update(window);
 	}
 }
@@ -56,6 +56,16 @@ void AstroMap::render(sf::RenderWindow &window, sf::VideoMode screen) {
 	//	window.draw(circle);
 	//}
 	for (unsigned i = 0; i < buttons.size(); i++) {
+		if (i != 0) {
+			double dFC = sqrt(pow(buttons[i]->getX() - (screen.width / 2), 2) + pow(buttons[i]->getY() - (screen.height / 2), 2));
+			sf::CircleShape orbit(dFC);
+			orbit.setFillColor(sf::Color::Transparent);
+			orbit.setOutlineThickness(1);
+			orbit.setOutlineColor(sf::Color::White);
+			orbit.setPointCount(200);
+			orbit.setPosition(screen.width / 2 - orbit.getRadius(), screen.height / 2 - orbit.getRadius());
+			window.draw(orbit);
+		}
 		buttons[i] -> render(window);
 	}
 
@@ -64,7 +74,7 @@ void AstroMap::render(sf::RenderWindow &window, sf::VideoMode screen) {
 	circle.setFillColor(sf::Color::Transparent);
 	circle.setOutlineColor(sf::Color::White);
 	circle.setOutlineThickness(1);
-	circle.setPosition(screen.width / 2 + ship.x / ppm - circle.getRadius() - 20, screen.height / 2 + ship.y / ppm - circle.getRadius() - 20);
+	circle.setPosition(screen.width / 2 + ship.x / ppm - circle.getRadius() / 2 - 20, screen.height / 2 + ship.y / ppm - circle.getRadius() / 2 - 20);
 	window.draw(circle);
 
 	// Draw Ship Text

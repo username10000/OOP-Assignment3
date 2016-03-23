@@ -7,12 +7,13 @@ AstroObject::AstroObject(double x, double y, float _radius, sf::Color _colour) :
 	force = velocity.x = velocity.y = 0;
 	acceleration = 0;
 	circle.setRadius(_radius);
-	circle.setPointCount(100);
+	circle.setPointCount(200);
 	circle.setFillColor(colour);
 	direction.x = 1;
 	direction.y = 1;
 	G = 0.667;
-	strcpy(name, "");
+	name = "OBJECT";
+	//strcpy(name, "");
 }
 
 AstroObject::AstroObject() : AstroObject(0, 0, 100, sf::Color(255, 255, 0)) {
@@ -66,8 +67,12 @@ void AstroObject::setDirection(double x, double y) {
 	direction.y = y;
 }
 
-void AstroObject::setName(char n[]) {
-	strncpy_s(name, n, 30);
+std::string AstroObject::getName() {
+	return name;
+}
+
+void AstroObject::setName(std::string n) {
+	name = n;
 }
 
 void AstroObject::setMass(float m) {

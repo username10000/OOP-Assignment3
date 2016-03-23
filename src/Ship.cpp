@@ -157,6 +157,10 @@ sf::FloatRect Ship::getBoundingBox() {
 	return sprite.getGlobalBounds();
 }
 
+float Ship::getAngle() {
+	return angle * 3.14159 / 180;
+}
+
 void Ship::update() {
 	for (int i = 0; i < 3; i++) {
 		ship[i].rotate(rotation);

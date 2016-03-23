@@ -3,6 +3,7 @@
 
 // Dependencies
 #include <iostream>
+#include <string>
 #include <SFML/Graphics.hpp>
 #include <GameObject.h>
 
@@ -18,7 +19,7 @@ class AstroObject : public GameObject {
 		sf::Vector2<double> direction;
 		sf::Color colour;
 		sf::CircleShape circle;
-		char name[31];
+		std::string name;
 	public:
 		AstroObject(double x, double y, float _radius, sf::Color _colour);
 		AstroObject();
@@ -35,7 +36,8 @@ class AstroObject : public GameObject {
 		void addVelocity(double x, double y);
 		sf::Vector2<double> getDirection();
 		void setDirection(double x, double y);
-		void setName(char n[]);
+		std::string getName();
+		void setName(std::string);
 		void setMass(float m);
 		sf::FloatRect getBoundingBox();
 };
