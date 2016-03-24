@@ -169,6 +169,13 @@ int Ship::getClosestPlanet() {
 	return closestPlanet;
 }
 
+void Ship::setRotation(float r) {
+	for (int i = 0; i < 3; i++) {
+		ship[i].rotate(r);
+	}
+	angle += r;
+}
+
 void Ship::update() {
 	for (int i = 0; i < 3; i++) {
 		ship[i].rotate(rotation);

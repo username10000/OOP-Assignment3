@@ -52,6 +52,7 @@ class Game {
 		int targetAstro;
 		bool onPlanet;
 		bool jump;
+		sf::Texture humanTexture;
 		//AstroMap astroMap(0);
 	public:
 		Game();

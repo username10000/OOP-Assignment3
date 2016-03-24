@@ -1,13 +1,13 @@
 #include <Sun.h>
 
-Sun::Sun(double x, double y, float _radius, sf::Color _colour) : AstroObject(x, y, _radius, _colour) {
+Sun::Sun(double x, double y, float _radius, sf::Color _colour, float _rotation) : AstroObject(x, y, _radius, _colour, _rotation) {
 	setMass(_radius * 9.3 * 5);
 	//circle.setRadius(_radius);
 	//circle.setPointCount(100);
 	//circle.setFillColor(_colour);
 }
 
-Sun::Sun() : Sun(0, 0, 100, sf::Color(255, 255, 0)) {
+Sun::Sun() : Sun(0, 0, 100, sf::Color(255, 255, 0), 0) {
 }
 
 void Sun::update() {

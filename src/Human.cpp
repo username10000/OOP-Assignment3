@@ -1,8 +1,8 @@
 #include <Human.h>
 
-Human::Human(double x, double y) : GameObject(x, y) {
-	texture.loadFromFile("human.png");
-	sprite.setTexture(texture);
+Human::Human(double x, double y, sf::Texture *texture) : GameObject(x, y) {
+	//texture.loadFromFile("human.png");
+	sprite.setTexture(*texture);
 	sprite.setOrigin(10, 20);
 
 	mass = 0.01;

@@ -8,15 +8,16 @@
 // Human
 class Human : public GameObject {
 	private:
-		sf::Texture texture;
+		//sf::Texture texture;
 		sf::Sprite sprite;
 		sf::Vector2<double> velocity;
 		sf::Vector2<double> direction;
 		float force;
 		float mass;
 		float angle;
+		float planetRotation;
 	public:
-		Human(double x, double y);
+		Human(double x, double y, sf::Texture *texture);
 		sf::Vector2<double> getVelocity();
 		sf::Vector2<double> getDirection();
 		float getMass();
@@ -26,6 +27,7 @@ class Human : public GameObject {
 		void setForce(float f);
 		void resetVelocity();
 		void setAngle(float a);
+		//void setPlanetRotation(float r);
 		void update();
 		void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);
 };

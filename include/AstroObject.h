@@ -15,13 +15,15 @@ class AstroObject : public GameObject {
 		double force;
 		float acceleration;
 		double G;
+		float rotation;
 		sf::Vector2<double> velocity;
 		sf::Vector2<double> direction;
 		sf::Color colour;
 		sf::CircleShape circle;
+		//sf::Texture texture;
 		std::string name;
 	public:
-		AstroObject(double x, double y, float _radius, sf::Color _colour);
+		AstroObject(double x, double y, float _radius, sf::Color _colour, float _rotation);
 		AstroObject();
 		virtual void update() = 0;
 		virtual void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);
@@ -40,6 +42,7 @@ class AstroObject : public GameObject {
 		void setName(std::string);
 		void setMass(float m);
 		sf::FloatRect getBoundingBox();
+		float getRotation();
 };
 
 #endif

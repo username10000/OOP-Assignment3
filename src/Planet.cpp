@@ -1,13 +1,13 @@
 #include <Planet.h>
 
-Planet::Planet(double x, double y, float _radius, sf::Color _colour) : AstroObject(x, y, _radius, _colour) {
+Planet::Planet(double x, double y, float _radius, sf::Color _colour, float _rotation) : AstroObject(x, y, _radius, _colour, _rotation) {
 	//circle.setRadius(_radius);
 	//circle.setPointCount(100);
 	//circle.setFillColor(_colour);
 	//addVelocity(1, 0);
 }
 
-Planet::Planet() : Planet(0, 0, 100, sf::Color(255, 255, 0)) {
+Planet::Planet() : Planet(0, 0, 100, sf::Color(255, 255, 0), 0.01) {
 }
 
 void Planet::update() {

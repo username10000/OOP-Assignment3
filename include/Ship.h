@@ -57,6 +57,7 @@ class Ship : public GameObject {
 		float getAngle();
 		void setClosestPlanet(int p);
 		int getClosestPlanet();
+		void setRotation(float r);
 		//float getAngleToPlanet();
 		//void setAngleToPlanet(float t);
 		//int getPlanet();

@@ -33,7 +33,7 @@ Game::Game() {
 	srand(time(NULL));
 
 	// Create the Astronomical Objects
-	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 1900, sf::Color(255, 255, 0))));
+	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 1900, sf::Color(255, 255, 0), 0)));
 	
 	// Set the name of the Sun
 	astro[0]->setName("Sun");
@@ -55,7 +55,7 @@ Game::Game() {
 		float angle = randomFloat(0, PI * 2);
 		
 		// Create the Astro Object in the generated position
-		astro.push_back(std::unique_ptr<AstroObject>(new Planet(-cos(angle) * rDist, -sin(angle) * rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
+		astro.push_back(std::unique_ptr<AstroObject>(new Planet(-cos(angle) * rDist, -sin(angle) * rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256), randomFloat(0.01, 0.1))));
 
 		// Increase the Angle to match the Direction of the Velocity Vector
 		angle += PI / 2;
@@ -124,7 +124,8 @@ Game::Game() {
 	ships[0]->setClosestPlanet(1);
 
 	// Add Human
-	human = std::unique_ptr<Human>(new Human(0, 0));
+	humanTexture.loadFromFile("human.png");
+	human = std::unique_ptr<Human>(new Human(0, 0, &humanTexture));
 
 	//std::cout << ships[0]
 
@@ -474,11 +475,13 @@ void Game::collisions() {
 				float dx = astro[i]->getX() - ships[j]->getX();
 				float theta = atan2(dy, dx);
 				theta = theta >= 0 ? theta : theta + 2 * PI;
+				theta += astro[i]->getRotation() * PI / 180;
 				ships[j]->resetVelocity();
 				sf::Vector2<double> v = astro[i]->getVelocity();
 				ships[j]->addVelocity(v.x, v.y);
 				ships[j]->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() + 20 * 0.15)); // + ships[j]->getRadius()
 				ships[j]->setY(astro[i]->getY() - sin(theta) * (astro[i]->getRadius() + 20 * 0.15)); // + ships[j]->getRadius()
+				ships[j]->setRotation(astro[i]->getRotation());
 				ships[j]->setLanded(true);
 			}
 		}
@@ -487,6 +490,7 @@ void Game::collisions() {
 			float dx = astro[i]->getX() - human->getX();
 			float theta = atan2(dy, dx);
 			theta = theta >= 0 ? theta : theta + 2 * PI;
+			theta += astro[i]->getRotation() * PI / 180;
 			human->resetVelocity();
 			sf::Vector2<double> v = astro[i]->getVelocity();
 			human->addVelocity(v.x, v.y);
