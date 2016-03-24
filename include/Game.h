@@ -18,6 +18,7 @@
 #include <VelocityVector.h>
 #include <DistanceToObject.h>
 #include <AstroMap.h>
+#include <Human.h>
 
 // Game
 class Game {
@@ -37,6 +38,7 @@ class Game {
 		std::unique_ptr<VelocityVector> velocityVector;
 		std::unique_ptr<DistanceToObject> distanceObject;
 		std::unique_ptr<AstroMap> astroMap;
+		std::unique_ptr<Human> human;
 		SolarSystem solarSystem;
 		sf::Vector2<double> view;
 		float ppm;
@@ -48,6 +50,8 @@ class Game {
 		float dt;
 		float accumulator;
 		int targetAstro;
+		bool onPlanet;
+		bool jump;
 		//AstroMap astroMap(0);
 	public:
 		Game();

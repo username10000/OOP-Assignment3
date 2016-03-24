@@ -32,7 +32,7 @@ VelocityVector::VelocityVector(sf::VideoMode _screen) {
 	zoom.setOrigin((float)zoom.getCharacterSize() / 2, (float)zoom.getCharacterSize() / 2);
 	//zoom.setOrigin(zoom.getLocalBounds().left + zoom.getLocalBounds().width / 2, zoom.getLocalBounds().top + zoom.getLocalBounds().height / 2);
 	zoom.setString("x1");
-	std::cout << zoom.getCharacterSize();
+	//std::cout << zoom.getCharacterSize();
 	zoom.setPosition(screen.width - size + offset, screen.height - zoom.getCharacterSize() - offset);
 
 	zoomLevel = 1;

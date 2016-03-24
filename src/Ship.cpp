@@ -161,6 +161,14 @@ float Ship::getAngle() {
 	return angle * 3.14159 / 180;
 }
 
+void Ship::setClosestPlanet(int p) {
+	closestPlanet = p;
+}
+
+int Ship::getClosestPlanet() {
+	return closestPlanet;
+}
+
 void Ship::update() {
 	for (int i = 0; i < 3; i++) {
 		ship[i].rotate(rotation);
@@ -214,6 +222,7 @@ void Ship::update() {
 void Ship::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {
 	for (int i = 0; i < 3; i++) {
 		ship[i].setScale((double)0.15 / ppm, (double)0.15 / ppm);
+		ship[i].setPosition((double)(((double)screen.width / 2) + (getX() - view.x) / (double)ppm - 20), (double)(((double)screen.height / 2) + (getY() - view.y) / (double)ppm - 20));
 		//ship[i].setPosition((double)(((double)screen.width / 2) + (getX() - view.x) / (double)ppm - ship[i].getGlobalBounds().width / 2), (double)(((double)screen.height / 2) + (getY() - view.y) / (double)ppm - ship[i].getGlobalBounds().width / 2));
 	}
 	//sprite.setScale(1 / ppm, 1 / ppm);

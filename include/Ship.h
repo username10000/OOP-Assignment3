@@ -28,6 +28,7 @@ class Ship : public GameObject {
 		bool landed;
 		//int planet;
 		int spriteNo;
+		int closestPlanet;
 		sf::Clock lastChange;
 	public:
 		Ship(double x, double y, float screenX, float screenY);
@@ -54,6 +55,8 @@ class Ship : public GameObject {
 		bool getLanded();
 		void setLanded(bool l);
 		float getAngle();
+		void setClosestPlanet(int p);
+		int getClosestPlanet();
 		//float getAngleToPlanet();
 		//void setAngleToPlanet(float t);
 		//int getPlanet();

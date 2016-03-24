@@ -104,9 +104,10 @@ void DistanceToObject::update(float _angle, float _distance, std::string _name, 
 	line[1] = sf::Vertex(sf::Vector2f(offset + size / 2 - cos(angle) * size / 2, screen.height - size / 2 - offset - sin(angle) * size / 2), sf::Color::Red);
 
 	// Set the angle of the Ship
-	shipAngle = _shipAngle + 3.14159 / 2;
+	shipAngle = _shipAngle + 3.14159 / 2 + 0.15;
 	shipDirection.setPosition(size / 2 + offset - cos(shipAngle) * (size / 4 + shipDirection.getRadius()), screen.height - size / 2 - offset - sin(shipAngle) * (size / 4 + shipDirection.getRadius()));
-	shipDirection.setRotation(shipAngle * 180 / 3.14159265359 + 23);
+	shipDirection.setRotation(shipAngle * 180 / 3.14159 + 23);
+	//std::cout << shipAngle << std::endl;
 
 	if (targetDistance != -1) {
 		// Creating the string
