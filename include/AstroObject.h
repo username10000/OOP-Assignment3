@@ -4,8 +4,11 @@
 // Dependencies
 #include <iostream>
 #include <string>
+#include <memory>
 #include <SFML/Graphics.hpp>
 #include <GameObject.h>
+#include <Human.h>
+#include <Functions.h>
 
 // AstroObject
 class AstroObject : public GameObject {
@@ -22,6 +25,9 @@ class AstroObject : public GameObject {
 		sf::CircleShape circle;
 		//sf::Texture texture;
 		std::string name;
+		bool habitable;
+		std::vector<std::unique_ptr<Human>> locals;
+		sf::Texture humanTexture;
 	public:
 		AstroObject(double x, double y, float _radius, sf::Color _colour, float _rotation);
 		AstroObject();
@@ -43,6 +49,8 @@ class AstroObject : public GameObject {
 		void setMass(float m);
 		sf::FloatRect getBoundingBox();
 		float getRotation();
+		bool isHabitable();
+		void setHumanTexture(sf::Texture *hT);
 };
 
 #endif

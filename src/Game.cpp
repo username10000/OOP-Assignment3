@@ -42,7 +42,7 @@ Game::Game() {
 	//astro.push_back(std::unique_ptr<AstroObject>(new Planet(-cos(rae) * 100000, -sin(rae) * 100000, 500, sf::Color(0, 0, 255))));
 	//astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, 100000, 500, sf::Color(0, 0, 255))));
 
-	noPlanets = randomInt(5, 10);
+	noPlanets = Functions::randomInt(5, 10);
 
 	float rDist = 0;
 	for (int i = 1; i < noPlanets; i++) {
@@ -50,18 +50,21 @@ Game::Game() {
 		//float rR = rand() % (500 - 250 + 1) + 250;
 		
 		// Generate random Distance from the Sun, random Radius and random Orbital Phase
-		rDist += randomInt(100000, 150000);
-		float rR = randomInt(300, 500);
-		float angle = randomFloat(0, PI * 2);
+		rDist += Functions::randomInt(100000, 150000);
+		float rR = Functions::randomInt(300, 500);
+		float angle = Functions::randomFloat(0, PI * 2);
 		
 		// Create the Astro Object in the generated position
-		astro.push_back(std::unique_ptr<AstroObject>(new Planet(-cos(angle) * rDist, -sin(angle) * rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256), randomFloat(0.01, 0.1))));
+		astro.push_back(std::unique_ptr<AstroObject>(new Planet(-cos(angle) * rDist, -sin(angle) * rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256), Functions::randomFloat(0.01, 0.05))));
+		if (astro[i]->isHabitable()) {
+			astro[i]->setHumanTexture(&humanTexture);
+		}
 
 		// Increase the Angle to match the Direction of the Velocity Vector
 		angle += PI / 2;
 
 		// Calculate the Velocity needed to stay in Circular Orbit
-		float aV = sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()));
+		float aV = sqrt(astro[0]->getG() * astro[0]->getMass() / Functions::dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()));
 	
 		// Set the velocity of the Astro Object
 		astro[i]->addVelocity(-cos(angle) * aV, -sin(angle) * aV);
@@ -72,7 +75,7 @@ Game::Game() {
 		f.open("Gods.txt");
 		if (f) {
 			std::string n;
-			for (int i = 0; i < randomInt(0, 2500); i++) {
+			for (int i = 0; i < Functions::randomInt(0, 2500); i++) {
 				f >> n;
 			}
 			int k = 0;
@@ -156,9 +159,9 @@ Game::Game() {
 	accumulator = 0;
 
 	for (unsigned int i = 0; i < 200; i++) {
-		stars[i][0] = randomInt(0, screen.width);
-		stars[i][1] = randomInt(0, screen.height);
-		stars[i][2] = randomInt(1, 3);
+		stars[i][0] = Functions::randomInt(0, screen.width);
+		stars[i][1] = Functions::randomInt(0, screen.height);
+		stars[i][2] = Functions::randomInt(1, 3);
 	}
 
 	// Menu Flags
@@ -167,7 +170,7 @@ Game::Game() {
 	//ppm = dist(0, 0, astro[noPlanets - 1] -> getX(), astro[noPlanets - 1] -> getY()) / (screen.height / 2);
 
 	// Create an Astro Map
-	astroMap = std::unique_ptr<AstroMap>(new AstroMap((float)(dist(0, 0, astro[noPlanets - 1]->getX(), astro[noPlanets - 1]->getY()) / (screen.height / 2.2)), font));
+	astroMap = std::unique_ptr<AstroMap>(new AstroMap((float)(Functions::dist(0, 0, astro[noPlanets - 1]->getX(), astro[noPlanets - 1]->getY()) / (screen.height / 2.2)), font));
 	astroMap -> setShip(ships[0]->getX(), ships[0]->getY());
 	for (unsigned i = 0; i < astro.size(); i++) {
 		astroMap -> addAstro(screen, astro[i] -> getX(), astro[i] -> getY(), astro[i] -> getColour(), astro[i] -> getRadius());
@@ -190,28 +193,28 @@ Game::~Game() {
 int Game::getStop() {
 	return stop;
 }
-
-double Game::dist(double x1, double y1, double x2, double y2) {
-	double X = pow(x2 - x1, 2);
-	double Y = pow(y2 - y1, 2);
-
-	return sqrt(X + Y);
-}
-
-double Game::map(double v, double lmin, double lmax, double rmin, double rmax) {
-	if (v < lmin)
-		v = lmin;
-
-	if (v > lmax)
-		v = lmax;
-
-	double leftRange = lmax - lmin;
-	double rightRange = rmax - rmin;
-
-	double leftPercentage = (v - lmin) / leftRange;
-
-	return rmin + (leftPercentage * rightRange);
-}
+//
+//double Game::dist(double x1, double y1, double x2, double y2) {
+//	double X = pow(x2 - x1, 2);
+//	double Y = pow(y2 - y1, 2);
+//
+//	return sqrt(X + Y);
+//}
+//
+//double Game::map(double v, double lmin, double lmax, double rmin, double rmax) {
+//	if (v < lmin)
+//		v = lmin;
+//
+//	if (v > lmax)
+//		v = lmax;
+//
+//	double leftRange = lmax - lmin;
+//	double rightRange = rmax - rmin;
+//
+//	double leftPercentage = (v - lmin) / leftRange;
+//
+//	return rmin + (leftPercentage * rightRange);
+//}
 
 void Game::disableMenus() {
 	for (auto el = menu.begin(); el != menu.end(); el++) {
@@ -238,7 +241,6 @@ void Game::events() {
 			// E - Exit / Enter
 			if (event.key.code == 4) {
 				onPlanet = !onPlanet;
-
 				// Initial Settings when the Player Exits the Ship
 				if (onPlanet) {
 					int cP = ships[0]->getClosestPlanet();
@@ -277,14 +279,14 @@ void Game::events() {
 		}
 	}
 }
-
-int Game::randomInt(int start, int stop) {
-	return rand() % (stop - start + 1) + start;
-}
-
-float Game::randomFloat(float start, float stop) {
-	return start + (float)(rand() / (float)(RAND_MAX / (stop - start)));
-}
+//
+//int Game::randomInt(int start, int stop) {
+//	return rand() % (stop - start + 1) + start;
+//}
+//
+//float Game::randomFloat(float start, float stop) {
+//	return start + (float)(rand() / (float)(RAND_MAX / (stop - start)));
+//}
 
 /*
 float Game::semiMajorAxis(int i) {
@@ -454,7 +456,7 @@ void Game::keyPressed() {
 void Game::fastForwardObject(int i, int loops) {
 	for (int j = 0; j < loops; j++) {
 		// Apply Force to the Planet
-		astro[i]->setForce(astro[0]->getG() * astro[0]->getMass() * astro[i]->getMass() / pow(dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()), 2));
+		astro[i]->setForce(astro[0]->getG() * astro[0]->getMass() * astro[i]->getMass() / pow(Functions::dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()), 2));
 
 		// Angle between the Sun and the Planet
 		float dy = astro[i]->getY() - astro[0]->getY();
@@ -470,7 +472,7 @@ void Game::collisions() {
 	for (int i = 0; i < astro.size(); i++) {
 		for (int j = 0; j < ships.size(); j++) {
 			ships[j]->setLanded(false);
-			if (dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) < astro[i]->getRadius() + 20 * 0.15) { // + ships[j] -> getRadius()
+			if (Functions::dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) < astro[i]->getRadius() + 20 * 0.15) { // + ships[j] -> getRadius()
 				float dy = astro[i]->getY() - ships[j]->getY();
 				float dx = astro[i]->getX() - ships[j]->getX();
 				float theta = atan2(dy, dx);
@@ -485,7 +487,7 @@ void Game::collisions() {
 				ships[j]->setLanded(true);
 			}
 		}
-		if (dist(astro[i]->getX(), astro[i]->getY(), human->getX(), human->getY()) < astro[i]->getRadius() + 20 * 0.07 && onPlanet) { // i == ships[0]->getClosestPlanet() && 
+		if (Functions::dist(astro[i]->getX(), astro[i]->getY(), human->getX(), human->getY()) < astro[i]->getRadius() + 20 * 0.07 && onPlanet) { // i == ships[0]->getClosestPlanet() && 
 			float dy = astro[i]->getY() - human->getY();
 			float dx = astro[i]->getX() - human->getX();
 			float theta = atan2(dy, dx);
@@ -533,7 +535,7 @@ void Game::update() {
 
 		// Apply Force to the Planets
 		for (unsigned int i = 1; i < astro.size(); i++) {
-			astro[i]->setForce(astro[0]->getG() * astro[0]->getMass() * astro[i]->getMass() / pow(dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()), 2));
+			astro[i]->setForce(astro[0]->getG() * astro[0]->getMass() * astro[i]->getMass() / pow(Functions::dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()), 2));
 
 			// Angle between the Sun and the Planets
 			float dy = astro[i]->getY() - astro[0]->getY();
@@ -548,14 +550,14 @@ void Game::update() {
 		int z = 0;
 
 		for (int i = 0; i < astro.size(); i++) {
-			if (dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()) < minDist) {
-				minDist = dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY());
+			if (Functions::dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()) < minDist) {
+				minDist = Functions::dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY());
 				z = i;
 			}
 		}
 
 		// Apply force to the Ship
-		ships[0]->setForce(astro[z]->getG() * astro[z]->getMass() * ships[0]->getMass() / pow(dist(astro[z]->getX(), astro[z]->getY(), ships[0]->getX(), ships[0]->getY()), 2));
+		ships[0]->setForce(astro[z]->getG() * astro[z]->getMass() * ships[0]->getMass() / pow(Functions::dist(astro[z]->getX(), astro[z]->getY(), ships[0]->getX(), ships[0]->getY()), 2));
 		ships[0]->setClosestPlanet(z);
 
 		// Angle between the Ship and the Planets
@@ -570,12 +572,12 @@ void Game::update() {
 		if (ships[0]->getLanded())
 			distFromCentre = 0;
 		else
-			distFromCentre = (int)dist(astro[z]->getX(), astro[z]->getY(), ships[0]->getX(), ships[0]->getY()) - (int)astro[z]->getRadius() - (int)(20 * 0.15);
+			distFromCentre = (int)Functions::dist(astro[z]->getX(), astro[z]->getY(), ships[0]->getX(), ships[0]->getY()) - (int)astro[z]->getRadius() - (int)(20 * 0.15);
 		distFromCentre = distFromCentre < 0 ? 0 : distFromCentre;
 
 		if (onPlanet) {
 			// Apply force to the human
-			human->setForce(astro[z]->getG() * astro[z]->getMass() * human->getMass() / pow(dist(astro[z]->getX(), astro[z]->getY(), human->getX(), human->getY()), 2));
+			human->setForce(astro[z]->getG() * astro[z]->getMass() * human->getMass() / pow(Functions::dist(astro[z]->getX(), astro[z]->getY(), human->getX(), human->getY()), 2));
 
 			// Angle between the Human and the Planets
 			dy = human->getY() - astro[z]->getY();
@@ -653,7 +655,7 @@ void Game::update() {
 		// Setting the info for the target
 		if (targetAstro != -1) {
 			// Distance from Target
-			int distFromTarget = (int)dist(astro[targetAstro]->getX(), astro[targetAstro]->getY(), ships[0]->getX(), ships[0]->getY()) - (int)astro[targetAstro]->getRadius() - (int)(20 * 0.15);
+			int distFromTarget = (int)Functions::dist(astro[targetAstro]->getX(), astro[targetAstro]->getY(), ships[0]->getX(), ships[0]->getY()) - (int)astro[targetAstro]->getRadius() - (int)(20 * 0.15);
 			distFromTarget = distFromTarget < 0 ? 0 : distFromTarget;
 
 			// Angle between the Ship and the Target
@@ -705,7 +707,7 @@ void Game::render() {
 				double vMargin = (screen.height - newHeight) / 2;
 				if (stars[i][0] > hMargin && stars[i][0] < screen.width - hMargin && stars[i][1] > vMargin && stars[i][1] < screen.height - vMargin) {
 					sf::CircleShape c(stars[i][2]);
-					c.setPosition(map(stars[i][0], hMargin, screen.width - hMargin, 0, screen.width) - 20, map(stars[i][1], vMargin, screen.height - vMargin, 0, screen.height) - 20);
+					c.setPosition(Functions::map(stars[i][0], hMargin, screen.width - hMargin, 0, screen.width) - 20, Functions::map(stars[i][1], vMargin, screen.height - vMargin, 0, screen.height) - 20);
 					window.draw(c);
 				}
 			}

@@ -1,11 +1,12 @@
 #ifndef SHIP_H
 #define SHIP_H
-#define PI 3.14159
+//#define PI 3.14159
 
 // Dependencies
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <GameObject.h>
+#include <Functions.h>
 #include <cmath>
 
 // Ship

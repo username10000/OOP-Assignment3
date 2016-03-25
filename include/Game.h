@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <unordered_map>
 #include <SFML/Graphics.hpp>
+#include <Functions.h>
 #include <memory>
 #include <cmath>
 #include <Formula.h>
@@ -59,16 +60,16 @@ class Game {
 		~Game();
 		void events();
 		int getStop();
-		double dist(double x1, double y1, double x2, double y2);
+		//double dist(double x1, double y1, double x2, double y2);
 		//float semiMajorAxis(int i);
 		//float eccentricityVector(int i);
 		//float apoapsis(int i);
 		void keyPressed();
 		void collisions();
 		void fastForwardObject(int i, int loops);
-		int randomInt(int start, int stop);
-		float randomFloat(float start, float stop);
-		double map(double v, double lmin, double lmax, double rmin, double rmax);
+		//int randomInt(int start, int stop);
+		//float randomFloat(float start, float stop);
+		//double map(double v, double lmin, double lmax, double rmin, double rmax);
 		void disableMenus();
 		void update();
 		void render();
