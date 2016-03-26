@@ -20,14 +20,14 @@ AstroObject::AstroObject(double x, double y, float _radius, sf::Color _colour, f
 	rotation = _rotation;
 	habitable = true;
 	
-	if (habitable) {
-		for (int i = 0; i < rand() % (20 - 5) + 5; i++) {
-			locals.push_back(std::unique_ptr<Human>(new Human(0, 0, &humanTexture)));
-			float rAngle = Functions::randomFloat(0, 2 * PI);
-			locals[i] -> setX(getX() - cos(rAngle) * radius);
-			locals[i] -> setY(getY() - sin(rAngle) * radius);
-		}
-	}
+	//if (habitable) {
+	//	for (int i = 0; i < rand() % (20 - 5) + 5; i++) {
+	//		locals.push_back(std::unique_ptr<Human>(new Human(0, 0, &humanTexture)));
+	//		float rAngle = Functions::randomFloat(0, 2 * PI);
+	//		locals[i] -> setX(getX() - cos(rAngle) * radius);
+	//		locals[i] -> setY(getY() - sin(rAngle) * radius);
+	//	}
+	//}
 }
 
 AstroObject::AstroObject() : AstroObject(0, 0, 100, sf::Color(255, 255, 0), 0.01) {
@@ -105,27 +105,27 @@ bool AstroObject::isHabitable() {
 	return habitable;
 }
 
-void AstroObject::setHumanTexture(sf::Texture *hT) {
-	humanTexture = *hT;
-}
+//void AstroObject::setHumanTexture(sf::Texture *hT) {
+//	humanTexture = *hT;
+//}
 
 void AstroObject::update() {
-	if (habitable) {
-		for (int i = 0; i < locals.size(); i++) {
-			if (Functions::dist(getX(), getY(), locals[i]->getX(), locals[i]->getY()) < getRadius() + 20 * 0.07) { // i == ships[0]->getClosestPlanet() && 
-				float dy = getY() - locals[i]->getY();
-				float dx = getX() - locals[i]->getX();
-				float theta = atan2(dy, dx);
-				theta = theta >= 0 ? theta : theta + 2 * PI;
-				theta += getRotation() * PI / 180;
-				locals[i]->resetVelocity();
-				sf::Vector2<double> v = getVelocity();
-				locals[i]->addVelocity(v.x, v.y);
-				locals[i]->setX(getX() - cos(theta) * (getRadius() + 20 * 0.07));
-				locals[i]->setY(getY() - sin(theta) * (getRadius() + 20 * 0.07));
-			}
-		}
-	}
+	//if (habitable) {
+	//	for (int i = 0; i < locals.size(); i++) {
+	//		if (Functions::dist(getX(), getY(), locals[i]->getX(), locals[i]->getY()) < getRadius() + 20 * 0.07) { // i == ships[0]->getClosestPlanet() && 
+	//			float dy = getY() - locals[i]->getY();
+	//			float dx = getX() - locals[i]->getX();
+	//			float theta = atan2(dy, dx);
+	//			theta = theta >= 0 ? theta : theta + 2 * PI;
+	//			theta += getRotation() * PI / 180;
+	//			locals[i]->resetVelocity();
+	//			sf::Vector2<double> v = getVelocity();
+	//			locals[i]->addVelocity(v.x, v.y);
+	//			locals[i]->setX(getX() - cos(theta) * (getRadius() + 20 * 0.07));
+	//			locals[i]->setY(getY() - sin(theta) * (getRadius() + 20 * 0.07));
+	//		}
+	//	}
+	//}
 }
 
 void AstroObject::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {
@@ -138,9 +138,9 @@ void AstroObject::render(sf::RenderWindow &window, sf::Vector2<double> view, sf:
 	//circle.setScale(getRadius() / ppm, getRadius() / ppm);
 	window.draw(circle);
 
-	if (habitable) {
-		for (int i = 0; i < locals.size(); i++) {
-			locals[i]->render(window, view, screen, ppm);
-		}
-	}
+	//if (habitable) {
+	//	for (int i = 0; i < locals.size(); i++) {
+	//		locals[i]->render(window, view, screen, ppm);
+	//	}
+	//}
 }

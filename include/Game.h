@@ -54,6 +54,8 @@ class Game {
 		bool onPlanet;
 		bool jump;
 		sf::Texture humanTexture;
+		std::vector<std::unique_ptr<Human>> locals;
+		int closestPlanet;
 		//AstroMap astroMap(0);
 	public:
 		Game();

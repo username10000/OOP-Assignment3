@@ -56,9 +56,6 @@ Game::Game() {
 		
 		// Create the Astro Object in the generated position
 		astro.push_back(std::unique_ptr<AstroObject>(new Planet(-cos(angle) * rDist, -sin(angle) * rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256), Functions::randomFloat(0.01, 0.05))));
-		if (astro[i]->isHabitable()) {
-			astro[i]->setHumanTexture(&humanTexture);
-		}
 
 		// Increase the Angle to match the Direction of the Velocity Vector
 		angle += PI / 2;
@@ -184,6 +181,17 @@ Game::Game() {
 
 	// Set the Human's state
 	jump = false;
+
+	closestPlanet = 1;
+
+	// Create Vector to store the Locals
+	for (int i = 0; i < 20; i++) {
+		locals.push_back(std::unique_ptr<Human>(new Human(0, 0, &humanTexture)));
+		int cP = closestPlanet;
+		float theta = Functions::randomFloat(0, 2 * PI);
+		locals[i]->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
+		locals[i]->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
+	}
 }
 
 Game::~Game() {
@@ -500,6 +508,20 @@ void Game::collisions() {
 			human->setY(astro[i]->getY() - sin(theta) * (astro[i]->getRadius() + 20 * 0.07));
 			jump = false;
 		}
+		for (int j = 0; j < locals.size(); j++) {
+			if (Functions::dist(astro[i]->getX(), astro[i]->getY(), locals[j]->getX(), locals[j]->getY()) < astro[i]->getRadius() + 20 * 0.07) {
+				float dy = astro[i]->getY() - locals[j]->getY();
+				float dx = astro[i]->getX() - locals[j]->getX();
+				float theta = atan2(dy, dx);
+				theta = theta >= 0 ? theta : theta + 2 * PI;
+				theta += astro[i]->getRotation() * PI / 180;
+				locals[j]->resetVelocity();
+				sf::Vector2<double> v = astro[i]->getVelocity();
+				locals[j]->addVelocity(v.x, v.y);
+				locals[j]->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() + 20 * 0.07));
+				locals[j]->setY(astro[i]->getY() - sin(theta) * (astro[i]->getRadius() + 20 * 0.07));
+			}
+		}
 	}
 }
 
@@ -589,6 +611,18 @@ void Game::update() {
 
 			// Update the Human
 			human->update();
+		}
+
+		// Update for the Locals
+		for (int i = 0; i < locals.size(); i++) {
+			dy = locals[i]->getY() - astro[z]->getY();
+			dx = locals[i]->getX() - astro[z]->getX();
+			float hAngle = atan2(dy, dx);
+			hAngle = hAngle >= 0 ? hAngle : hAngle + 2 * PI;
+			locals[i]->setForce(astro[z]->getG() * astro[z]->getMass() * locals[i]->getMass() / pow(Functions::dist(astro[z]->getX(), astro[z]->getY(), locals[i]->getX(), locals[i]->getY()), 2));
+			locals[i]->setDirection(-cos(hAngle), -sin(hAngle));
+			locals[i]->setAngle((hAngle + PI / 2) * 180 / PI);
+			locals[i]->update();
 		}
 
 		//if (distFromCentre < screen.height / 2 * ppm) {
@@ -730,6 +764,11 @@ void Game::render() {
 		// Ships
 		for (int i = 0; i < ships.size(); i++) {
 			ships[i]->render(window, view, screen, ppm);
+		}
+
+		// Locals
+		for (int i = 0; i < locals.size(); i++) {
+			locals[i]->render(window, view, screen, ppm);
 		}
 
 		// Human
