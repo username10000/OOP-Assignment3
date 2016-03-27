@@ -192,6 +192,9 @@ Game::Game() {
 		locals[i]->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
 		locals[i]->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
 	}
+
+	planetTexture.loadFromFile("T1.png");
+	astro[1]->setPlanetTexture(&planetTexture);
 }
 
 Game::~Game() {

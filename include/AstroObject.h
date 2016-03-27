@@ -23,7 +23,7 @@ class AstroObject : public GameObject {
 		sf::Vector2<double> direction;
 		sf::Color colour;
 		sf::CircleShape circle;
-		//sf::Texture texture;
+		sf::Texture texture;
 		std::string name;
 		bool habitable;
 		//std::vector<std::unique_ptr<Human>> locals;
@@ -50,7 +50,7 @@ class AstroObject : public GameObject {
 		sf::FloatRect getBoundingBox();
 		float getRotation();
 		bool isHabitable();
-		//void setHumanTexture(sf::Texture *hT);
+		void AstroObject::setPlanetTexture(sf::Texture *pT);
 };
 
 #endif

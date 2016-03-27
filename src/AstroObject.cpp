@@ -1,8 +1,8 @@
 #include <AstroObject.h>
 
 AstroObject::AstroObject(double x, double y, float _radius, sf::Color _colour, float _rotation) : GameObject(x, y) {
-	//texture.loadFromFile("grass2.png");
-	//texture.setRepeated(true);
+	//texture.loadFromFile("T1.png");
+	//texture.setRepeated(false);
 	radius = _radius;
 	colour = _colour;
 	mass = (float)(_radius * 9.3);
@@ -11,8 +11,16 @@ AstroObject::AstroObject(double x, double y, float _radius, sf::Color _colour, f
 	circle.setRadius(_radius);
 	circle.setOrigin(_radius, _radius);
 	circle.setPointCount(200);
+
 	//circle.setTexture(&texture);
-	circle.setFillColor(colour);
+	//sf::IntRect sR;
+	//sR.left = 100;
+	//sR.top = 100;
+	//sR.width = radius * 10;
+	//sR.height = radius * 10;
+	//circle.setTextureRect(sR);
+
+	//circle.setFillColor(sf::Color::Yellow);
 	direction.x = 1;
 	direction.y = 1;
 	G = 0.667;
@@ -105,9 +113,15 @@ bool AstroObject::isHabitable() {
 	return habitable;
 }
 
-//void AstroObject::setHumanTexture(sf::Texture *hT) {
-//	humanTexture = *hT;
-//}
+void AstroObject::setPlanetTexture(sf::Texture *pT) {
+	circle.setTexture(pT);
+	sf::IntRect sR;
+	sR.left = Functions::randomFloat(0, 10000 - radius * 10);
+	sR.top = Functions::randomFloat(0, 10000 - radius * 10);
+	sR.width = radius * 10;
+	sR.height = radius * 10;
+	circle.setTextureRect(sR);
+}
 
 void AstroObject::update() {
 	//if (habitable) {
