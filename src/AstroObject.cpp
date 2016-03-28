@@ -12,6 +12,69 @@ AstroObject::AstroObject(double x, double y, float _radius, sf::Color _colour, f
 	circle.setOrigin(_radius, _radius);
 	circle.setPointCount(200);
 
+	//rTexture.create(radius, radius);
+	//rTexture.clear(sf::Color::Green);
+
+	//float xCentre = radius / 2;
+	//float yCentre = radius / 2;
+	//std::vector<sf::Vertex> vertices;
+
+	//// Centre
+	//vertices.push_back(sf::Vertex(sf::Vector2f(xCentre, yCentre), sf::Color::Red));
+	//float maxRadius = 100;
+	//float lastRadius = maxRadius;
+
+	//int verticesNum = 100;
+	//for (int i = 1; i <= verticesNum; i++) {
+	//	float theta = Functions::map(i, 1, verticesNum, 0, 2 * PI);
+	//	if (Functions::randomInt(0, 1) == 0 || lastRadius > maxRadius)
+	//		lastRadius -= Functions::randomFloat(1, maxRadius / 10);
+	//	else
+	//		lastRadius += Functions::randomFloat(1, maxRadius / 10);
+	//	float xPos = xCentre + sin(theta) * lastRadius;
+	//	float yPos = yCentre - cos(theta) * lastRadius;
+	//	vertices.push_back(sf::Vertex(sf::Vector2f(xPos, yPos), sf::Color::Red));
+	//}
+
+	//rTexture.draw(&vertices[0], vertices.size(), sf::TrianglesFan);
+
+	//rTexture.display();
+	//circle.setTexture(&rTexture.getTexture());
+
+	//sf::Image image;
+	//int imageRadius = 2000;
+	//image.create(imageRadius, imageRadius);
+
+	//// Texture Background
+	//for (int i = 0; i < imageRadius; i++) {
+	//	for (int j = 0; j < imageRadius; j++) {
+	//		image.setPixel(i, j, sf::Color::Green);
+	//	}
+	//}
+
+	//// Islands
+	//for (int z = 0; z < Functions::randomInt(50, 100); z++) {
+	//	int maxRadius = Functions::randomInt(50, 100);
+	//	sf::Vector2i coords;
+	//	coords.x = Functions::randomInt(0, imageRadius - 1);
+	//	coords.y = Functions::randomInt(0, imageRadius - 1);
+
+	//	for (int i = coords.x - maxRadius; i <= coords.x + maxRadius; i++) {
+	//		for (int j = coords.y - maxRadius; j <= coords.y + maxRadius; j++) {
+	//			if (i > 0 && i < imageRadius && j > 0 && j < imageRadius && Functions::dist(i, j, coords.x, coords.y) <= maxRadius) {
+	//				int distance = (int)Functions::dist(i, j, coords.x, coords.y);
+	//				int mappedDistance = (int)Functions::map(distance, 0, maxRadius, 100, 1);
+	//				if (Functions::randomInt(1, 100) <= mappedDistance) {
+	//					image.setPixel(i, j, sf::Color::Blue);
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+
+	//texture.loadFromImage(image);
+	//circle.setTexture(&texture);
+
 	//circle.setTexture(&texture);
 	//sf::IntRect sR;
 	//sR.left = 100;
@@ -115,38 +178,28 @@ bool AstroObject::isHabitable() {
 
 void AstroObject::setPlanetTexture(sf::Texture *pT) {
 	circle.setTexture(pT);
-	sf::IntRect sR;
-	sR.left = Functions::randomFloat(0, 10000 - radius * 10);
-	sR.top = Functions::randomFloat(0, 10000 - radius * 10);
-	sR.width = radius * 10;
-	sR.height = radius * 10;
-	circle.setTextureRect(sR);
+	//sf::IntRect sR;
+	//sR.left = 100;// Functions::randomFloat(0, 10000 - radius * 1);
+	//sR.top = 100;// Functions::randomFloat(0, 10000 - radius * 1);
+	//sR.width = radius * 1;
+	//sR.height = radius * 1;
+	//circle.setTextureRect(sR);
+	//circle.setFillColor(sf::Color::Green);
+}
+
+void AstroObject::rotate() {
+	circle.rotate(rotation);
 }
 
 void AstroObject::update() {
-	//if (habitable) {
-	//	for (int i = 0; i < locals.size(); i++) {
-	//		if (Functions::dist(getX(), getY(), locals[i]->getX(), locals[i]->getY()) < getRadius() + 20 * 0.07) { // i == ships[0]->getClosestPlanet() && 
-	//			float dy = getY() - locals[i]->getY();
-	//			float dx = getX() - locals[i]->getX();
-	//			float theta = atan2(dy, dx);
-	//			theta = theta >= 0 ? theta : theta + 2 * PI;
-	//			theta += getRotation() * PI / 180;
-	//			locals[i]->resetVelocity();
-	//			sf::Vector2<double> v = getVelocity();
-	//			locals[i]->addVelocity(v.x, v.y);
-	//			locals[i]->setX(getX() - cos(theta) * (getRadius() + 20 * 0.07));
-	//			locals[i]->setY(getY() - sin(theta) * (getRadius() + 20 * 0.07));
-	//		}
-	//	}
-	//}
+	//circle.rotate(rotation);
 }
 
 void AstroObject::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {
 	circle.setRadius(getRadius() / (double)ppm);
 	circle.setPosition((double)(((double)screen.width / 2) + (getX() - view.x) / (double)ppm - 20), (double)(((double)screen.height / 2) + (getY() - view.y) / (double)ppm - 20));
 	circle.setOrigin(circle.getRadius(), circle.getRadius());
-	circle.rotate(rotation);
+	
 	//std::cout << sqrt(pow(circle.getPosition().x + circle.getRadius() - screen.width / 2, 2) + pow(circle.getPosition().y + circle.getRadius() - screen.height / 2, 2)) << std::endl;
 	//std::cout << circle.getPosition().x << " " << circle.getPosition().y << std::endl;
 	//circle.setScale(getRadius() / ppm, getRadius() / ppm);

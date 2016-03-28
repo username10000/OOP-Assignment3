@@ -31,6 +31,7 @@ class Game {
 		int keys[512] = { 0 };
 		int stop;
 		int noPlanets;
+		float fps;
 		std::vector<std::unique_ptr<AstroObject>> astro;
 		std::vector<std::unique_ptr<Ship>> ships;
 		std::unordered_map<std::string, bool> menu;
@@ -54,7 +55,6 @@ class Game {
 		bool onPlanet;
 		bool jump;
 		sf::Texture humanTexture;
-		sf::Texture planetTexture;
 		std::vector<std::unique_ptr<Human>> locals;
 		int closestPlanet;
 		//AstroMap astroMap(0);

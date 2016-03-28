@@ -9,9 +9,9 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 	//sprite.setScale(sf::Vector2f(10.0f, 10.0f));
 
 	// Load Sprites
-	shipTexture[0].loadFromFile("ship.png");
-	shipTexture[1].loadFromFile("ship1.png");
-	shipTexture[2].loadFromFile("ship2.png");
+	shipTexture[0].loadFromFile("Source/resources/ship.png");
+	shipTexture[1].loadFromFile("Source/resources/ship1.png");
+	shipTexture[2].loadFromFile("Source/resources/ship2.png");
 	ship[0].setTexture(shipTexture[0]);
 	ship[1].setTexture(shipTexture[1]);
 	ship[2].setTexture(shipTexture[2]);

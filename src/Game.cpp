@@ -11,13 +11,12 @@ Game::Game() {
 	window.create(screen, "SFML Window", sf::Style::None, settings); //sf::Style::Fullscreen
 
 	// Frame Count
-	float fps = 60;
+	fps = 60;
 	dt = 1 / fps;
 
 	// Set framerate limit - maybe temporarily
-	window.setFramerateLimit(60);
-
-	//window.setVerticalSyncEnabled(true);
+	//window.setFramerateLimit(60);
+	window.setVerticalSyncEnabled(true);
 
 	// Open Font
 	font.loadFromFile("OpenSans-Regular.ttf");
@@ -38,17 +37,10 @@ Game::Game() {
 	// Set the name of the Sun
 	astro[0]->setName("Sun");
 
-	//float rae = rand() % 6;
-	//astro.push_back(std::unique_ptr<AstroObject>(new Planet(-cos(rae) * 100000, -sin(rae) * 100000, 500, sf::Color(0, 0, 255))));
-	//astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, 100000, 500, sf::Color(0, 0, 255))));
-
 	noPlanets = Functions::randomInt(5, 10);
 
 	float rDist = 0;
 	for (int i = 1; i < noPlanets; i++) {
-		//float rDist = rand() % (100000 - 50000 + 1) + 50000;
-		//float rR = rand() % (500 - 250 + 1) + 250;
-		
 		// Generate random Distance from the Sun, random Radius and random Orbital Phase
 		rDist += Functions::randomInt(100000, 150000);
 		float rR = Functions::randomInt(300, 500);
@@ -67,9 +59,8 @@ Game::Game() {
 		astro[i]->addVelocity(-cos(angle) * aV, -sin(angle) * aV);
 
 		// Set the name of the Planets
-		//astro[i]->setName("Planet" + std::to_string(i));
 		std::ifstream f;
-		f.open("Gods.txt");
+		f.open("Source/resources/Gods.txt");
 		if (f) {
 			std::string n;
 			for (int i = 0; i < Functions::randomInt(0, 2500); i++) {
@@ -83,54 +74,17 @@ Game::Game() {
 			f.close();
 			astro[i]->setName(n);
 		}
-
-		//switch (randomInt(1, 4)) {
-		//	case 1:
-		//		astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
-		//		astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())), 0);
-		//		break;
-		//	case 2:
-		//		astro.push_back(std::unique_ptr<AstroObject>(new Planet(rDist, 0, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
-		//		astro[i]->addVelocity(0, -sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())));
-		//		break;
-		//	case 3:
-		//		astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, -rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
-		//		astro[i]->addVelocity(-sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())), 0);
-		//		break;
-		//	default:
-		//		astro.push_back(std::unique_ptr<AstroObject>(new Planet(-rDist, 0, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
-		//		astro[i]->addVelocity(0, sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())));
-		//		break;
-		//}
-		//astro.push_back(std::unique_ptr<AstroObject>(new Planet(0, rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256))));
-		//astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())), 0);
-		//fastForwardObject(1, randomInt(1000, 10000));
 	}
 
-	// Initial Velocity for the Planets
-	//int i = 1;
-	//for (unsigned int i = 1; i < astro.size(); i++) {
-	//	//double vel = sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()));
-	//	//astro[i]->addVelocity(-sin(rae) * vel, -cos(rae));
-	//	astro[i]->addVelocity(sqrt(astro[0]->getG() * astro[0]->getMass() / dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY())), 0);
-	//	fastForwardObject(1, (int)(rand() % (100000 - 1000 + 1) + 1000));
-	//}
-
 	// Add Ships
-	//ships.push_back(std::unique_ptr<Ship>(new Ship(-cos(rae) * 100000 + 500, -sin(rae) * 100000, (float)(screen.width / 2), (float)(screen.height / 2))));
 	ships.push_back(std::unique_ptr<Ship>(new Ship(astro[1]->getX(), astro[1]->getY() - astro[1]->getRadius(), (float)(screen.width / 2), (float)(screen.height / 2))));
 
 	// Set the closest Planet to the Ship
 	ships[0]->setClosestPlanet(1);
 
 	// Add Human
-	humanTexture.loadFromFile("human.png");
+	humanTexture.loadFromFile("Source/resources/human.png");
 	human = std::unique_ptr<Human>(new Human(0, 0, &humanTexture));
-
-	//std::cout << ships[0]
-
-	//ships[0]->addVelocity(0, sqrt(astro[1]->getG() * astro[1]->getMass() / (dist(astro[1]->getX(), astro[1]->getY(), ships[0]->getX(), ships[0]->getY()))));
-	//std::cout << ships[0]->getVelocity().x << " " << ships[0]->getVelocity().y << std::endl;
 
 	// Add Velocity Vector
 	velocityVector = std::unique_ptr<VelocityVector>(new VelocityVector(screen));
@@ -138,7 +92,6 @@ Game::Game() {
 
 	// Add Distance To Object
 	distanceObject = std::unique_ptr<DistanceToObject>(new DistanceToObject(screen, font));
-	//*velocityVector = std::unique_ptr<VelocityVector>(new VelocityVector(screen));
 
 	// Pixels Per Meter
 	ppm = 1;
@@ -192,9 +145,6 @@ Game::Game() {
 		locals[i]->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
 		locals[i]->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
 	}
-
-	planetTexture.loadFromFile("T1.png");
-	astro[1]->setPlanetTexture(&planetTexture);
 }
 
 Game::~Game() {
@@ -449,7 +399,7 @@ void Game::keyPressed() {
 		} else {
 			if (!jump) {
 				// Human
-				float f = 0.005;
+				float f = 0.0025;
 				int cP = ships[0]->getClosestPlanet();
 				float dy = astro[cP]->getY() - human->getY();
 				float dx = astro[cP]->getX() - human->getX();
@@ -499,16 +449,30 @@ void Game::collisions() {
 			}
 		}
 		if (Functions::dist(astro[i]->getX(), astro[i]->getY(), human->getX(), human->getY()) < astro[i]->getRadius() + 20 * 0.07 && onPlanet) { // i == ships[0]->getClosestPlanet() && 
+			// Get the Angle between the Human and the Object
 			float dy = astro[i]->getY() - human->getY();
 			float dx = astro[i]->getX() - human->getX();
 			float theta = atan2(dy, dx);
 			theta = theta >= 0 ? theta : theta + 2 * PI;
-			theta += astro[i]->getRotation() * PI / 180;
+			//theta += astro[i]->getRotation() * PI / 180;
+
+			// Reset the Velocity of the Human
 			human->resetVelocity();
+
+			// Add the Velocity of the Object to the velocity of the Human
 			sf::Vector2<double> v = astro[i]->getVelocity();
 			human->addVelocity(v.x, v.y);
+
+			// Add the Velocity that is caused by the Rotation of the Object to the Human
+			double circumference = (double)(2.0f * (double)PI * (double)astro[i]->getRadius());
+			double velVect = (double)Functions::map((double)astro[i]->getRotation(), 0, 358.7, 0, circumference);// +astro[i]->getRotation() / 10;
+			human->addVelocity(-cos(theta + PI / 2) * velVect, -sin(theta + PI / 2) * velVect);
+
+			// Set the Position of the Human to be at the edge of the Object
 			human->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() + 20 * 0.07));
 			human->setY(astro[i]->getY() - sin(theta) * (astro[i]->getRadius() + 20 * 0.07));
+
+			// Reset the Jump Flag
 			jump = false;
 		}
 		for (int j = 0; j < locals.size(); j++) {

@@ -26,6 +26,7 @@ class AstroObject : public GameObject {
 		sf::Texture texture;
 		std::string name;
 		bool habitable;
+		//sf::RenderTexture rTexture;
 		//std::vector<std::unique_ptr<Human>> locals;
 		//sf::Texture humanTexture;
 	public:
@@ -51,6 +52,7 @@ class AstroObject : public GameObject {
 		float getRotation();
 		bool isHabitable();
 		void AstroObject::setPlanetTexture(sf::Texture *pT);
+		void rotate();
 };
 
 #endif
