@@ -433,18 +433,34 @@ void Game::collisions() {
 	for (int i = 0; i < astro.size(); i++) {
 		for (int j = 0; j < ships.size(); j++) {
 			ships[j]->setLanded(false);
-			if (Functions::dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) < astro[i]->getRadius() + 20 * 0.15) { // + ships[j] -> getRadius()
+			if (Functions::dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) < astro[i]->getRadius() + 20 * 0.15) {
+				// Get the Angle between the Ship and the Object
 				float dy = astro[i]->getY() - ships[j]->getY();
 				float dx = astro[i]->getX() - ships[j]->getX();
 				float theta = atan2(dy, dx);
 				theta = theta >= 0 ? theta : theta + 2 * PI;
-				theta += astro[i]->getRotation() * PI / 180;
+				//theta += astro[i]->getRotation() * PI / 180;
+
+				// Reset the Velocity of the Ship
 				ships[j]->resetVelocity();
+
+				// Add the Velocity of the Object to the Velocity of the Ship
 				sf::Vector2<double> v = astro[i]->getVelocity();
 				ships[j]->addVelocity(v.x, v.y);
+
+				// Add the Velocity that is caused by the Rotation of the Object to the Human
+				double circumference = (double)(2.0f * (double)PI * (double)astro[i]->getRadius());
+				double velVect = (double)Functions::map((double)astro[i]->getRotation(), 0, 358.75, 0, circumference);
+				ships[j]->addVelocity(-cos(theta + (double)PI / 2) * (double)velVect, -sin(theta + (double)PI / 2) * (double)velVect);
+
+				// Set the Position of the Human to be at the edge of the Object
 				ships[j]->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() + 20 * 0.15)); // + ships[j]->getRadius()
 				ships[j]->setY(astro[i]->getY() - sin(theta) * (astro[i]->getRadius() + 20 * 0.15)); // + ships[j]->getRadius()
+
+				// Rotate the Ship to match the Object's Rotation
 				ships[j]->setRotation(astro[i]->getRotation());
+
+				// Set the Landed Flag
 				ships[j]->setLanded(true);
 			}
 		}
@@ -459,14 +475,14 @@ void Game::collisions() {
 			// Reset the Velocity of the Human
 			human->resetVelocity();
 
-			// Add the Velocity of the Object to the velocity of the Human
+			// Add the Velocity of the Object to the Velocity of the Human
 			sf::Vector2<double> v = astro[i]->getVelocity();
 			human->addVelocity(v.x, v.y);
 
 			// Add the Velocity that is caused by the Rotation of the Object to the Human
 			double circumference = (double)(2.0f * (double)PI * (double)astro[i]->getRadius());
-			double velVect = (double)Functions::map((double)astro[i]->getRotation(), 0, 358.7, 0, circumference);// +astro[i]->getRotation() / 10;
-			human->addVelocity(-cos(theta + PI / 2) * velVect, -sin(theta + PI / 2) * velVect);
+			double velVect = (double)Functions::map((double)astro[i]->getRotation(), 0, 358.75, 0, circumference);
+			human->addVelocity(-cos(theta + (double)PI / 2) * (double)velVect, -sin(theta + (double)PI / 2) * (double)velVect);
 
 			// Set the Position of the Human to be at the edge of the Object
 			human->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() + 20 * 0.07));
