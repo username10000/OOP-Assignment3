@@ -36,6 +36,7 @@ Game::Game() {
 	
 	// Set the name of the Sun
 	astro[0]->setName("Sun");
+	astro[0]->setInhabitants(0);
 
 	noPlanets = Functions::randomInt(5, 10);
 
@@ -47,7 +48,10 @@ Game::Game() {
 		float angle = Functions::randomFloat(0, PI * 2);
 		
 		// Create the Astro Object in the generated position
-		astro.push_back(std::unique_ptr<AstroObject>(new Planet(-cos(angle) * rDist, -sin(angle) * rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256), Functions::randomFloat(0.01, 0.05))));
+		astro.push_back(std::unique_ptr<AstroObject>(new Planet(-cos(angle) * rDist, -sin(angle) * rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256), Functions::randomFloat(0.005, 0.01))));
+
+		// Set number of Inhabitants
+		astro[i]->setInhabitants(Functions::randomInt(10, 99));
 
 		// Increase the Angle to match the Direction of the Velocity Vector
 		angle += PI / 2;
@@ -83,7 +87,7 @@ Game::Game() {
 	ships[0]->setClosestPlanet(1);
 
 	// Add Human
-	humanTexture.loadFromFile("Source/resources/human.png");
+	humanTexture.loadFromFile("Source/resources/humanSheet.png");
 	human = std::unique_ptr<Human>(new Human(0, 0, &humanTexture));
 
 	// Add Velocity Vector
@@ -138,7 +142,7 @@ Game::Game() {
 	closestPlanet = 1;
 
 	// Create Vector to store the Locals
-	for (int i = 0; i < 20; i++) {
+	for (int i = 0; i < 100; i++) {
 		locals.push_back(std::unique_ptr<Human>(new Human(0, 0, &humanTexture)));
 		int cP = closestPlanet;
 		float theta = Functions::randomFloat(0, 2 * PI);
@@ -217,7 +221,7 @@ void Game::events() {
 				//window.close();
 			// Set the pressed key
 			keys[event.key.code] = 1;
-			//std::cout << event.key.code << " ";
+			//std::cout << "Key Pressed: " << event.key.code << std::endl;
 			break;
 		case sf::Event::KeyReleased:
 			// Unset the released key
@@ -230,8 +234,8 @@ void Game::events() {
 			break;
 		case sf::Event::MouseWheelMoved:
 			ppm -= event.mouseWheel.delta * 0.05;
-			if (ppm <= 0.1)
-				ppm = 0.1f;
+			if (ppm <= 0.05)
+				ppm = 0.05f;
 			if (ppm > 1)
 				ppm = 1;
 			break;
@@ -309,6 +313,12 @@ float Game::apoapsis(int i) {
 */
 
 void Game::keyPressed() {
+	float speedMult = 1;
+	// Shift
+	if (keys[38]) {
+		speedMult = 5;
+	}
+
 	// +
 	if (keys[68]) {
 		float s = 1;
@@ -335,15 +345,30 @@ void Game::keyPressed() {
 	if (keys[22] && !onPlanet) {
 		ships[0]->addVelocity();
 		ships[0]->setAccelerating(true);
-		//ships[0]->setLanded(false);
+		if (ships[0]->getLanded()) {
+			int cP = ships[0]->getClosestPlanet();
+			// Get the Angle between the Ship and the Object
+			float dy = astro[cP]->getY() - ships[0]->getY();
+			float dx = astro[cP]->getX() - ships[0]->getX();
+			float theta = atan2(dy, dx);
+			theta = theta >= 0 ? theta : theta + 2 * PI;
+
+			// Add the Velocity that is caused by the Rotation of the Object to the Human
+			double circumference = (double)(2.0f * (double)PI * (double)astro[cP]->getRadius());
+			double velVect = (double)Functions::map((double)astro[cP]->getRotation(), 0, 358.75, 0, circumference);
+			ships[0]->addVelocity(-cos(theta + (double)PI / 2) * (double)velVect, -sin(theta + (double)PI / 2) * (double)velVect);
+		}
+		ships[0]->setLanded(false);
 	}
 
 	// S
 	if (keys[18] && !onPlanet) {
 		ships[0]->subVelocity();
 		ships[0]->setAccelerating(true);
-		//ships[0]->setLanded(false);
+		ships[0]->setLanded(false);
 	}
+
+	bool moved = false;
 
 	// A
 	if (keys[0]) {
@@ -353,10 +378,13 @@ void Game::keyPressed() {
 		} else {
 			// Human
 			float f;
-			if (!jump)
-				f = 0.01;
-			else
-				f = 0.0001;
+			if (!jump) {
+				f = 0.001 * speedMult;
+				human->setDir(-1);
+			} else {
+				f = 0.00001 * speedMult;
+				human->setDirJump(-1);
+			}
 			int cP = ships[0]->getClosestPlanet();
 			float dy = astro[cP]->getY() - human->getY();
 			float dx = astro[cP]->getX() - human->getX();
@@ -365,6 +393,8 @@ void Game::keyPressed() {
 			theta -= PI / 2;
 			float acceleration = f / human->getMass();
 			human->addVelocity(-cos(theta) * acceleration, -sin(theta) * acceleration);
+			
+			moved = true;
 		}
 	}
 
@@ -376,10 +406,13 @@ void Game::keyPressed() {
 		} else {
 			// Human
 			float f;
-			if (!jump)
-				f = 0.01;
-			else
-				f = 0.0001;
+			if (!jump) {
+				f = 0.001 * speedMult;
+				human->setDir(1);
+			} else {
+				f = 0.00001 * speedMult;
+				human->setDirJump(1);
+			}
 			int cP = ships[0]->getClosestPlanet();
 			float dy = astro[cP]->getY() - human->getY();
 			float dx = astro[cP]->getX() - human->getX();
@@ -388,7 +421,14 @@ void Game::keyPressed() {
 			theta += PI / 2;
 			float acceleration = f / human->getMass();
 			human->addVelocity(-cos(theta) * acceleration, -sin(theta) * acceleration);
+			
+			moved = true;
 		}
+	}
+
+	// Reset the Sprite if the Human is not moving and he's not mid air
+	if (!moved && !jump) {
+		human->resetSprite();
 	}
 
 	// SPACE
@@ -409,6 +449,11 @@ void Game::keyPressed() {
 				float acceleration = f / human->getMass();
 				human->addVelocity(-cos(theta) * acceleration, -sin(theta) * acceleration);
 				jump = true;
+
+				// Add the Velocity that is caused by the Rotation of the Object to the Human
+				double circumference = (double)(2.0f * (double)PI * (double)astro[cP]->getRadius());
+				double velVect = (double)Functions::map((double)astro[cP]->getRotation(), 0, 358.75, 0, circumference);
+				human->addVelocity(-cos(theta + (double)PI / 2) * (double)velVect, -sin(theta + (double)PI / 2) * (double)velVect);
 			}
 		}
 	}
@@ -432,14 +477,14 @@ void Game::fastForwardObject(int i, int loops) {
 void Game::collisions() {
 	for (int i = 0; i < astro.size(); i++) {
 		for (int j = 0; j < ships.size(); j++) {
-			ships[j]->setLanded(false);
+			//ships[j]->setLanded(false);
 			if (Functions::dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) < astro[i]->getRadius() + 20 * 0.15) {
 				// Get the Angle between the Ship and the Object
 				float dy = astro[i]->getY() - ships[j]->getY();
 				float dx = astro[i]->getX() - ships[j]->getX();
 				float theta = atan2(dy, dx);
 				theta = theta >= 0 ? theta : theta + 2 * PI;
-				//theta += astro[i]->getRotation() * PI / 180;
+				theta += astro[i]->getRotation() * PI / 180;
 
 				// Reset the Velocity of the Ship
 				ships[j]->resetVelocity();
@@ -449,9 +494,9 @@ void Game::collisions() {
 				ships[j]->addVelocity(v.x, v.y);
 
 				// Add the Velocity that is caused by the Rotation of the Object to the Human
-				double circumference = (double)(2.0f * (double)PI * (double)astro[i]->getRadius());
-				double velVect = (double)Functions::map((double)astro[i]->getRotation(), 0, 358.75, 0, circumference);
-				ships[j]->addVelocity(-cos(theta + (double)PI / 2) * (double)velVect, -sin(theta + (double)PI / 2) * (double)velVect);
+				//double circumference = (double)(2.0f * (double)PI * (double)astro[i]->getRadius());
+				//double velVect = (double)Functions::map((double)astro[i]->getRotation(), 0, 358.75, 0, circumference);
+				//ships[j]->addVelocity(-cos(theta + (double)PI / 2) * (double)velVect, -sin(theta + (double)PI / 2) * (double)velVect);
 
 				// Set the Position of the Human to be at the edge of the Object
 				ships[j]->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() + 20 * 0.15)); // + ships[j]->getRadius()
@@ -470,7 +515,9 @@ void Game::collisions() {
 			float dx = astro[i]->getX() - human->getX();
 			float theta = atan2(dy, dx);
 			theta = theta >= 0 ? theta : theta + 2 * PI;
-			//theta += astro[i]->getRotation() * PI / 180;
+
+			if (!jump)
+				theta += astro[i]->getRotation() * PI / 180;
 
 			// Reset the Velocity of the Human
 			human->resetVelocity();
@@ -480,9 +527,9 @@ void Game::collisions() {
 			human->addVelocity(v.x, v.y);
 
 			// Add the Velocity that is caused by the Rotation of the Object to the Human
-			double circumference = (double)(2.0f * (double)PI * (double)astro[i]->getRadius());
-			double velVect = (double)Functions::map((double)astro[i]->getRotation(), 0, 358.75, 0, circumference);
-			human->addVelocity(-cos(theta + (double)PI / 2) * (double)velVect, -sin(theta + (double)PI / 2) * (double)velVect);
+			//double circumference = (double)(2.0f * (double)PI * (double)astro[i]->getRadius());
+			//double velVect = (double)Functions::map((double)astro[i]->getRotation(), 0, 358.75, 0, circumference);
+			//human->addVelocity(-cos(theta + (double)PI / 2) * (double)velVect, -sin(theta + (double)PI / 2) * (double)velVect);
 
 			// Set the Position of the Human to be at the edge of the Object
 			human->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() + 20 * 0.07));
@@ -491,7 +538,7 @@ void Game::collisions() {
 			// Reset the Jump Flag
 			jump = false;
 		}
-		for (int j = 0; j < locals.size(); j++) {
+		for (int j = 0; j < astro[closestPlanet]->getInhabitants(); j++) {
 			if (Functions::dist(astro[i]->getX(), astro[i]->getY(), locals[j]->getX(), locals[j]->getY()) < astro[i]->getRadius() + 20 * 0.07) {
 				float dy = astro[i]->getY() - locals[j]->getY();
 				float dx = astro[i]->getX() - locals[j]->getX();
@@ -503,6 +550,7 @@ void Game::collisions() {
 				locals[j]->addVelocity(v.x, v.y);
 				locals[j]->setX(astro[i]->getX() - cos(theta) * (astro[i]->getRadius() + 20 * 0.07));
 				locals[j]->setY(astro[i]->getY() - sin(theta) * (astro[i]->getRadius() + 20 * 0.07));
+				locals[j]->setJump(false);
 			}
 		}
 	}
@@ -553,7 +601,6 @@ void Game::update() {
 		// Find the closest Planet
 		double minDist = DBL_MAX;
 		int z = 0;
-
 		for (int i = 0; i < astro.size(); i++) {
 			if (Functions::dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()) < minDist) {
 				minDist = Functions::dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY());
@@ -580,6 +627,7 @@ void Game::update() {
 			distFromCentre = (int)Functions::dist(astro[z]->getX(), astro[z]->getY(), ships[0]->getX(), ships[0]->getY()) - (int)astro[z]->getRadius() - (int)(20 * 0.15);
 		distFromCentre = distFromCentre < 0 ? 0 : distFromCentre;
 
+		// Update for the Human
 		if (onPlanet) {
 			// Apply force to the human
 			human->setForce(astro[z]->getG() * astro[z]->getMass() * human->getMass() / pow(Functions::dist(astro[z]->getX(), astro[z]->getY(), human->getX(), human->getY()), 2));
@@ -594,10 +642,95 @@ void Game::update() {
 
 			// Update the Human
 			human->update();
+
+			//dy = astro[z]->getY() - human->getY();
+			//dx = astro[z]->getX() - human->getX();
+			//hAngle = atan2(dy, dx);
+			//hAngle = hAngle >= 0 ? hAngle : hAngle + 2 * PI;
+			//hAngle += astro[z]->getRotation() * PI / 180;
+
+			//human->setX(astro[z]->getX() - cos(hAngle) * (Functions::dist(astro[z]->getX(), astro[z]->getY(), human->getX(), human->getY()) + 20 * 0.07));
+			//human->setY(astro[z]->getY() - sin(hAngle) * (Functions::dist(astro[z]->getX(), astro[z]->getY(), human->getX(), human->getY()) + 20 * 0.07));
 		}
 
 		// Update for the Locals
-		for (int i = 0; i < locals.size(); i++) {
+		for (int i = 0; i < astro[closestPlanet]->getInhabitants(); i++) {
+			float f, dx, dy, theta, acceleration;
+			int cP;
+
+			// Movement
+			if (stateTime.getElapsedTime().asSeconds() > locals[i]->getNextStateChange()) {
+				locals[i]->setNextStateChange(stateTime.getElapsedTime().asSeconds() + Functions::randomFloat(0, 10));
+				locals[i]->setState(Functions::randomInt(0, 3));
+			} else {
+				switch (locals[i]->getState()) {
+					case 1:
+						// Go Left
+						if (!locals[i]->getJump()) {
+							f = 0.001;
+							locals[i]->setDir(-1);
+						} else {
+							f = 0.00001;
+							locals[i]->setDirJump(-1);
+						}
+						cP = ships[0]->getClosestPlanet();
+						dy = astro[cP]->getY() - locals[i]->getY();
+						dx = astro[cP]->getX() - locals[i]->getX();
+						theta = atan2(dy, dx);
+						theta = theta >= 0 ? theta : theta + 2 * PI;
+						theta -= PI / 2;
+						acceleration = f / locals[i]->getMass();
+						locals[i]->addVelocity(-cos(theta) * acceleration, -sin(theta) * acceleration);
+						break;
+					case 2:
+						// Go Right
+						if (!locals[i]->getJump()) {
+							f = 0.001;
+							locals[i]->setDir(1);
+						} else {
+							f = 0.00001;
+							locals[i]->setDirJump(1);
+						}
+						cP = ships[0]->getClosestPlanet();
+						dy = astro[cP]->getY() - locals[i]->getY();
+						dx = astro[cP]->getX() - locals[i]->getX();
+						theta = atan2(dy, dx);
+						theta = theta >= 0 ? theta : theta + 2 * PI;
+						theta += PI / 2;
+						acceleration = f / locals[i]->getMass();
+						locals[i]->addVelocity(-cos(theta) * acceleration, -sin(theta) * acceleration);
+						break;
+					case 3:
+						// Jump
+						if (!locals[i]->getJump()) {
+							// Human
+							f = 0.0025;
+							cP = ships[0]->getClosestPlanet();
+							dy = astro[cP]->getY() - locals[i]->getY();
+							dx = astro[cP]->getX() - locals[i]->getX();
+							theta = atan2(dy, dx);
+							theta = theta >= 0 ? theta : theta + 2 * PI;
+							//theta += PI;
+							acceleration = f / locals[i]->getMass();
+							locals[i]->addVelocity(-cos(theta) * acceleration, -sin(theta) * acceleration);
+							locals[i]->setJump(true);
+
+							// Add the Velocity that is caused by the Rotation of the Object to the Human
+							double circumference = (double)(2.0f * (double)PI * (double)astro[cP]->getRadius());
+							double velVect = (double)Functions::map((double)astro[cP]->getRotation(), 0, 358.75, 0, circumference);
+							locals[i]->addVelocity(-cos(theta + (double)PI / 2) * (double)velVect, -sin(theta + (double)PI / 2) * (double)velVect);
+						}
+						break;
+					default:
+						// Wait
+						break;
+				}
+				if (locals[i]->getState() != 1 && locals[i]->getState() != 2 && !locals[i]->getJump()) {
+					locals[i]->resetSprite();
+				}
+			}
+
+			// Gravity
 			dy = locals[i]->getY() - astro[z]->getY();
 			dx = locals[i]->getX() - astro[z]->getX();
 			float hAngle = atan2(dy, dx);
@@ -607,34 +740,6 @@ void Game::update() {
 			locals[i]->setAngle((hAngle + PI / 2) * 180 / PI);
 			locals[i]->update();
 		}
-
-		//if (distFromCentre < screen.height / 2 * ppm) {
-		//	distance.setString("");
-		//} else {
-		//	char d[10];
-		//	sprintf_s(d, "%d m", distFromCentre);
-		//	distance.setString(d);
-		//	distance.setPosition(screen.width / 2 + -cos(theta) * screen.height / 2 * 9 / 10, screen.height / 2 + -sin(theta) * screen.height / 2 * 9 / 10);
-		//}
-
-		/*
-		ships[0]->setForce(0);
-		// Apply force to the ship
-		for (int i = 0; i < astro.size(); i++) {
-			if (dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()) < astro[i]->getRadius() * 10) {
-				ships[0]->addForce(astro[i]->getG() * astro[i]->getMass() * ships[0]->getMass() / pow(dist(astro[i]->getX(), astro[i]->getY(), ships[0]->getX(), ships[0]->getY()), 2));
-
-				// Angle between the Ship and the Planets
-				float dy = ships[0]->getY() - astro[i]->getY();
-				float dx = ships[0]->getX() - astro[i]->getX();
-				float theta = atan2(dy, dx);
-				theta = theta >= 0 ? theta : theta + 2 * PI;
-				ships[0]->setDirection(-cos(theta), -sin(theta));
-			}
-		}
-		*/
-
-		//std::cout << Formula::relativeOrbitalSpeed(astro[1]->getG(), astro[1]->getMass(), ships[0]->getMass(), dist(astro[1]->getX(), astro[1]->getY(), ships[0]->getX(), ships[0]->getY())) << std::endl;
 
 		// Update all the objects
 		for (int i = 0; i < astro.size(); i++) {
@@ -691,6 +796,17 @@ void Game::update() {
 
 		// Distance To Object
 		distanceObject->update(theta, distFromCentre, astro[z] -> getName(), ships[0] -> getAngle());
+
+		// Move Locals to the Closest Planet
+		if (ships[0]->getClosestPlanet() != closestPlanet && ships[0]->getClosestPlanet() != 0) {
+			closestPlanet = ships[0]->getClosestPlanet();
+			for (int i = 0; i < astro[closestPlanet]->getInhabitants(); i++) {
+				int cP = closestPlanet;
+				float theta = Functions::randomFloat(0, 2 * PI);
+				locals[i]->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
+				locals[i]->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
+			}
+		}
 
 		//frameTime.restart();
 		accumulator -= dt;
@@ -750,7 +866,7 @@ void Game::render() {
 		}
 
 		// Locals
-		for (int i = 0; i < locals.size(); i++) {
+		for (int i = 0; i < astro[closestPlanet]->getInhabitants(); i++) {
 			locals[i]->render(window, view, screen, ppm);
 		}
 

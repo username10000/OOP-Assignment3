@@ -178,17 +178,18 @@ bool AstroObject::isHabitable() {
 
 void AstroObject::setPlanetTexture(sf::Texture *pT) {
 	circle.setTexture(pT);
-	//sf::IntRect sR;
-	//sR.left = 100;// Functions::randomFloat(0, 10000 - radius * 1);
-	//sR.top = 100;// Functions::randomFloat(0, 10000 - radius * 1);
-	//sR.width = radius * 1;
-	//sR.height = radius * 1;
-	//circle.setTextureRect(sR);
-	//circle.setFillColor(sf::Color::Green);
 }
 
 void AstroObject::rotate() {
 	circle.rotate(rotation);
+}
+
+void AstroObject::setInhabitants(int h) {
+	inhabitants = h;
+}
+
+int AstroObject::getInhabitants() {
+	return inhabitants;
 }
 
 void AstroObject::update() {
@@ -199,15 +200,5 @@ void AstroObject::render(sf::RenderWindow &window, sf::Vector2<double> view, sf:
 	circle.setRadius(getRadius() / (double)ppm);
 	circle.setPosition((double)(((double)screen.width / 2) + (getX() - view.x) / (double)ppm - 20), (double)(((double)screen.height / 2) + (getY() - view.y) / (double)ppm - 20));
 	circle.setOrigin(circle.getRadius(), circle.getRadius());
-	
-	//std::cout << sqrt(pow(circle.getPosition().x + circle.getRadius() - screen.width / 2, 2) + pow(circle.getPosition().y + circle.getRadius() - screen.height / 2, 2)) << std::endl;
-	//std::cout << circle.getPosition().x << " " << circle.getPosition().y << std::endl;
-	//circle.setScale(getRadius() / ppm, getRadius() / ppm);
 	window.draw(circle);
-
-	//if (habitable) {
-	//	for (int i = 0; i < locals.size(); i++) {
-	//		locals[i]->render(window, view, screen, ppm);
-	//	}
-	//}
 }

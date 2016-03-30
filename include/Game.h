@@ -47,6 +47,7 @@ class Game {
 		int frames;
 		sf::Clock clock;
 		sf::Clock frameTime;
+		sf::Clock stateTime;
 		sf::Text frameRate;
 		sf::Text distance;
 		float dt;
