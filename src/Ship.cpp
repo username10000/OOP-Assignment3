@@ -26,15 +26,18 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 	direction.x = direction.y = 0;
 	//mass = 0.00000000000000000000040 * 9.3;
 	mass = 1;
-	speed = 0.02;
+	speed = 0.0003;
 
 	accelerating = false;
 	spriteNo = 0;
 
 	landed = false;
-	//angleToPlanet = 0;
-	//planet = -1;
-	//std::cout << sprite.getGlobalBounds().width << " " << sprite.getGlobalBounds().height;
+
+	fuel = 100;
+	thrust = 0;
+	maxThrust = 75;
+
+	inertiaDamper = true;
 }
 
 Ship::Ship() : Ship(0, 0, 0, 0) {
@@ -42,8 +45,21 @@ Ship::Ship() : Ship(0, 0, 0, 0) {
 }
 
 void Ship::addVelocity() {
-	velocity.x += sin(angle * PI / 180) * speed;
-	velocity.y += -cos(angle * PI / 180) * speed;
+	thrust += 0.5;
+	thrust = thrust > maxThrust ? maxThrust : thrust;
+	//thrust.x += sin(angle * PI / 180) * speed;
+	//thrust.y += -cos(angle * PI / 180) * speed;
+	//velocity.x += sin(angle * PI / 180) * speed;
+	//velocity.y += -cos(angle * PI / 180) * speed;
+}
+
+void Ship::subVelocity() {
+	thrust -= 0.5;
+	thrust = thrust < 0 ? 0 : thrust;
+	//thrust.x -= sin(angle * PI / 180) * speed;
+	//thrust.y -= -cos(angle * PI / 180) * speed;
+	//velocity.x -= sin(angle * PI / 180) * speed;
+	//velocity.y -= -cos(angle * PI / 180) * speed;
 }
 
 void Ship::addVelocity(double x, double y) {
@@ -54,11 +70,6 @@ void Ship::addVelocity(double x, double y) {
 void Ship::setVelocity(double x, double y) {
 	velocity.x = x;
 	velocity.y = y;
-}
-
-void Ship::subVelocity() {
-	velocity.x -= sin(angle * PI / 180) * speed;
-	velocity.y -= -cos(angle * PI / 180) * speed;
 }
 
 sf::Vector2<double> Ship::getVelocity() {
@@ -176,6 +187,22 @@ void Ship::setRotation(float r) {
 	angle += r;
 }
 
+float Ship::getThrustPercentage() {
+	return Functions::map(thrust, 0, maxThrust, 0, 100);
+}
+
+void Ship::cutThrust() {
+	thrust = 0;
+}
+
+void Ship::setInertiaDamper(bool iD) {
+	inertiaDamper = iD;
+}
+
+bool Ship::getInertiaDamper() {
+	return inertiaDamper;
+}
+
 void Ship::update() {
 	for (int i = 0; i < 3; i++) {
 		ship[i].rotate(rotation);
@@ -187,6 +214,21 @@ void Ship::update() {
 		angle -= 360;
 	if (angle <= -360)
 		angle += 360;
+
+	if (inertiaDamper && rotation != 0) {
+		float oldRotation = rotation;
+		if (rotation > 0)
+			rotation -= 0.02;
+		else
+			rotation += 0.02;
+		if ((oldRotation < 0 && rotation > 0) || (oldRotation > 0 && rotation < 0))
+			rotation = 0;
+	}
+
+	if (thrust != 0)
+		accelerating = true;
+	else
+		accelerating = false;
 
 	// Animate Sprite
 	if (accelerating) {
@@ -205,6 +247,10 @@ void Ship::update() {
 	} else {
 		 spriteNo = 0;
 	 }
+
+	// Add Thrust Velocity
+	velocity.x += sin(angle * PI / 180) * thrust * speed;
+	velocity.y += -cos(angle * PI / 180) * thrust * speed;
 	
 	// Force
 	float acceleration = getForce() / getMass();

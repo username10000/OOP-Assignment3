@@ -18,6 +18,7 @@
 #include <Ship.h>
 #include <VelocityVector.h>
 #include <DistanceToObject.h>
+#include <Thrust.h>
 #include <AstroMap.h>
 #include <Human.h>
 
@@ -39,6 +40,7 @@ class Game {
 		//std::vector<std::unique_ptr<sf::CircleShape>> stars;
 		std::unique_ptr<VelocityVector> velocityVector;
 		std::unique_ptr<DistanceToObject> distanceObject;
+		std::unique_ptr<Thrust> thrust;
 		std::unique_ptr<AstroMap> astroMap;
 		std::unique_ptr<Human> human;
 		SolarSystem solarSystem;
@@ -50,6 +52,7 @@ class Game {
 		sf::Clock stateTime;
 		sf::Text frameRate;
 		sf::Text distance;
+		sf::Text idText;
 		float dt;
 		float accumulator;
 		int targetAstro;

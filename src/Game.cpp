@@ -97,6 +97,9 @@ Game::Game() {
 	// Add Distance To Object
 	distanceObject = std::unique_ptr<DistanceToObject>(new DistanceToObject(screen, font));
 
+	// Add Thrust
+	thrust = std::unique_ptr<Thrust>(new Thrust(screen, font));
+
 	// Pixels Per Meter
 	ppm = 1;
 
@@ -105,10 +108,16 @@ Game::Game() {
 	frameRate.setString("0");
 
 	// Distance Indicator
-	distance.setFont(font);
-	distance.scale(0.5, 0.5);
-	distance.setOrigin(distance.getLocalBounds().width / 2, distance.getLocalBounds().height / 2);
-	distance.setString("0");
+	//distance.setFont(font);
+	//distance.scale(0.5, 0.5);
+	//distance.setOrigin(distance.getLocalBounds().width / 2, distance.getLocalBounds().height / 2);
+	//distance.setString("0");
+
+	// Inertia Dampers Text
+	idText.setFont(font);
+	idText.setCharacterSize(12);
+	idText.setString("Inertia Damper: ON");
+	idText.setPosition(0, frameRate.getCharacterSize() * 1.5);
 
 	accumulator = 0;
 
@@ -217,6 +226,19 @@ void Game::events() {
 					human->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
 					human->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
 				}
+			}
+			// X - Cut Thrust
+			if (event.key.code == 23) {
+				ships[0]->cutThrust();
+			}
+
+			// I - Toggle Inertia Damper
+			if (event.key.code == 8) {
+				ships[0]->setInertiaDamper(!ships[0]->getInertiaDamper());
+				if (ships[0]->getInertiaDamper())
+					idText.setString("Inertia Damper: ON");
+				else
+					idText.setString("Inertia Damper: OFF");
 			}
 				//window.close();
 			// Set the pressed key
@@ -344,28 +366,14 @@ void Game::keyPressed() {
 	// W
 	if (keys[22] && !onPlanet) {
 		ships[0]->addVelocity();
-		ships[0]->setAccelerating(true);
-		if (ships[0]->getLanded()) {
-			int cP = ships[0]->getClosestPlanet();
-			// Get the Angle between the Ship and the Object
-			float dy = astro[cP]->getY() - ships[0]->getY();
-			float dx = astro[cP]->getX() - ships[0]->getX();
-			float theta = atan2(dy, dx);
-			theta = theta >= 0 ? theta : theta + 2 * PI;
-
-			// Add the Velocity that is caused by the Rotation of the Object to the Human
-			double circumference = (double)(2.0f * (double)PI * (double)astro[cP]->getRadius());
-			double velVect = (double)Functions::map((double)astro[cP]->getRotation(), 0, 358.75, 0, circumference);
-			ships[0]->addVelocity(-cos(theta + (double)PI / 2) * (double)velVect, -sin(theta + (double)PI / 2) * (double)velVect);
-		}
-		ships[0]->setLanded(false);
+		//ships[0]->setAccelerating(true);
 	}
 
 	// S
 	if (keys[18] && !onPlanet) {
 		ships[0]->subVelocity();
-		ships[0]->setAccelerating(true);
-		ships[0]->setLanded(false);
+		//ships[0]->setAccelerating(true);
+		//ships[0]->setLanded(false);
 	}
 
 	bool moved = false;
@@ -477,7 +485,6 @@ void Game::fastForwardObject(int i, int loops) {
 void Game::collisions() {
 	for (int i = 0; i < astro.size(); i++) {
 		for (int j = 0; j < ships.size(); j++) {
-			//ships[j]->setLanded(false);
 			if (Functions::dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) < astro[i]->getRadius() + 20 * 0.15) {
 				// Get the Angle between the Ship and the Object
 				float dy = astro[i]->getY() - ships[j]->getY();
@@ -493,7 +500,7 @@ void Game::collisions() {
 				sf::Vector2<double> v = astro[i]->getVelocity();
 				ships[j]->addVelocity(v.x, v.y);
 
-				// Add the Velocity that is caused by the Rotation of the Object to the Human
+				// Add the Velocity that is caused by the Rotation of the Object to the Ship
 				//double circumference = (double)(2.0f * (double)PI * (double)astro[i]->getRadius());
 				//double velVect = (double)Functions::map((double)astro[i]->getRotation(), 0, 358.75, 0, circumference);
 				//ships[j]->addVelocity(-cos(theta + (double)PI / 2) * (double)velVect, -sin(theta + (double)PI / 2) * (double)velVect);
@@ -754,6 +761,33 @@ void Game::update() {
 		// Check collisions
 		collisions();
 
+		// Unset the Landed Flag
+		if (ships[0]->getLanded() && Functions::dist(astro[closestPlanet]->getX(), astro[closestPlanet]->getY(), ships[0]->getX(), ships[0]->getY()) > astro[closestPlanet]->getRadius() + 20 * 0.15 + 0.1) {
+			int cP = ships[0]->getClosestPlanet();
+			// Get the Angle between the Ship and the Object
+			float dy = astro[cP]->getY() - ships[0]->getY();
+			float dx = astro[cP]->getX() - ships[0]->getX();
+			float theta = atan2(dy, dx);
+			theta = theta >= 0 ? theta : theta + 2 * PI;
+
+			// Add the Velocity that is caused by the Rotation of the Object to the Human
+			double circumference = (double)(2.0f * (double)PI * (double)astro[cP]->getRadius());
+			double velVect = (double)Functions::map((double)astro[cP]->getRotation(), 0, 358.75, 0, circumference);
+			ships[0]->addVelocity(-cos(theta + (double)PI / 2) * (double)velVect, -sin(theta + (double)PI / 2) * (double)velVect);
+			ships[0]->setLanded(false);
+		}
+
+		// Move Locals to the Closest Planet
+		if (ships[0]->getClosestPlanet() != closestPlanet && ships[0]->getClosestPlanet() != 0) {
+			closestPlanet = ships[0]->getClosestPlanet();
+			for (int i = 0; i < astro[closestPlanet]->getInhabitants(); i++) {
+				int cP = closestPlanet;
+				float theta = Functions::randomFloat(0, 2 * PI);
+				locals[i]->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
+				locals[i]->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
+			}
+		}
+
 		// Update the view
 		if (!onPlanet) {
 			view.x = ships[0]->getX();
@@ -797,16 +831,8 @@ void Game::update() {
 		// Distance To Object
 		distanceObject->update(theta, distFromCentre, astro[z] -> getName(), ships[0] -> getAngle());
 
-		// Move Locals to the Closest Planet
-		if (ships[0]->getClosestPlanet() != closestPlanet && ships[0]->getClosestPlanet() != 0) {
-			closestPlanet = ships[0]->getClosestPlanet();
-			for (int i = 0; i < astro[closestPlanet]->getInhabitants(); i++) {
-				int cP = closestPlanet;
-				float theta = Functions::randomFloat(0, 2 * PI);
-				locals[i]->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
-				locals[i]->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
-			}
-		}
+		// Thrust
+		thrust->update(ships[0]->getThrustPercentage());
 
 		//frameTime.restart();
 		accumulator -= dt;
@@ -879,6 +905,12 @@ void Game::render() {
 
 			// Distance To Object
 			distanceObject->render(window);
+
+			// Thurst
+			thrust->render(window);
+
+			// Inertia Damper
+			window.draw(idText);
 		}
 	}
 

@@ -24,9 +24,13 @@ class Ship : public GameObject {
 		float rotation;
 		float angle;
 		float speed;
+		float fuel;
+		float thrust;
+		float maxThrust;
 		//float angleToPlanet;
 		bool accelerating;
 		bool landed;
+		bool inertiaDamper;
 		//int planet;
 		int spriteNo;
 		int closestPlanet;
@@ -59,6 +63,10 @@ class Ship : public GameObject {
 		void setClosestPlanet(int p);
 		int getClosestPlanet();
 		void setRotation(float r);
+		float getThrustPercentage();
+		void cutThrust();
+		void setInertiaDamper(bool iD);
+		bool getInertiaDamper();
 		//float getAngleToPlanet();
 		//void setAngleToPlanet(float t);
 		//int getPlanet();
