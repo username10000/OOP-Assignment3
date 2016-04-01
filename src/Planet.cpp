@@ -9,6 +9,7 @@ Planet::Planet(double x, double y, float _radius, sf::Color _colour, float _rota
 	rTexture.create(getRadius(), getRadius());
 	rTexture.clear(_colour);
 	_colour = sf::Color(Functions::randomInt(0, 255), Functions::randomInt(0, 255), Functions::randomInt(0, 255));
+	setSecondColour(_colour);
 
 	// Create Texture
 	for (int z = 0; z < Functions::randomInt(10, 20); z++) {
@@ -71,6 +72,7 @@ void Planet::update() {
 	setX(getX() + velocity.x);
 	setY(getY() + velocity.y);
 	rotate();
+	updateCommonObject();
 	//std::cout << getX() << " " << getY() << std::endl;
 	//std::cout << velocity.x << " " << velocity.y << std::endl;
 	//std::cout << getDirection().x << " " << getDirection().y << std::endl;

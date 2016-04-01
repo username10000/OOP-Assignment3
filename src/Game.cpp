@@ -31,6 +31,9 @@ Game::Game() {
 	// Setting the random seed
 	srand(time(NULL));
 
+	// Load Textures for the Objects
+	commonTexture.loadFromFile("Source/resources/tree.png");
+
 	// Create the Astronomical Objects
 	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 1900, sf::Color(255, 255, 0), 0)));
 	
@@ -49,6 +52,9 @@ Game::Game() {
 		
 		// Create the Astro Object in the generated position
 		astro.push_back(std::unique_ptr<AstroObject>(new Planet(-cos(angle) * rDist, -sin(angle) * rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256), Functions::randomFloat(0.005, 0.01))));
+		
+		// Create Common Textures
+		astro[i]->createCommonObjects(&commonTexture);
 
 		// Set number of Inhabitants
 		astro[i]->setInhabitants(Functions::randomInt(10, 99));
@@ -99,6 +105,9 @@ Game::Game() {
 
 	// Add Thrust
 	thrust = std::unique_ptr<Thrust>(new Thrust(screen, font));
+
+	// Add Fuel
+	fuel = std::unique_ptr<Fuel>(new Fuel(screen, font));
 
 	// Pixels Per Meter
 	ppm = 1;
@@ -834,6 +843,9 @@ void Game::update() {
 		// Thrust
 		thrust->update(ships[0]->getThrustPercentage());
 
+		// Fuel
+		fuel->update(ships[0]->getFuelPercentage());
+
 		//frameTime.restart();
 		accumulator -= dt;
 	//}
@@ -879,11 +891,8 @@ void Game::render() {
 
 		// Astronomical Object
 		for (int i = 0; i < astro.size(); i++) {
-			/*if (astro[i]->getX() + astro[i]->getRadius() > view.x - screen.width / 2 * ppm &&
-				astro[i]->getX() - astro[i]->getRadius() < view.x + screen.width / 2 * ppm &&
-				astro[i]->getY() + astro[i]->getRadius() > view.y - screen.height / 2 * ppm &&
-				astro[i]->getY() - astro[i]->getRadius() < view.y + screen.height / 2 * ppm)*/
-			astro[i]->render(window, view, screen, ppm);
+			if (i == closestPlanet || i == 0)
+				astro[i]->render(window, view, screen, ppm);
 		}
 
 		// Ships
@@ -908,6 +917,9 @@ void Game::render() {
 
 			// Thurst
 			thrust->render(window);
+
+			// Fuel
+			fuel->render(window);
 
 			// Inertia Damper
 			window.draw(idText);

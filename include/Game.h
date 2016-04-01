@@ -19,6 +19,7 @@
 #include <VelocityVector.h>
 #include <DistanceToObject.h>
 #include <Thrust.h>
+#include <Fuel.h>
 #include <AstroMap.h>
 #include <Human.h>
 
@@ -41,6 +42,7 @@ class Game {
 		std::unique_ptr<VelocityVector> velocityVector;
 		std::unique_ptr<DistanceToObject> distanceObject;
 		std::unique_ptr<Thrust> thrust;
+		std::unique_ptr<Fuel> fuel;
 		std::unique_ptr<AstroMap> astroMap;
 		std::unique_ptr<Human> human;
 		SolarSystem solarSystem;
@@ -59,6 +61,7 @@ class Game {
 		bool onPlanet;
 		bool jump;
 		sf::Texture humanTexture;
+		sf::Texture commonTexture;
 		std::vector<std::unique_ptr<Human>> locals;
 		int closestPlanet;
 		//AstroMap astroMap(0);

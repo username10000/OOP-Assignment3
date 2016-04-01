@@ -33,7 +33,8 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 
 	landed = false;
 
-	fuel = 100;
+	fuel = maxFuel = 100000;
+
 	thrust = 0;
 	maxThrust = 75;
 
@@ -203,6 +204,10 @@ bool Ship::getInertiaDamper() {
 	return inertiaDamper;
 }
 
+float Ship::getFuelPercentage() {
+	return Functions::map(fuel, 0, maxFuel, 0, 100);
+}
+
 void Ship::update() {
 	for (int i = 0; i < 3; i++) {
 		ship[i].rotate(rotation);
@@ -225,7 +230,7 @@ void Ship::update() {
 			rotation = 0;
 	}
 
-	if (thrust != 0)
+	if (thrust != 0 && fuel != 0)
 		accelerating = true;
 	else
 		accelerating = false;
@@ -248,9 +253,20 @@ void Ship::update() {
 		 spriteNo = 0;
 	 }
 
-	// Add Thrust Velocity
-	velocity.x += sin(angle * PI / 180) * thrust * speed;
-	velocity.y += -cos(angle * PI / 180) * thrust * speed;
+	if (fuel > thrust * 0.1) {
+		// Add Thrust Velocity
+		velocity.x += sin(angle * PI / 180) * thrust * speed;
+		velocity.y += -cos(angle * PI / 180) * thrust * speed;
+		fuel -= thrust * 0.1;
+	} else {
+		if (fuel > 0) {
+			// Add Thrust Velocity for the remaining Fuel
+			velocity.x += sin(angle * PI / 180) * (fuel / 0.1) * speed;
+			velocity.y += -cos(angle * PI / 180) * (fuel / 0.1) * speed;
+			fuel = 0;
+		}
+	}
+		
 	
 	// Force
 	float acceleration = getForce() / getMass();

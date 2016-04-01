@@ -9,6 +9,7 @@
 #include <GameObject.h>
 #include <Human.h>
 #include <Functions.h>
+#include <CommonObject.h>
 
 // AstroObject
 class AstroObject : public GameObject {
@@ -22,9 +23,14 @@ class AstroObject : public GameObject {
 		sf::Vector2<double> velocity;
 		sf::Vector2<double> direction;
 		sf::Color colour;
+		sf::Color ndColour;
 		sf::CircleShape circle;
+		sf::CircleShape atmosphere;
+		sf::RenderTexture atmTexture;
 		sf::Texture texture;
+		sf::Texture atmosphereTexture;
 		std::string name;
+		std::vector<std::unique_ptr<CommonObject>> objs;
 		bool habitable;
 		int inhabitants;
 		//sf::RenderTexture rTexture;
@@ -56,6 +62,9 @@ class AstroObject : public GameObject {
 		void rotate();
 		void setInhabitants(int h);
 		int getInhabitants();
+		void setSecondColour(sf::Color col);
+		void createCommonObjects(sf::Texture *cT);
+		void updateCommonObject();
 };
 
 #endif

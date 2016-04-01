@@ -6,6 +6,7 @@
 #include <SFML/Graphics.hpp>
 #include <Functions.h>
 
+// Thrust
 class Thrust {
 	private:
 		sf::VideoMode screen;
@@ -15,8 +16,6 @@ class Thrust {
 		sf::Text left, right;
 		sf::CircleShape indicator;
 		sf::VertexArray lines;
-		//sf::Vertex[2] lines;
-		//std::vector<sf::Vertex[2]> lines;
 		float thrustLevel;
 		float offset;
 	public:
