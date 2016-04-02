@@ -10,6 +10,7 @@
 #include <Human.h>
 #include <Functions.h>
 #include <CommonObject.h>
+#include <SpecialObject.h>
 
 // AstroObject
 class AstroObject : public GameObject {
@@ -31,6 +32,7 @@ class AstroObject : public GameObject {
 		sf::Texture atmosphereTexture;
 		std::string name;
 		std::vector<std::unique_ptr<CommonObject>> objs;
+		std::vector<std::unique_ptr<SpecialObject>> sObjs;
 		bool habitable;
 		int inhabitants;
 		//sf::RenderTexture rTexture;
@@ -65,6 +67,9 @@ class AstroObject : public GameObject {
 		void setSecondColour(sf::Color col);
 		void createCommonObjects(sf::Texture *cT);
 		void updateCommonObject();
+		int getNearSpecial(double x, double y);
+		int getType(int index);
+		void setInactive(int index);
 };
 
 #endif

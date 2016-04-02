@@ -146,8 +146,9 @@ void AstroObject::setSecondColour(sf::Color col) {
 }
 
 void AstroObject::createCommonObjects(sf::Texture *cT) {
-	float angle = 0, scale, spacing, objSpace;
+	float angle = 0, scale = 0, spacing = 0, objSpace = 0, totalEmpty = 0;
 	int numObj = 0, type = 0;
+	bool fuelStation = false;
 	sf::Color col;
 	sf::IntRect tR;
 	tR.top = 0;
@@ -158,6 +159,35 @@ void AstroObject::createCommonObjects(sf::Texture *cT) {
 	do {
 		// Change type of Object
 		if (numObj == 0) {
+			// Create a Special Object in the Empty Space
+			if (totalEmpty != 0) {
+				if (!fuelStation) {
+					scale = 0.3;
+					spacing = 0;
+					objSpace = (20 * scale + spacing) / radius;
+					col = sf::Color::White;
+					tR.top = 41;
+					tR.left = 0;
+					sObjs.push_back(std::unique_ptr<SpecialObject>(new SpecialObject(cT, col, angle - totalEmpty / 2, rotation, radius)));
+					sObjs[sObjs.size() - 1]->setScale(scale);
+					sObjs[sObjs.size() - 1]->setTextureRect(tR);
+					sObjs[sObjs.size() - 1]->setType(0);
+					fuelStation = true;
+				} else {
+					scale = 0.3;
+					spacing = 0;
+					objSpace = (20 * scale + spacing) / radius;
+					col = sf::Color::White;
+					tR.top = 41;
+					tR.left = 21;
+					sObjs.push_back(std::unique_ptr<SpecialObject>(new SpecialObject(cT, col, angle - totalEmpty / 2, rotation, radius)));
+					sObjs[sObjs.size() - 1]->setScale(scale);
+					sObjs[sObjs.size() - 1]->setTextureRect(tR);
+					sObjs[sObjs.size() - 1]->setType(Functions::randomInt(1, 3));
+				}
+				totalEmpty = 0;
+			}
+
 			type = Functions::randomInt(0, 2); // (type + 1) % 3;
 			switch (type) {
 				case 0:
@@ -183,6 +213,7 @@ void AstroObject::createCommonObjects(sf::Texture *cT) {
 				spacing = Functions::randomFloat(0, 5) * scale;
 				objSpace = (20 * scale + spacing) / radius;
 				col = ndColour;
+				tR.top = 0;
 				tR.left = 0;
 				break;
 			case 1:
@@ -191,6 +222,7 @@ void AstroObject::createCommonObjects(sf::Texture *cT) {
 				spacing = Functions::randomFloat(10, 20) * scale;
 				objSpace = (20 * scale + spacing) / radius;
 				col = sf::Color(Functions::randomInt(0, 255), Functions::randomInt(0, 255), Functions::randomInt(0, 255));
+				tR.top = 0;
 				tR.left = Functions::randomInt(1, 5) * 21;
 				break;
 			default:
@@ -203,11 +235,15 @@ void AstroObject::createCommonObjects(sf::Texture *cT) {
 				break;
 		}
 
-		if (type != 2) {
+		if (type == 0 || type == 1) {
 			// Create the Object
 			objs.push_back(std::unique_ptr<CommonObject>(new CommonObject(cT, col, angle, rotation, radius)));
 			objs[objs.size() - 1]->setScale(scale);
 			objs[objs.size() - 1]->setTextureRect(tR);
+		}
+
+		if (type == 2) {
+			totalEmpty += objSpace;
 		}
 
 		angle += objSpace;
@@ -220,6 +256,26 @@ void AstroObject::updateCommonObject() {
 	for (int i = 0; i < objs.size(); i++) {
 		objs[i]->update(getX(), getY());
 	}
+	for (int i = 0; i < sObjs.size(); i++) {
+		sObjs[i]->update(getX(), getY());
+	}
+}
+
+int AstroObject::getNearSpecial(double x, double y) {
+	for (int i = 0; i < sObjs.size(); i++) {
+		if (Functions::dist(x, y, sObjs[i]->getX(), sObjs[i]->getY()) <= sObjs[i]->getDimension().x * sObjs[i]->getScale() && sObjs[i]->getActive()) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+int AstroObject::getType(int index) {
+	return sObjs[index]->getType();
+}
+
+void AstroObject::setInactive(int index) {
+	sObjs[index]->setActive(false);
 }
 
 void AstroObject::update() {
@@ -236,6 +292,9 @@ void AstroObject::render(sf::RenderWindow &window, sf::Vector2<double> view, sf:
 		window.draw(atmosphere);
 		for (int i = 0; i < objs.size(); i++) {
 			objs[i]->render(window, view, screen, ppm);
+		}
+		for (int i = 0; i < sObjs.size(); i++) {
+			sObjs[i]->render(window, view, screen, ppm);
 		}
 	}
 	window.draw(circle);

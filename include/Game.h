@@ -22,6 +22,7 @@
 #include <Fuel.h>
 #include <AstroMap.h>
 #include <Human.h>
+#include <Message.h>
 
 // Game
 class Game {
@@ -30,6 +31,9 @@ class Game {
 		sf::VideoMode screen;
 		sf::ContextSettings settings;
 		sf::Font font;
+		sf::RectangleShape background;
+		sf::RenderTexture bRenderTexture;
+		sf::Texture bTexture;
 		int keys[512] = { 0 };
 		int stop;
 		int noPlanets;
@@ -45,6 +49,7 @@ class Game {
 		std::unique_ptr<Fuel> fuel;
 		std::unique_ptr<AstroMap> astroMap;
 		std::unique_ptr<Human> human;
+		std::unique_ptr<Message> message;
 		SolarSystem solarSystem;
 		sf::Vector2<double> view;
 		float ppm;
@@ -60,6 +65,7 @@ class Game {
 		int targetAstro;
 		bool onPlanet;
 		bool jump;
+		bool gameOver;
 		sf::Texture humanTexture;
 		sf::Texture commonTexture;
 		std::vector<std::unique_ptr<Human>> locals;
@@ -76,7 +82,9 @@ class Game {
 		//float apoapsis(int i);
 		void keyPressed();
 		void collisions();
+		void nearObjects();
 		void fastForwardObject(int i, int loops);
+		double getRelativeVelocity();
 		//int randomInt(int start, int stop);
 		//float randomFloat(float start, float stop);
 		//double map(double v, double lmin, double lmax, double rmin, double rmax);

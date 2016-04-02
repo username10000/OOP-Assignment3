@@ -39,6 +39,8 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 	maxThrust = 75;
 
 	inertiaDamper = true;
+
+	maxVelocity = 1;
 }
 
 Ship::Ship() : Ship(0, 0, 0, 0) {
@@ -206,6 +208,26 @@ bool Ship::getInertiaDamper() {
 
 float Ship::getFuelPercentage() {
 	return Functions::map(fuel, 0, maxFuel, 0, 100);
+}
+
+void Ship::refuel() {
+	fuel = maxFuel;
+}
+
+void Ship::addMaxFuel(float f) {
+	maxFuel += f;
+}
+
+void Ship::addMaxThrust(float t) {
+	thrust += t;
+}
+
+void Ship::addMaxVelocity(float v) {
+	maxVelocity += v;
+}
+
+float Ship::getMaxVelocity() {
+	return maxVelocity;
 }
 
 void Ship::update() {

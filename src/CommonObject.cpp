@@ -1,12 +1,12 @@
 #include <CommonObject.h>
 
 CommonObject::CommonObject(sf::Texture *texture, sf::Color col, float sA, float rA, float r) {
-	dimension.x = texture->getSize().x;
-	dimension.y = texture->getSize().y;
+	dimension.x = texture->getSize().x / 6;
+	dimension.y = texture->getSize().y / 2;
 	colour = col;
 	sprite.setTexture(*texture);
 	sprite.setColor(colour);
-	//sprite.setOrigin(dimension.x / 2, dimension.y / 2);
+	sprite.setOrigin(dimension.x / 2, dimension.y / 2);
 	//middleObject.x = mX;
 	//middleObject.y = mY;
 	angle = sA;
@@ -18,6 +18,14 @@ CommonObject::CommonObject(sf::Texture *texture, sf::Color col, float sA, float 
 
 void CommonObject::setScale(float s) {
 	scale = s;
+}
+
+float CommonObject::getScale() {
+	return scale;
+}
+
+sf::Vector2<double> CommonObject::getDimension() {
+	return dimension;
 }
 
 void CommonObject::setTextureRect(sf::IntRect tR) {
@@ -40,8 +48,8 @@ bool CommonObject::isTree() {
 }
 
 void CommonObject::update(double mX, double mY) {
-	setX(mX - cos(angle) * (radius + dimension.y * scale - 0.1));
-	setY(mY - sin(angle) * (radius + dimension.y * scale - 0.1));
+	setX(mX - cos(angle) * (radius + dimension.y * scale / 2 - 0.1));
+	setY(mY - sin(angle) * (radius + dimension.y * scale / 2 - 0.1));
 	angle += rotAngle * PI / 180;
 	sprite.rotate(rotAngle);
 }

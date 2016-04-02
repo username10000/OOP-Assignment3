@@ -23,6 +23,8 @@ Human::Human(double x, double y, sf::Texture *texture) : GameObject(x, y) {
 
 	state = 0;
 	nextStateChange = 0;
+
+	closestSpecial = -1;
 }
 
 sf::Vector2<double> Human::getVelocity() {
@@ -120,6 +122,14 @@ void Human::setJump(bool j) {
 
 bool Human::getJump() {
 	return jump;
+}
+
+void Human::setClosestSpecial(int cS) {
+	closestSpecial = cS;
+}
+
+int Human::getClosestSpecial() {
+	return closestSpecial;
 }
 
 void Human::update() {

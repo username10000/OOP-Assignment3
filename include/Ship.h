@@ -28,6 +28,7 @@ class Ship : public GameObject {
 		float maxFuel;
 		float thrust;
 		float maxThrust;
+		float maxVelocity;
 		//float angleToPlanet;
 		bool accelerating;
 		bool landed;
@@ -69,6 +70,11 @@ class Ship : public GameObject {
 		void setInertiaDamper(bool iD);
 		bool getInertiaDamper();
 		float getFuelPercentage();
+		void refuel();
+		void addMaxFuel(float f);
+		void addMaxThrust(float t);
+		void addMaxVelocity(float v);
+		float getMaxVelocity();
 		//float getAngleToPlanet();
 		//void setAngleToPlanet(float t);
 		//int getPlanet();

@@ -109,6 +109,9 @@ Game::Game() {
 	// Add Fuel
 	fuel = std::unique_ptr<Fuel>(new Fuel(screen, font));
 
+	// Add Message
+	message = std::unique_ptr<Message>(new Message(screen, font));
+
 	// Pixels Per Meter
 	ppm = 1;
 
@@ -157,6 +160,8 @@ Game::Game() {
 	// Set the Human's state
 	jump = false;
 
+	gameOver = false;
+
 	closestPlanet = 1;
 
 	// Create Vector to store the Locals
@@ -167,6 +172,27 @@ Game::Game() {
 		locals[i]->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
 		locals[i]->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
 	}
+
+	// Star Field - generate stars
+	bRenderTexture.create(screen.width, screen.height);
+	bRenderTexture.clear(sf::Color::Black);
+
+	int numStars = Functions::randomInt(1000, 2000);
+	for (int i = 0; i < numStars; i++) {
+		float xStar = Functions::randomFloat(0, screen.width);
+		float yStar = Functions::randomFloat(0, screen.height);
+		float rStar = Functions::randomFloat(0.1, 2);
+		sf::CircleShape c(rStar);
+		c.setPosition(xStar - 20, yStar - 20);
+		//c.setPointCount(100);
+		bRenderTexture.draw(c);
+	}
+
+	bRenderTexture.display();
+	bTexture = bRenderTexture.getTexture();
+
+	background.setSize(sf::Vector2f(screen.width, screen.height));
+	background.setTexture(&bTexture);
 }
 
 Game::~Game() {
@@ -176,28 +202,6 @@ Game::~Game() {
 int Game::getStop() {
 	return stop;
 }
-//
-//double Game::dist(double x1, double y1, double x2, double y2) {
-//	double X = pow(x2 - x1, 2);
-//	double Y = pow(y2 - y1, 2);
-//
-//	return sqrt(X + Y);
-//}
-//
-//double Game::map(double v, double lmin, double lmax, double rmin, double rmax) {
-//	if (v < lmin)
-//		v = lmin;
-//
-//	if (v > lmax)
-//		v = lmax;
-//
-//	double leftRange = lmax - lmin;
-//	double rightRange = rmax - rmin;
-//
-//	double leftPercentage = (v - lmin) / leftRange;
-//
-//	return rmin + (leftPercentage * rightRange);
-//}
 
 void Game::disableMenus() {
 	for (auto el = menu.begin(); el != menu.end(); el++) {
@@ -222,10 +226,11 @@ void Game::events() {
 				menu["map"] = !menu["map"];
 			}
 			// E - Exit / Enter
-			if (event.key.code == 4) {
-				onPlanet = !onPlanet;
-				// Initial Settings when the Player Exits the Ship
-				if (onPlanet) {
+			if (event.key.code == 4 && !gameOver) {
+
+				if (!onPlanet && ships[0]->getLanded()) {
+					// Initial Settings when the Player Exits the Ship
+					onPlanet = true;
 					int cP = ships[0]->getClosestPlanet();
 					float dy = astro[cP]->getY() - ships[0]->getY();
 					float dx = astro[cP]->getX() - ships[0]->getX();
@@ -234,15 +239,50 @@ void Game::events() {
 					//theta += 0.01;
 					human->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
 					human->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
+				} else if (onPlanet && Functions::dist(human->getX(), human->getY(), ships[0]->getX(), ships[0]->getY()) < 20 * 0.15) {
+					onPlanet = false;
 				}
+
+				int cS = human->getClosestSpecial();
+				if (cS != -1) {
+					switch (astro[closestPlanet]->getType(human->getClosestSpecial())) {
+						case 0:
+							ships[0]->refuel();
+							break;
+						case 1:
+							ships[0]->addMaxFuel(10000);
+							astro[closestPlanet]->setInactive(cS);
+							break;
+						case 2:
+							ships[0]->addMaxThrust(10);
+							astro[closestPlanet]->setInactive(cS);
+							break;
+						case 3:
+							ships[0]->addMaxVelocity(0.5);
+							astro[closestPlanet]->setInactive(cS);
+						default:
+							break;
+					}
+				}
+				
+				//if (onPlanet) {
+				//	int cP = ships[0]->getClosestPlanet();
+				//	float dy = astro[cP]->getY() - ships[0]->getY();
+				//	float dx = astro[cP]->getX() - ships[0]->getX();
+				//	float theta = atan2(dy, dx);
+				//	theta = theta >= 0 ? theta : theta + 2 * PI;
+				//	//theta += 0.01;
+				//	human->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
+				//	human->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
+				//}
 			}
 			// X - Cut Thrust
-			if (event.key.code == 23) {
+			if (event.key.code == 23 && !gameOver) {
 				ships[0]->cutThrust();
 			}
 
 			// I - Toggle Inertia Damper
-			if (event.key.code == 8) {
+			if (event.key.code == 8 && !gameOver) {
 				ships[0]->setInertiaDamper(!ships[0]->getInertiaDamper());
 				if (ships[0]->getInertiaDamper())
 					idText.setString("Inertia Damper: ON");
@@ -373,13 +413,13 @@ void Game::keyPressed() {
 	}
 
 	// W
-	if (keys[22] && !onPlanet) {
+	if (keys[22] && !onPlanet && !gameOver) {
 		ships[0]->addVelocity();
 		//ships[0]->setAccelerating(true);
 	}
 
 	// S
-	if (keys[18] && !onPlanet) {
+	if (keys[18] && !onPlanet && !gameOver) {
 		ships[0]->subVelocity();
 		//ships[0]->setAccelerating(true);
 		//ships[0]->setLanded(false);
@@ -388,7 +428,7 @@ void Game::keyPressed() {
 	bool moved = false;
 
 	// A
-	if (keys[0]) {
+	if (keys[0] && !gameOver) {
 		if (!onPlanet) {
 			// Ship
 			ships[0]->addRotation(-0.05f);
@@ -416,7 +456,7 @@ void Game::keyPressed() {
 	}
 
 	// D
-	if (keys[3]) {
+	if (keys[3] && !gameOver) {
 		if (!onPlanet) {
 			// Ship
 			ships[0]->addRotation(0.05f);
@@ -495,6 +535,10 @@ void Game::collisions() {
 	for (int i = 0; i < astro.size(); i++) {
 		for (int j = 0; j < ships.size(); j++) {
 			if (Functions::dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) < astro[i]->getRadius() + 20 * 0.15) {
+				// Check if it's Game Over
+				if (getRelativeVelocity() > ships[0]->getMaxVelocity())
+					gameOver = true;
+
 				// Get the Angle between the Ship and the Object
 				float dy = astro[i]->getY() - ships[j]->getY();
 				float dx = astro[i]->getX() - ships[j]->getX();
@@ -570,6 +614,48 @@ void Game::collisions() {
 			}
 		}
 	}
+}
+
+void Game::nearObjects() {
+	message->hide();
+	if (onPlanet) {
+		if (Functions::dist(human->getX(), human->getY(), ships[0]->getX(), ships[0]->getY()) < 20 * 0.15) {
+			message->update("Press \'E\' to Enter the Ship");
+		}
+
+		int specialIndex = astro[closestPlanet]->getNearSpecial(human->getX(), human->getY());
+		if (specialIndex != -1) {
+			switch (astro[closestPlanet]->getType(specialIndex)) {
+				case 0:
+					break;
+				case 1:
+					message->update("Press \'E\' to Increase the Maximum Fuel");
+					break;
+				case 2:
+					message->update("Press \'E\' to Increase the Maximum Thrust");
+					break;
+				case 3:
+					message->update("Press \'E\' to Increase the Durability");
+				default:
+					message->update("Allan please add details");
+					break;
+			}
+			
+			human->setClosestSpecial(specialIndex);
+		} else {
+			human->setClosestSpecial(-1);
+		}
+	}
+
+	if (!onPlanet) {
+		if (Functions::dist(ships[0]->getX(), ships[0]->getY(), astro[closestPlanet]->getX(), astro[closestPlanet]->getY()) < 1000 && getRelativeVelocity() > ships[0]->getMaxVelocity()) {
+			message->update("WARNING! HIGH SPEED!", sf::Color::Red);
+		}
+	}
+}
+
+double Game::getRelativeVelocity() {
+	return sqrt( pow( ships[0]->getVelocity().x - astro[closestPlanet]->getVelocity().x, 2 ) + pow( ships[0]->getVelocity().y - astro[closestPlanet]->getVelocity().y, 2 ) );
 }
 
 void Game::update() {
@@ -770,6 +856,9 @@ void Game::update() {
 		// Check collisions
 		collisions();
 
+		// Check for Near Objects
+		nearObjects();
+
 		// Unset the Landed Flag
 		if (ships[0]->getLanded() && Functions::dist(astro[closestPlanet]->getX(), astro[closestPlanet]->getY(), ships[0]->getX(), ships[0]->getY()) > astro[closestPlanet]->getRadius() + 20 * 0.15 + 0.1) {
 			int cP = ships[0]->getClosestPlanet();
@@ -846,6 +935,11 @@ void Game::update() {
 		// Fuel
 		fuel->update(ships[0]->getFuelPercentage());
 
+		if (gameOver) {
+			message->update("GAME OVER! Press \'Esc\' to Exit", sf::Color::Red);
+			ships[0]->cutThrust();
+		}
+
 		//frameTime.restart();
 		accumulator -= dt;
 	//}
@@ -868,26 +962,21 @@ void Game::render() {
 
 		// Distance To Object
 		distanceObject->render(window);
+
+		// Thurst
+		thrust->render(window);
+
+		// Fuel
+		fuel->render(window);
 	} else {
 		// Star Field
-		for (unsigned int i = 0; i < 200; i++) {
-			if (ppm < 1) {
-				double newWidth = screen.width * ppm;
-				double newHeight = screen.height * ppm;
-				double hMargin = (screen.width - newWidth) / 2;
-				double vMargin = (screen.height - newHeight) / 2;
-				if (stars[i][0] > hMargin && stars[i][0] < screen.width - hMargin && stars[i][1] > vMargin && stars[i][1] < screen.height - vMargin) {
-					sf::CircleShape c(stars[i][2]);
-					c.setPosition(Functions::map(stars[i][0], hMargin, screen.width - hMargin, 0, screen.width) - 20, Functions::map(stars[i][1], vMargin, screen.height - vMargin, 0, screen.height) - 20);
-					window.draw(c);
-				}
-			}
-			else {
-				sf::CircleShape c(stars[i][2]);
-				c.setPosition(stars[i][0] - 20, stars[i][1] - 20);
-				window.draw(c);
-			}
-		}
+		sf::IntRect tR;
+		tR.width = screen.width * ppm;
+		tR.height = screen.height * ppm;
+		tR.left = (screen.width - tR.width) / 2 + 20 * ppm;
+		tR.top = (screen.height - tR.height) / 2 + 20 * ppm;
+		background.setTextureRect(tR);
+		window.draw(background);
 
 		// Astronomical Object
 		for (int i = 0; i < astro.size(); i++) {
@@ -923,6 +1012,11 @@ void Game::render() {
 
 			// Inertia Damper
 			window.draw(idText);
+		}
+
+		// Message
+		if (message->getIsVisible()) {
+			message->render(window);
 		}
 	}
 

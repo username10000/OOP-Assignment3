@@ -20,6 +20,8 @@ class CommonObject : public GameObject {
 	public:
 		CommonObject(sf::Texture *texture, sf::Color col, float sA, float rA, float r);
 		void setScale(float s);
+		float getScale();
+		sf::Vector2<double> getDimension();
 		void setTextureRect(sf::IntRect tR);
 		float getAngle();
 		bool isTree();

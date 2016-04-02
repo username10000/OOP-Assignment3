@@ -20,6 +20,7 @@ class Human : public GameObject {
 		int dir;
 		int state;
 		int nextStateChange;
+		int closestSpecial;
 		bool jump;
 	public:
 		Human(double x, double y, sf::Texture *texture);
@@ -42,6 +43,8 @@ class Human : public GameObject {
 		int getNextStateChange();
 		void setJump(bool j);
 		bool getJump();
+		void setClosestSpecial(int cS);
+		int getClosestSpecial();
 		//void setPlanetRotation(float r);
 		void update();
 		void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);
