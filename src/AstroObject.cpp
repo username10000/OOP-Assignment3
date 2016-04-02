@@ -146,9 +146,74 @@ void AstroObject::setSecondColour(sf::Color col) {
 }
 
 void AstroObject::createCommonObjects(sf::Texture *cT) {
-	for (int i = 0; i < Functions::randomInt(50, 100); i++) {
-		objs.push_back(std::unique_ptr<CommonObject>(new CommonObject(cT, ndColour, Functions::randomFloat(0, 2 * PI), rotation, radius)));
-	}
+	float angle = 0, scale, spacing, objSpace;
+	int numObj = 0, type = 0;
+	sf::Color col;
+	sf::IntRect tR;
+	tR.top = 0;
+	tR.left = 0;
+	tR.width = 20;
+	tR.height = 40;
+
+	do {
+		// Change type of Object
+		if (numObj == 0) {
+			type = Functions::randomInt(0, 2); // (type + 1) % 3;
+			switch (type) {
+				case 0:
+					// Tree
+					numObj = Functions::randomInt(10, 20);
+					break;
+				case 1:
+					// Building
+					numObj = Functions::randomInt(5, 9);
+					break;
+				default:
+					// Empty Space
+					numObj = Functions::randomInt(5, 10);
+					break;
+			}
+		}
+
+		// Change the Properties of each Object
+		switch (type) {
+			case 0:
+				// Tree
+				scale = Functions::randomFloat(0.3, 0.5);
+				spacing = Functions::randomFloat(0, 5) * scale;
+				objSpace = (20 * scale + spacing) / radius;
+				col = ndColour;
+				tR.left = 0;
+				break;
+			case 1:
+				// Building
+				scale = Functions::randomFloat(0.5, 0.9);
+				spacing = Functions::randomFloat(10, 20) * scale;
+				objSpace = (20 * scale + spacing) / radius;
+				col = sf::Color(Functions::randomInt(0, 255), Functions::randomInt(0, 255), Functions::randomInt(0, 255));
+				tR.left = Functions::randomInt(1, 5) * 21;
+				break;
+			default:
+				//Empty Space
+				scale = Functions::randomFloat(0.5, 0.9);
+				spacing = Functions::randomFloat(10, 20) * scale;
+				objSpace = (20 * scale + spacing) / radius;
+				//col = sf::Color(Functions::randomInt(0, 255), Functions::randomInt(0, 255), Functions::randomInt(0, 255));
+				//tR.left = Functions::randomInt(1, 5) * 21;
+				break;
+		}
+
+		if (type != 2) {
+			// Create the Object
+			objs.push_back(std::unique_ptr<CommonObject>(new CommonObject(cT, col, angle, rotation, radius)));
+			objs[objs.size() - 1]->setScale(scale);
+			objs[objs.size() - 1]->setTextureRect(tR);
+		}
+
+		angle += objSpace;
+		numObj--;
+
+	} while (angle < 2 * PI);
 }
 
 void AstroObject::updateCommonObject() {

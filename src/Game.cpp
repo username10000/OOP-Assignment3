@@ -32,7 +32,7 @@ Game::Game() {
 	srand(time(NULL));
 
 	// Load Textures for the Objects
-	commonTexture.loadFromFile("Source/resources/tree.png");
+	commonTexture.loadFromFile("Source/resources/objectsSheet.png");
 
 	// Create the Astronomical Objects
 	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 1900, sf::Color(255, 255, 0), 0)));
