@@ -23,6 +23,7 @@
 #include <AstroMap.h>
 #include <Human.h>
 #include <Message.h>
+#include <InfoPanel.h>
 
 // Game
 class Game {
@@ -50,6 +51,7 @@ class Game {
 		std::unique_ptr<AstroMap> astroMap;
 		std::unique_ptr<Human> human;
 		std::unique_ptr<Message> message;
+		std::unique_ptr<InfoPanel> infoPanel;
 		SolarSystem solarSystem;
 		sf::Vector2<double> view;
 		float ppm;
@@ -66,6 +68,7 @@ class Game {
 		bool onPlanet;
 		bool jump;
 		bool gameOver;
+		bool panel;
 		sf::Texture humanTexture;
 		sf::Texture commonTexture;
 		std::vector<std::unique_ptr<Human>> locals;
@@ -85,6 +88,7 @@ class Game {
 		void nearObjects();
 		void fastForwardObject(int i, int loops);
 		double getRelativeVelocity();
+		double getRelativeVelocity(int index);
 		//int randomInt(int start, int stop);
 		//float randomFloat(float start, float stop);
 		//double map(double v, double lmin, double lmax, double rmin, double rmax);

@@ -109,6 +109,9 @@ Game::Game() {
 	// Add Fuel
 	fuel = std::unique_ptr<Fuel>(new Fuel(screen, font));
 
+	// Add Info Panel
+	infoPanel = std::unique_ptr<InfoPanel>(new InfoPanel(screen, font));
+
 	// Add Message
 	message = std::unique_ptr<Message>(new Message(screen, font));
 
@@ -117,6 +120,7 @@ Game::Game() {
 
 	// FrameRate Settings
 	frameRate.setFont(font);
+	frameRate.setPosition(screen.width / 2, 0);
 	frameRate.setString("0");
 
 	// Distance Indicator
@@ -193,6 +197,8 @@ Game::Game() {
 
 	background.setSize(sf::Vector2f(screen.width, screen.height));
 	background.setTexture(&bTexture);
+
+	panel = false;
 }
 
 Game::~Game() {
@@ -289,7 +295,13 @@ void Game::events() {
 				else
 					idText.setString("Inertia Damper: OFF");
 			}
-				//window.close();
+
+			// P - Toggle Info Panel
+			if (event.key.code == 15) {
+				panel = !panel;
+			}
+
+			//window.close();
 			// Set the pressed key
 			keys[event.key.code] = 1;
 			//std::cout << "Key Pressed: " << event.key.code << std::endl;
@@ -627,6 +639,7 @@ void Game::nearObjects() {
 		if (specialIndex != -1) {
 			switch (astro[closestPlanet]->getType(specialIndex)) {
 				case 0:
+					message->update("Press \'E\' to Refuel");
 					break;
 				case 1:
 					message->update("Press \'E\' to Increase the Maximum Fuel");
@@ -636,6 +649,7 @@ void Game::nearObjects() {
 					break;
 				case 3:
 					message->update("Press \'E\' to Increase the Durability");
+					break;
 				default:
 					message->update("Allan please add details");
 					break;
@@ -656,6 +670,10 @@ void Game::nearObjects() {
 
 double Game::getRelativeVelocity() {
 	return sqrt( pow( ships[0]->getVelocity().x - astro[closestPlanet]->getVelocity().x, 2 ) + pow( ships[0]->getVelocity().y - astro[closestPlanet]->getVelocity().y, 2 ) );
+}
+
+double Game::getRelativeVelocity(int index) {
+	return sqrt( pow( ships[0]->getVelocity().x - astro[index]->getVelocity().x, 2) + pow(ships[0]->getVelocity().y - astro[index]->getVelocity().y, 2 ) );
 }
 
 void Game::update() {
@@ -935,6 +953,15 @@ void Game::update() {
 		// Fuel
 		fuel->update(ships[0]->getFuelPercentage());
 
+		// Info Panel
+		int relToTarget;
+		if (targetAstro != -1) {
+			relToTarget = getRelativeVelocity(targetAstro);
+		} else {
+			relToTarget = -1;
+		}
+		infoPanel->update(idText.getString(), ships[0]->getThrust(), ships[0]->getMaxThrust(), ships[0]->getFuel(), ships[0]->getMaxFuel(), (float)sqrt( pow( ships[0]->getVelocity().x, 2 ) + pow( ships[0]->getVelocity().y, 2 ) ), getRelativeVelocity(),  relToTarget, ships[0]->getMaxVelocity());
+
 		if (gameOver) {
 			message->update("GAME OVER! Press \'Esc\' to Exit", sf::Color::Red);
 			ships[0]->cutThrust();
@@ -968,6 +995,11 @@ void Game::render() {
 
 		// Fuel
 		fuel->render(window);
+
+		// Info Panel
+		if (panel) {
+			infoPanel->render(window);
+		}
 	} else {
 		// Star Field
 		sf::IntRect tR;
@@ -1010,8 +1042,13 @@ void Game::render() {
 			// Fuel
 			fuel->render(window);
 
+			// Info Panel
+			if (panel) {
+				infoPanel->render(window);
+			}
+
 			// Inertia Damper
-			window.draw(idText);
+			//window.draw(idText);
 		}
 
 		// Message

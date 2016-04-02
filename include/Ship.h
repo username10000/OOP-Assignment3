@@ -75,6 +75,10 @@ class Ship : public GameObject {
 		void addMaxThrust(float t);
 		void addMaxVelocity(float v);
 		float getMaxVelocity();
+		float getThrust();
+		float getMaxThrust();
+		float getFuel();
+		float getMaxFuel();
 		//float getAngleToPlanet();
 		//void setAngleToPlanet(float t);
 		//int getPlanet();

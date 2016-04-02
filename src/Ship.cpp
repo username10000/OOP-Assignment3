@@ -219,7 +219,7 @@ void Ship::addMaxFuel(float f) {
 }
 
 void Ship::addMaxThrust(float t) {
-	thrust += t;
+	maxThrust += t;
 }
 
 void Ship::addMaxVelocity(float v) {
@@ -228,6 +228,22 @@ void Ship::addMaxVelocity(float v) {
 
 float Ship::getMaxVelocity() {
 	return maxVelocity;
+}
+
+float Ship::getThrust() {
+	return thrust;
+}
+
+float Ship::getMaxThrust() {
+	return maxThrust;
+}
+
+float Ship::getFuel() {
+	return fuel;
+}
+
+float Ship::getMaxFuel() {
+	return maxFuel;
 }
 
 void Ship::update() {
