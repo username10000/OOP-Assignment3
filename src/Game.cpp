@@ -145,6 +145,11 @@ Game::Game() {
 
 	// Menu Flags
 	menu["map"] = false;
+	menu["infoPanel"] = true;
+	menu["thrust"] = true;
+	menu["fuel"] = true;
+	menu["distance"] = true;
+	menu["velocity"] = true;
 
 	//ppm = dist(0, 0, astro[noPlanets - 1] -> getX(), astro[noPlanets - 1] -> getY()) / (screen.height / 2);
 
@@ -185,7 +190,7 @@ Game::Game() {
 	for (int i = 0; i < numStars; i++) {
 		float xStar = Functions::randomFloat(0, screen.width);
 		float yStar = Functions::randomFloat(0, screen.height);
-		float rStar = Functions::randomFloat(0.1, 2);
+		float rStar = Functions::randomFloat(0.1, 1);
 		sf::CircleShape c(rStar);
 		c.setPosition(xStar - 20, yStar - 20);
 		//c.setPointCount(100);
@@ -282,6 +287,35 @@ void Game::events() {
 				//	human->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
 				//}
 			}
+
+			// F - Set Ship Straight
+			if (event.key.code == 5 && onPlanet && !gameOver) {
+				// Get the Angle between the Ship and the Object
+				float dy = astro[closestPlanet]->getY() - ships[0]->getY();
+				float dx = astro[closestPlanet]->getX() - ships[0]->getX();
+				float theta = atan2(dy, dx);
+				theta = theta >= 0 ? theta : theta + 2 * PI;
+				float curTheta = ships[0]->getRotation();
+				if (abs(theta - curTheta) > 0) {
+					if (abs(theta - curTheta) < abs(curTheta - theta)) {
+						float alpha = (curTheta - theta) * 180 / PI;
+						if (alpha < 0)
+							alpha = -360 - alpha;
+						else
+							alpha = 360 - alpha;
+						ships[0]->setLeftRotate(alpha);
+					}
+					else {
+						float alpha = (theta - curTheta) * 180 / PI;
+						if (alpha < 0)
+							alpha = -360 - alpha;
+						else
+							alpha = 360 - alpha;
+						ships[0]->setLeftRotate(alpha);
+					}
+				}
+			}
+
 			// X - Cut Thrust
 			if (event.key.code == 23 && !gameOver) {
 				ships[0]->cutThrust();
@@ -298,7 +332,49 @@ void Game::events() {
 
 			// P - Toggle Info Panel
 			if (event.key.code == 15) {
-				panel = !panel;
+				menu["infoPanel"] = !menu["infoPanel"];
+			}
+
+			// 0
+			if (event.key.code == 26) {
+				if (!menu["distance"] && !menu["velocity"] && !menu["infoPanel"] && !menu["thrust"] && !menu["fuel"]) {
+					menu["distance"] = true;
+					menu["velocity"] = true;
+					menu["infoPanel"] = true;
+					menu["thrust"] = true;
+					menu["fuel"] = true;
+				} else {
+					menu["distance"] = false;
+					menu["velocity"] = false;
+					menu["infoPanel"] = false;
+					menu["thrust"] = false;
+					menu["fuel"] = false;
+				}
+			}
+
+			// 1
+			if (event.key.code == 27) {
+				menu["distance"] = !menu["distance"];
+			}
+
+			// 2
+			if (event.key.code == 28) {
+				menu["velocity"] = !menu["velocity"];
+			}
+
+			// 3
+			if (event.key.code == 29) {
+				menu["infoPanel"] = !menu["infoPanel"];
+			}
+
+			// 4
+			if (event.key.code == 30) {
+				menu["thrust"] = !menu["thrust"];
+			}
+
+			// 5
+			if (event.key.code == 31) {
+				menu["fuel"] = !menu["fuel"];
 			}
 
 			//window.close();
@@ -502,10 +578,7 @@ void Game::keyPressed() {
 
 	// SPACE
 	if (keys[57]) {
-		if (!onPlanet) {
-			// Ship
-			ships[0]->resetRotation();
-		} else {
+		if (onPlanet) {
 			if (!jump) {
 				// Human
 				float f = 0.0025;
@@ -556,6 +629,11 @@ void Game::collisions() {
 				float dx = astro[i]->getX() - ships[j]->getX();
 				float theta = atan2(dy, dx);
 				theta = theta >= 0 ? theta : theta + 2 * PI;
+
+				if (!ships[j]->getLanded()) {
+					ships[j]->setStraight(theta - PI / 2);
+				}
+
 				theta += astro[i]->getRotation() * PI / 180;
 
 				// Reset the Velocity of the Ship
@@ -662,7 +740,7 @@ void Game::nearObjects() {
 	}
 
 	if (!onPlanet) {
-		if (Functions::dist(ships[0]->getX(), ships[0]->getY(), astro[closestPlanet]->getX(), astro[closestPlanet]->getY()) < 1000 && getRelativeVelocity() > ships[0]->getMaxVelocity()) {
+		if (Functions::dist(ships[0]->getX(), ships[0]->getY(), astro[closestPlanet]->getX(), astro[closestPlanet]->getY()) - astro[closestPlanet]->getRadius() - 20 * 0.15 < 1000 && getRelativeVelocity() > ships[0]->getMaxVelocity()) {
 			message->update("WARNING! HIGH SPEED!", sf::Color::Red);
 		}
 	}
@@ -954,7 +1032,7 @@ void Game::update() {
 		fuel->update(ships[0]->getFuelPercentage());
 
 		// Info Panel
-		int relToTarget;
+		float relToTarget;
 		if (targetAstro != -1) {
 			relToTarget = getRelativeVelocity(targetAstro);
 		} else {
@@ -985,19 +1063,27 @@ void Game::render() {
 		astroMap -> render(window, screen);
 
 		// Velocity Vector
-		velocityVector->render(window);
+		if (menu["velocity"]) {
+			velocityVector->render(window);
+		}
 
 		// Distance To Object
-		distanceObject->render(window);
+		if (menu["distance"]) {
+			distanceObject->render(window);
+		}
 
 		// Thurst
-		thrust->render(window);
+		if (menu["thrust"]) {
+			thrust->render(window);
+		}
 
 		// Fuel
-		fuel->render(window);
+		if (menu["fuel"]) {
+			fuel->render(window);
+		}
 
 		// Info Panel
-		if (panel) {
+		if (menu["infoPanel"]) {
 			infoPanel->render(window);
 		}
 	} else {
@@ -1031,19 +1117,27 @@ void Game::render() {
 			human->render(window, view, screen, ppm);
 		} else {
 			// Velocity Vector
-			velocityVector->render(window);
+			if (menu["velocity"]) {
+				velocityVector->render(window);
+			}
 
 			// Distance To Object
-			distanceObject->render(window);
+			if (menu["distance"]) {
+				distanceObject->render(window);
+			}
 
 			// Thurst
-			thrust->render(window);
+			if (menu["thrust"]) {
+				thrust->render(window);
+			}
 
 			// Fuel
-			fuel->render(window);
+			if (menu["fuel"]) {
+				fuel->render(window);
+			}
 
 			// Info Panel
-			if (panel) {
+			if (menu["infoPanel"]) {
 				infoPanel->render(window);
 			}
 

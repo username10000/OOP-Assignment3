@@ -41,6 +41,8 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 	inertiaDamper = true;
 
 	maxVelocity = 1;
+
+	leftRotate = 0;
 }
 
 Ship::Ship() : Ship(0, 0, 0, 0) {
@@ -246,19 +248,73 @@ float Ship::getMaxFuel() {
 	return maxFuel;
 }
 
-void Ship::update() {
+void Ship::setStraight(float a) {
 	for (int i = 0; i < 3; i++) {
-		ship[i].rotate(rotation);
+		ship[i].setRotation(a * 180 / PI);
 	}
-	sprite.rotate(rotation);
-	angle += rotation;
+	angle = a;
+}
+
+void Ship::setLeftRotate(float r) {
+	leftRotate = r;
+}
+
+float Ship::getRotation() {
+	return ship[0].getRotation() * PI / 180;
+}
+
+void Ship::update() {
+	if (!landed) {
+		for (int i = 0; i < 3; i++) {
+			ship[i].rotate(rotation);
+		}
+		sprite.rotate(rotation);
+		angle += rotation;
+	}
+
+	if (leftRotate != 0) {
+		if (leftRotate < 0) {
+			float rot = 1;
+			std::cout << leftRotate << " " << rot << "  ";
+			if (abs(leftRotate) < abs(rot)) {
+				rot = leftRotate;
+				leftRotate = 0;
+				angle -= rot;
+			} else {
+				leftRotate += rot;
+				angle += rot;
+			}
+			std::cout << leftRotate << " " << rot << std::endl;
+			for (int i = 0; i < 3; i++) {
+				ship[i].rotate(rot);
+			}
+
+		} else {
+			float rot = -1;
+			std::cout << leftRotate << " " << rot << "  ";
+			if (abs(leftRotate) < abs(rot)) {
+				rot = leftRotate;
+				leftRotate = 0;
+				angle -= rot;
+			}
+			else {
+				leftRotate += rot;
+				angle += rot;
+			}
+			std::cout << leftRotate << " " << rot << std::endl;
+			for (int i = 0; i < 3; i++) {
+				ship[i].rotate(rot);
+			}
+		}
+	}
+
 
 	if (angle >= 360)
 		angle -= 360;
 	if (angle <= -360)
 		angle += 360;
 
-	if (inertiaDamper && rotation != 0) {
+	if (inertiaDamper && rotation != 0 && leftRotate == 0) {
 		float oldRotation = rotation;
 		if (rotation > 0)
 			rotation -= 0.02;

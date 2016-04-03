@@ -29,6 +29,7 @@ class Ship : public GameObject {
 		float thrust;
 		float maxThrust;
 		float maxVelocity;
+		float leftRotate;
 		//float angleToPlanet;
 		bool accelerating;
 		bool landed;
@@ -79,6 +80,9 @@ class Ship : public GameObject {
 		float getMaxThrust();
 		float getFuel();
 		float getMaxFuel();
+		void setStraight(float a);
+		void setLeftRotate(float r);
+		float getRotation();
 		//float getAngleToPlanet();
 		//void setAngleToPlanet(float t);
 		//int getPlanet();
