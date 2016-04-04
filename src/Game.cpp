@@ -304,8 +304,7 @@ void Game::events() {
 						else
 							alpha = 360 - alpha;
 						ships[0]->setLeftRotate(alpha);
-					}
-					else {
+					} else {
 						float alpha = (theta - curTheta) * 180 / PI;
 						if (alpha < 0)
 							alpha = -360 - alpha;
