@@ -275,7 +275,7 @@ void Ship::update() {
 	if (leftRotate != 0) {
 		if (leftRotate < 0) {
 			float rot = 1;
-			std::cout << leftRotate << " " << rot << "  ";
+			//std::cout << leftRotate << " " << rot << "  ";
 			if (abs(leftRotate) < abs(rot)) {
 				rot = leftRotate;
 				leftRotate = 0;
@@ -284,14 +284,13 @@ void Ship::update() {
 				leftRotate += rot;
 				angle += rot;
 			}
-			std::cout << leftRotate << " " << rot << std::endl;
+			//std::cout << leftRotate << " " << rot << std::endl;
 			for (int i = 0; i < 3; i++) {
 				ship[i].rotate(rot);
 			}
-
 		} else {
 			float rot = -1;
-			std::cout << leftRotate << " " << rot << "  ";
+			//std::cout << leftRotate << " " << rot << "  ";
 			if (abs(leftRotate) < abs(rot)) {
 				rot = leftRotate;
 				leftRotate = 0;
@@ -301,7 +300,7 @@ void Ship::update() {
 				leftRotate += rot;
 				angle += rot;
 			}
-			std::cout << leftRotate << " " << rot << std::endl;
+			//std::cout << leftRotate << " " << rot << std::endl;
 			for (int i = 0; i < 3; i++) {
 				ship[i].rotate(rot);
 			}

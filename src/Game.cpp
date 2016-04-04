@@ -295,24 +295,32 @@ void Game::events() {
 				float dx = astro[closestPlanet]->getX() - ships[0]->getX();
 				float theta = atan2(dy, dx);
 				theta = theta >= 0 ? theta : theta + 2 * PI;
+				theta -= PI / 2;
 				float curTheta = ships[0]->getRotation();
-				if (abs(theta - curTheta) > 0) {
-					if (abs(theta - curTheta) < abs(curTheta - theta)) {
-						float alpha = (curTheta - theta) * 180 / PI;
-						if (alpha < 0)
-							alpha = -360 - alpha;
-						else
-							alpha = 360 - alpha;
-						ships[0]->setLeftRotate(alpha);
-					} else {
-						float alpha = (theta - curTheta) * 180 / PI;
-						if (alpha < 0)
-							alpha = -360 - alpha;
-						else
-							alpha = 360 - alpha;
-						ships[0]->setLeftRotate(alpha);
+
+				float dif1 = curTheta - theta;
+				dif1 = dif1 < 0 ? dif1 + PI * 2 : dif1;
+				float dif2 = theta - curTheta;
+				dif2 = dif2 < 0 ? dif2 + PI * 2 : dif2;
+				std::cout << dif1 << " " << dif2 << std::endl;
+
+				if (dif1 < dif2) {
+					if (dif1 > 0.01) {
+						//ships[0]->setLeftRotate(dif1 * 180 / PI);
+						ships[0]->setLeftRotate(1);
+					}
+				} else {
+					if (dif2 > 0.01) {
+						//ships[0]->setLeftRotate(-dif2 * 180 / PI);
+						ships[0]->setLeftRotate(-1);
 					}
 				}
+
+				//if (abs(curTheta - theta) < abs(theta - curTheta)) {
+				//	ships[0]->setLeftRotate(-(curTheta - theta) * 180 / PI);
+				//} else {
+				//	ships[0]->setLeftRotate(-(theta - curTheta) * 180 / PI);
+				//}
 			}
 
 			// X - Cut Thrust
@@ -629,9 +637,9 @@ void Game::collisions() {
 				float theta = atan2(dy, dx);
 				theta = theta >= 0 ? theta : theta + 2 * PI;
 
-				if (!ships[j]->getLanded()) {
-					ships[j]->setStraight(theta - PI / 2);
-				}
+				//if (!ships[j]->getLanded()) {
+				//	ships[j]->setStraight(theta - PI / 2);
+				//}
 
 				theta += astro[i]->getRotation() * PI / 180;
 
