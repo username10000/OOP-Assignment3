@@ -35,6 +35,7 @@ class AstroObject : public GameObject {
 		std::vector<std::unique_ptr<SpecialObject>> sObjs;
 		bool habitable;
 		int inhabitants;
+		int parentPlanet;
 		//sf::RenderTexture rTexture;
 		//std::vector<std::unique_ptr<Human>> locals;
 		//sf::Texture humanTexture;
@@ -70,6 +71,8 @@ class AstroObject : public GameObject {
 		int getNearSpecial(double x, double y);
 		int getType(int index);
 		void setInactive(int index);
+		void setParentPlanet(int pP);
+		int getParentPlanet();
 };
 
 #endif

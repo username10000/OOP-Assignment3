@@ -278,6 +278,14 @@ void AstroObject::setInactive(int index) {
 	sObjs[index]->setActive(false);
 }
 
+void AstroObject::setParentPlanet(int pP) {
+	parentPlanet = pP;
+}
+
+int AstroObject::getParentPlanet() {
+	return parentPlanet;
+}
+
 void AstroObject::update() {
 	//circle.rotate(rotation);
 }

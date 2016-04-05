@@ -86,6 +86,56 @@ Game::Game() {
 		}
 	}
 
+	noMoons = 0;
+
+	// Genrate Moons
+	for (int i = 1; i < noPlanets; i++) {
+		// Generate random Distance from the Sun, random Radius and random Orbital Phase
+		rDist = Functions::randomInt(10000, 15000);
+		float rR = Functions::randomInt(100, 150);
+		float angle = Functions::randomFloat(0, PI * 2);
+
+		// Create the Astro Object in the generated position
+		astro.push_back(std::unique_ptr<AstroObject>(new Moon(astro[i]->getX() - cos(angle) * rDist, astro[i]->getY() - sin(angle) * rDist, rR, sf::Color(100, 100, 100), Functions::randomFloat(0.005, 0.01))));
+
+		noMoons++;
+
+		// Create Common Textures
+		astro[astro.size() - 1]->createCommonObjects(&commonTexture);
+
+		// Set number of Inhabitants
+		astro[astro.size() - 1]->setInhabitants(0);
+
+		// Set the Parent Planet Number
+		astro[astro.size() - 1]->setParentPlanet(i);
+
+		// Increase the Angle to match the Direction of the Velocity Vector
+		angle += PI / 2;
+
+		// Calculate the Velocity needed to stay in Circular Orbit
+		float aV = sqrt(astro[i]->getG() * astro[i]->getMass() / Functions::dist(astro[i]->getX(), astro[i]->getY(), astro[astro.size() - 1]->getX(), astro[astro.size() - 1]->getY()));
+
+		// Set the velocity of the Astro Object
+		astro[astro.size() - 1]->addVelocity(-cos(angle) * aV, -sin(angle) * aV);
+
+		// Set the name of the Planets
+		std::ifstream f;
+		f.open("Source/resources/Gods.txt");
+		if (f) {
+			std::string n;
+			for (int j = 0; j < Functions::randomInt(0, 2500); j++) {
+				f >> n;
+			}
+			int k = 0;
+			do {
+				f >> n;
+				k++;
+			} while (n.size() > 10 && k < 100);
+			f.close();
+			astro[astro.size() - 1]->setName(n);
+		}
+	}
+
 	// Add Ships
 	ships.push_back(std::unique_ptr<Ship>(new Ship(astro[1]->getX(), astro[1]->getY() - astro[1]->getRadius(), (float)(screen.width / 2), (float)(screen.height / 2))));
 
@@ -302,7 +352,6 @@ void Game::events() {
 				dif1 = dif1 < 0 ? dif1 + PI * 2 : dif1;
 				float dif2 = theta - curTheta;
 				dif2 = dif2 < 0 ? dif2 + PI * 2 : dif2;
-				std::cout << dif1 << " " << dif2 << std::endl;
 
 				if (dif1 < dif2) {
 					if (dif1 > 0.01) {
@@ -335,11 +384,6 @@ void Game::events() {
 					idText.setString("Inertia Damper: ON");
 				else
 					idText.setString("Inertia Damper: OFF");
-			}
-
-			// P - Toggle Info Panel
-			if (event.key.code == 15) {
-				menu["infoPanel"] = !menu["infoPanel"];
 			}
 
 			// 0
@@ -792,7 +836,7 @@ void Game::update() {
 		keyPressed();
 
 		// Apply Force to the Planets
-		for (unsigned int i = 1; i < astro.size(); i++) {
+		for (unsigned int i = 1; i < noPlanets; i++) {
 			astro[i]->setForce(astro[0]->getG() * astro[0]->getMass() * astro[i]->getMass() / pow(Functions::dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY()), 2));
 
 			// Angle between the Sun and the Planets
@@ -803,7 +847,20 @@ void Game::update() {
 			astro[i]->setDirection(-cos(theta), -sin(theta));
 		}
 
-		// Find the closest Planet
+		// Apply Force to the Moons
+		for (unsigned int i = noPlanets; i < noPlanets + noMoons; i++) {
+			int parent = astro[i]->getParentPlanet();
+			astro[i]->setForce(astro[parent]->getG() * astro[parent]->getMass() * astro[i]->getMass() / pow(Functions::dist(astro[parent]->getX(), astro[parent]->getY(), astro[i]->getX(), astro[i]->getY()), 2));
+
+			// Angle between the Planets and the Moons
+			float dy = astro[i]->getY() - astro[parent]->getY();
+			float dx = astro[i]->getX() - astro[parent]->getX();
+			float theta = atan2(dy, dx);
+			theta = theta >= 0 ? theta : theta + 2 * PI;
+			astro[i]->setDirection(-cos(theta), -sin(theta));
+		}
+
+		// Find the closest Object
 		double minDist = DBL_MAX;
 		int z = 0;
 		for (int i = 0; i < astro.size(); i++) {

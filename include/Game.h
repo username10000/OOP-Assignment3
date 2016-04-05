@@ -14,6 +14,7 @@
 #include <AstroObject.h>
 #include <Sun.h>
 #include <Planet.h>
+#include <Moon.h>
 #include <SolarSystem.h>
 #include <Ship.h>
 #include <VelocityVector.h>
@@ -38,6 +39,7 @@ class Game {
 		int keys[512] = { 0 };
 		int stop;
 		int noPlanets;
+		int noMoons;
 		float fps;
 		std::vector<std::unique_ptr<AstroObject>> astro;
 		std::vector<std::unique_ptr<Ship>> ships;
