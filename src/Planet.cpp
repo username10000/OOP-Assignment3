@@ -58,6 +58,8 @@ Planet::Planet(double x, double y, float _radius, sf::Color _colour, float _rota
 	// Assign the Texture to the Planet
 	texture = rTexture.getTexture();
 	setPlanetTexture(&texture);
+
+	setHabitable(true);
 }
 
 Planet::Planet() : Planet(0, 0, 100, sf::Color(255, 255, 0), 0.01) {

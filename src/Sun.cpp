@@ -2,6 +2,7 @@
 
 Sun::Sun(double x, double y, float _radius, sf::Color _colour, float _rotation) : AstroObject(x, y, _radius, _colour, _rotation) {
 	setMass(_radius * 9.3 * 5);
+	setHabitable(false);
 	//circle.setRadius(_radius);
 	//circle.setPointCount(100);
 	//circle.setFillColor(_colour);

@@ -7,6 +7,9 @@
 
 // Moon
 class Moon : public Planet {
+	private:
+		sf::RenderTexture rTexture;
+		sf::Texture texture;
 	public:
 		Moon(double x, double y, float _radius, sf::Color _colour, float _rotation);
 };

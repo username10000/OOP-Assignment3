@@ -13,7 +13,7 @@ void AstroMap::addAstro(sf::VideoMode screen, double x, double y, sf::Color colo
 	//astroColour.push_back(colour);
 	//astroRadius.push_back(radius);
 
-	sf::CircleShape circle(radius / 50);
+	sf::CircleShape circle(radius / 30);
 	circle.setFillColor(colour);
 	circle.setPosition((double)(((double)screen.width / 2) + x / (double)ppm - circle.getRadius() - 20), (double)(((double)screen.height / 2) + y / (double)ppm - circle.getRadius() - 20));
 	buttons.push_back( std::unique_ptr<Button>( new Button(circle) ) );
@@ -39,6 +39,14 @@ void AstroMap::setppm(float ppm) {
 	this->ppm = ppm;
 }
 
+void AstroMap::setNoPlanets(int nP) {
+	noPlanets = nP;
+}
+
+void AstroMap::setParent(int moon, int planet) {
+	parent[moon] = planet;
+}
+
 int AstroMap::getClickedPlanet() {
 	for (int i = 0; i < buttons.size(); i++) {
 		if (buttons[i] -> isActive())
@@ -57,20 +65,20 @@ void AstroMap::render(sf::RenderWindow &window, sf::VideoMode screen) {
 	//}
 	for (unsigned i = 0; i < buttons.size(); i++) {
 		if (i != 0) {
-			double dFC = sqrt(pow(buttons[i]->getX() - (screen.width / 2), 2) + pow(buttons[i]->getY() - (screen.height / 2), 2));
+			double dFC = sqrt(pow(buttons[i]->getX() - buttons[parent[i]]->getX(), 2) + pow(buttons[i]->getY() - buttons[parent[i]]->getY(), 2));
 			sf::CircleShape orbit(dFC);
 			orbit.setFillColor(sf::Color::Transparent);
 			orbit.setOutlineThickness(1);
 			orbit.setOutlineColor(sf::Color::White);
 			orbit.setPointCount(200);
-			orbit.setPosition(screen.width / 2 - orbit.getRadius(), screen.height / 2 - orbit.getRadius());
+			orbit.setPosition(buttons[parent[i]]->getX() - orbit.getRadius(), buttons[parent[i]]->getY() - orbit.getRadius());
 			window.draw(orbit);
 		}
 		buttons[i] -> render(window);
 	}
 
 	// Draw Ship
-	sf::CircleShape circle(10);
+	sf::CircleShape circle(1);
 	circle.setFillColor(sf::Color::Transparent);
 	circle.setOutlineColor(sf::Color::White);
 	circle.setOutlineThickness(1);

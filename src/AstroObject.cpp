@@ -148,7 +148,7 @@ void AstroObject::setSecondColour(sf::Color col) {
 void AstroObject::createCommonObjects(sf::Texture *cT) {
 	float angle = 0, scale = 0, spacing = 0, objSpace = 0, totalEmpty = 0;
 	int numObj = 0, type = 0;
-	bool fuelStation = false;
+	//bool fuelStation = false;
 	sf::Color col;
 	sf::IntRect tR;
 	tR.top = 0;
@@ -156,40 +156,42 @@ void AstroObject::createCommonObjects(sf::Texture *cT) {
 	tR.width = 20;
 	tR.height = 40;
 
-	do {
-		// Change type of Object
-		if (numObj == 0) {
-			// Create a Special Object in the Empty Space
-			if (totalEmpty != 0) {
-				if (!fuelStation) {
-					scale = 0.3;
-					spacing = 0;
-					objSpace = (20 * scale + spacing) / radius;
-					col = sf::Color::White;
-					tR.top = 41;
-					tR.left = 0;
-					sObjs.push_back(std::unique_ptr<SpecialObject>(new SpecialObject(cT, col, angle - totalEmpty / 2, rotation, radius)));
-					sObjs[sObjs.size() - 1]->setScale(scale);
-					sObjs[sObjs.size() - 1]->setTextureRect(tR);
-					sObjs[sObjs.size() - 1]->setType(0);
-					fuelStation = true;
-				} else {
-					scale = 0.3;
-					spacing = 0;
-					objSpace = (20 * scale + spacing) / radius;
-					col = sf::Color::White;
-					tR.top = 41;
-					tR.left = 21;
-					sObjs.push_back(std::unique_ptr<SpecialObject>(new SpecialObject(cT, col, angle - totalEmpty / 2, rotation, radius)));
-					sObjs[sObjs.size() - 1]->setScale(scale);
-					sObjs[sObjs.size() - 1]->setTextureRect(tR);
-					sObjs[sObjs.size() - 1]->setType(Functions::randomInt(1, 3));
-				}
-				totalEmpty = 0;
-			}
+	if (habitable) {
+		do {
+			// Change type of Object
+			if (numObj == 0) {
+				// Create a Special Object in the Empty Space
+				/*if (totalEmpty != 0) {
+					if (!fuelStation) {
+						scale = 0.3;
+						spacing = 0;
+						objSpace = (20 * scale + spacing) / radius;
+						col = sf::Color::White;
+						tR.top = 41;
+						tR.left = 0;
+						sObjs.push_back(std::unique_ptr<SpecialObject>(new SpecialObject(cT, col, angle - totalEmpty / 2, rotation, radius)));
+						sObjs[sObjs.size() - 1]->setScale(scale);
+						sObjs[sObjs.size() - 1]->setTextureRect(tR);
+						sObjs[sObjs.size() - 1]->setType(0);
+						fuelStation = true;
+					}
+					else {
+						scale = 0.3;
+						spacing = 0;
+						objSpace = (20 * scale + spacing) / radius;
+						col = sf::Color::White;
+						tR.top = 41;
+						tR.left = 21;
+						sObjs.push_back(std::unique_ptr<SpecialObject>(new SpecialObject(cT, col, angle - totalEmpty / 2, rotation, radius)));
+						sObjs[sObjs.size() - 1]->setScale(scale);
+						sObjs[sObjs.size() - 1]->setTextureRect(tR);
+						sObjs[sObjs.size() - 1]->setType(Functions::randomInt(1, 3));
+					}
+					totalEmpty = 0;
+				}*/
 
-			type = Functions::randomInt(0, 2); // (type + 1) % 3;
-			switch (type) {
+				type = Functions::randomInt(0, 2); // (type + 1) % 3;
+				switch (type) {
 				case 0:
 					// Tree
 					numObj = Functions::randomInt(10, 20);
@@ -202,54 +204,85 @@ void AstroObject::createCommonObjects(sf::Texture *cT) {
 					// Empty Space
 					numObj = Functions::randomInt(5, 10);
 					break;
+				}
 			}
-		}
 
-		// Change the Properties of each Object
-		switch (type) {
-			case 0:
-				// Tree
-				scale = Functions::randomFloat(0.3, 0.5);
-				spacing = Functions::randomFloat(0, 5) * scale;
-				objSpace = (20 * scale + spacing) / radius;
-				col = ndColour;
-				tR.top = 0;
-				tR.left = 0;
-				break;
-			case 1:
-				// Building
-				scale = Functions::randomFloat(0.5, 0.9);
-				spacing = Functions::randomFloat(10, 20) * scale;
-				objSpace = (20 * scale + spacing) / radius;
-				col = sf::Color(Functions::randomInt(0, 255), Functions::randomInt(0, 255), Functions::randomInt(0, 255));
-				tR.top = 0;
-				tR.left = Functions::randomInt(1, 5) * 21;
-				break;
-			default:
-				//Empty Space
-				scale = Functions::randomFloat(0.5, 0.9);
-				spacing = Functions::randomFloat(10, 20) * scale;
-				objSpace = (20 * scale + spacing) / radius;
-				//col = sf::Color(Functions::randomInt(0, 255), Functions::randomInt(0, 255), Functions::randomInt(0, 255));
-				//tR.left = Functions::randomInt(1, 5) * 21;
-				break;
-		}
+			// Change the Properties of each Object
+			switch (type) {
+				case 0:
+					// Tree
+					scale = Functions::randomFloat(0.3, 0.5);
+					spacing = Functions::randomFloat(0, 5) * scale;
+					objSpace = (20 * scale + spacing) / radius;
+					col = ndColour;
+					tR.top = 0;
+					tR.left = 0;
+					break;
+				case 1:
+					// Building
+					scale = Functions::randomFloat(0.5, 0.9);
+					spacing = Functions::randomFloat(10, 20) * scale;
+					objSpace = (20 * scale + spacing) / radius;
+					col = sf::Color(Functions::randomInt(0, 255), Functions::randomInt(0, 255), Functions::randomInt(0, 255));
+					tR.top = 0;
+					tR.left = Functions::randomInt(1, 5) * 21;
+					break;
+				default:
+					//Empty Space
+					scale = Functions::randomFloat(0.5, 0.9);
+					spacing = Functions::randomFloat(10, 20) * scale;
+					objSpace = (20 * scale + spacing) / radius;
+					//col = sf::Color(Functions::randomInt(0, 255), Functions::randomInt(0, 255), Functions::randomInt(0, 255));
+					//tR.left = Functions::randomInt(1, 5) * 21;
+					break;
+			}
 
-		if (type == 0 || type == 1) {
-			// Create the Object
-			objs.push_back(std::unique_ptr<CommonObject>(new CommonObject(cT, col, angle, rotation, radius)));
-			objs[objs.size() - 1]->setScale(scale);
-			objs[objs.size() - 1]->setTextureRect(tR);
-		}
+			if (type == 0 || type == 1) {
+				// Create the Object
+				objs.push_back(std::unique_ptr<CommonObject>(new CommonObject(cT, col, angle, rotation, radius)));
+				objs[objs.size() - 1]->setScale(scale);
+				objs[objs.size() - 1]->setTextureRect(tR);
+			}
 
-		if (type == 2) {
-			totalEmpty += objSpace;
-		}
+			//if (type == 2) {
+			//	totalEmpty += objSpace;
+			//}
 
-		angle += objSpace;
-		numObj--;
+			angle += objSpace;
+			numObj--;
 
-	} while (angle < 2 * PI);
+		} while (angle < 2 * PI);
+	} else {
+			float fuelAngle = Functions::randomFloat(0, 2 * PI);
+			// Fuel
+			scale = 0.3;
+			spacing = 0;
+			objSpace = (20 * scale + spacing) / radius;
+			col = sf::Color::White;
+			tR.top = 41;
+			tR.left = 0;
+			sObjs.push_back(std::unique_ptr<SpecialObject>(new SpecialObject(cT, col, fuelAngle, rotation, radius)));
+			sObjs[sObjs.size() - 1]->setScale(scale);
+			sObjs[sObjs.size() - 1]->setTextureRect(tR);
+			sObjs[sObjs.size() - 1]->setType(0);
+		
+			float monolithAngle;
+			do {
+				monolithAngle = Functions::randomFloat(0, 2 * PI);
+			} while (abs(fuelAngle - monolithAngle) < PI / 2);
+
+			// Monolith
+			scale = 0.3;
+			spacing = 0;
+			objSpace = (20 * scale + spacing) / radius;
+			col = sf::Color::White;
+			tR.top = 41;
+			tR.left = 21;
+			sObjs.push_back(std::unique_ptr<SpecialObject>(new SpecialObject(cT, col, monolithAngle, rotation, radius)));
+			sObjs[sObjs.size() - 1]->setScale(scale);
+			sObjs[sObjs.size() - 1]->setTextureRect(tR);
+			sObjs[sObjs.size() - 1]->setType(Functions::randomInt(1, 3));
+	}
 }
 
 void AstroObject::updateCommonObject() {
@@ -286,6 +319,10 @@ int AstroObject::getParentPlanet() {
 	return parentPlanet;
 }
 
+void AstroObject::setHabitable(bool h) {
+	habitable = h;
+}
+
 void AstroObject::update() {
 	//circle.rotate(rotation);
 }
@@ -294,10 +331,12 @@ void AstroObject::render(sf::RenderWindow &window, sf::Vector2<double> view, sf:
 	circle.setRadius(getRadius() / (double)ppm);
 	circle.setPosition((double)(((double)screen.width / 2) + (getX() - view.x) / (double)ppm - 20), (double)(((double)screen.height / 2) + (getY() - view.y) / (double)ppm - 20));
 	circle.setOrigin(circle.getRadius(), circle.getRadius());
-	if (rotation != 0) {
+	if (habitable) {
 		atmosphere.setScale(1 / (double)ppm, 1 / (double)ppm);
 		atmosphere.setPosition(circle.getPosition().x, circle.getPosition().y);
 		window.draw(atmosphere);
+	}
+	if (rotation != 0) {
 		for (int i = 0; i < objs.size(); i++) {
 			objs[i]->render(window, view, screen, ppm);
 		}

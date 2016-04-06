@@ -73,6 +73,7 @@ class AstroObject : public GameObject {
 		void setInactive(int index);
 		void setParentPlanet(int pP);
 		int getParentPlanet();
+		void setHabitable(bool h);
 };
 
 #endif

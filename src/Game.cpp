@@ -41,12 +41,15 @@ Game::Game() {
 	astro[0]->setName("Sun");
 	astro[0]->setInhabitants(0);
 
-	noPlanets = Functions::randomInt(5, 10);
+	noPlanets = Functions::randomInt(7, 10);
 
 	float rDist = 0;
 	for (int i = 1; i < noPlanets; i++) {
 		// Generate random Distance from the Sun, random Radius and random Orbital Phase
-		rDist += Functions::randomInt(100000, 150000);
+		if (i == 1)
+			rDist += Functions::randomInt(250000, 300000);
+		else
+			rDist += Functions::randomInt(100000, 150000);
 		float rR = Functions::randomInt(300, 500);
 		float angle = Functions::randomFloat(0, PI * 2);
 		
@@ -91,12 +94,13 @@ Game::Game() {
 	// Genrate Moons
 	for (int i = 1; i < noPlanets; i++) {
 		// Generate random Distance from the Sun, random Radius and random Orbital Phase
-		rDist = Functions::randomInt(10000, 15000);
+		rDist = Functions::randomInt(30000, 50000);
 		float rR = Functions::randomInt(100, 150);
 		float angle = Functions::randomFloat(0, PI * 2);
+		int rCol = Functions::randomInt(0, 255);
 
 		// Create the Astro Object in the generated position
-		astro.push_back(std::unique_ptr<AstroObject>(new Moon(astro[i]->getX() - cos(angle) * rDist, astro[i]->getY() - sin(angle) * rDist, rR, sf::Color(100, 100, 100), Functions::randomFloat(0.005, 0.01))));
+		astro.push_back(std::unique_ptr<AstroObject>(new Moon(astro[i]->getX() - cos(angle) * rDist, astro[i]->getY() - sin(angle) * rDist, rR, sf::Color(rCol, rCol, rCol), Functions::randomFloat(0.005, 0.01))));
 
 		noMoons++;
 
@@ -208,7 +212,13 @@ Game::Game() {
 	astroMap -> setShip(ships[0]->getX(), ships[0]->getY());
 	for (unsigned i = 0; i < astro.size(); i++) {
 		astroMap -> addAstro(screen, astro[i] -> getX(), astro[i] -> getY(), astro[i] -> getColour(), astro[i] -> getRadius());
+		if (i >= noPlanets) {
+			astroMap -> setParent(i, astro[i]->getParentPlanet());
+		} else {
+			astroMap -> setParent(i, 0);
+		}
 	}
+	astroMap -> setNoPlanets(noPlanets);
 
 	// Unset the Target Object
 	targetAstro = -1;
@@ -252,8 +262,6 @@ Game::Game() {
 
 	background.setSize(sf::Vector2f(screen.width, screen.height));
 	background.setTexture(&bTexture);
-
-	panel = false;
 }
 
 Game::~Game() {
