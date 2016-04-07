@@ -4,6 +4,8 @@
 
 // Dependencies
 #include <cmath>
+#include <string>
+#include <sstream>
 
 class Functions {
 	public:
@@ -11,6 +13,7 @@ class Functions {
 		static double map(double v, double lmin, double lmax, double rmin, double rmax);
 		static int randomInt(int start, int stop);
 		static float randomFloat(float start, float stop);
+		static std::string toStringWithComma(int num);
 };
 
 #endif

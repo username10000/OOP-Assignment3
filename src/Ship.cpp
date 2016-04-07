@@ -233,11 +233,11 @@ float Ship::getMaxVelocity() {
 }
 
 float Ship::getThrust() {
-	return thrust;
+	return thrust * speed;
 }
 
 float Ship::getMaxThrust() {
-	return maxThrust;
+	return maxThrust * speed;
 }
 
 float Ship::getFuel() {

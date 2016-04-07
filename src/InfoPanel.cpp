@@ -28,15 +28,15 @@ void InfoPanel::update(std::string inertia, float thrust, float maxThrust, float
 	float length = 0;
 	
 	lines[0].setString(inertia);
-	lines[1].setString("Thrust: " + std::to_string((int)thrust) + " / " + std::to_string((int)maxThrust));
-	lines[2].setString("Fuel: " + std::to_string((int)fuel) + " / " + std::to_string((int)maxFuel));
-	lines[3].setString("Speed: " + std::to_string((int)(speed * 60)) + " KM / S");
-	lines[4].setString("Speed to Closest: " + std::to_string((int)(speedToClosest * 60)) + " KM / S");
+	lines[1].setString("Thrust: " + Functions::toStringWithComma((int)(thrust * 60 * 1000)) + " / " + Functions::toStringWithComma((int)(maxThrust * 60 * 1000)) + " m / s / s");
+	lines[2].setString("Fuel: " + Functions::toStringWithComma((int)fuel) + " / " + Functions::toStringWithComma((int)maxFuel) + " l");
+	lines[3].setString("Speed: " + Functions::toStringWithComma((int)(speed * 60 * 1000)) + " m / s");
+	lines[4].setString("Speed to Closest: " + Functions::toStringWithComma((int)(speedToClosest * 60 * 1000)) + " m / s");
 	if (speedToTarget != -1)
-		lines[5].setString("Speed to Target: " + std::to_string((int)(speedToTarget * 60)) + " KM / S");
+		lines[5].setString("Speed to Target: " + Functions::toStringWithComma((int)(speedToTarget * 60 * 1000)) + " m / s");
 	else
 		lines[5].setString("Speed to Target: N / A");
-	lines[6].setString("Max Relative Speed: " + std::to_string((int)(maxSpeed * 60)) + " KM / S");
+	lines[6].setString("Max Relative Speed: " + Functions::toStringWithComma((int)(maxSpeed * 60 * 1000)) + " m / s");
 
 	// Increase the Container's Size to fit the Text
 	for (int i = 0; i < lines.size(); i++) {

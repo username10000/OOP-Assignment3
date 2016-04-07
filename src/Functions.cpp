@@ -33,3 +33,35 @@ int Functions::randomInt(int start, int stop) {
 float Functions::randomFloat(float start, float stop) {
 	return start + (float)(rand() / (float)(RAND_MAX / (stop - start)));
 }
+
+// Return String with the Comma added for the Thousands place
+std::string Functions::toStringWithComma(int num) {
+	if (num == 0) {
+		return "0";
+	}
+
+	std::stringstream ss;
+	bool negative = num < 0 ? true : false;
+	int digits = 1;
+
+	while (num) {
+		int d = abs(num % 10);
+
+		if (digits != 0) {
+			ss << d;
+			digits = (digits + 1) % 4;
+		} else {
+			ss << "," << d;
+			digits = 2;
+		}
+		num /= 10;
+	}
+
+	if (negative)
+		ss << "-";
+
+	std::string string(ss.str());
+	std::string reverse(string.rbegin(), string.rend());
+
+	return reverse;
+}

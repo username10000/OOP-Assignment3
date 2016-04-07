@@ -3,6 +3,7 @@
 
 // Dependencies
 #include <SFML/Graphics.hpp>
+#include <Functions.h>
 
 // Information Panel
 class InfoPanel {
