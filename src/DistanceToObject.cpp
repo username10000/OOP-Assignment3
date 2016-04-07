@@ -40,7 +40,7 @@ DistanceToObject::DistanceToObject(sf::VideoMode _screen, sf::Font _font) {
 	closestName.setCharacterSize(12);
 	closestName.setColor(sf::Color::Red);
 	closestName.setStyle(sf::Text::Bold);
-	closestName.setPosition(size / 2 + offset, screen.height - size / 2 - distanceText.getCharacterSize() * 3 - offset);
+	closestName.setPosition(size / 2 + offset, screen.height - size / 2 - distanceText.getCharacterSize() * 2 - offset);
 	closestName.setString("0");
 
 	// Settings for the target name
@@ -48,7 +48,7 @@ DistanceToObject::DistanceToObject(sf::VideoMode _screen, sf::Font _font) {
 	targetName.setCharacterSize(12);
 	targetName.setColor(sf::Color::Cyan);
 	targetName.setStyle(sf::Text::Bold);
-	targetName.setPosition(size / 2 + offset, screen.height - size / 2 + distanceText.getCharacterSize() * 3 - offset);
+	targetName.setPosition(size / 2 + offset, screen.height - size / 2 + distanceText.getCharacterSize() * 2 - offset);
 	targetName.setString("0");
 
 	// Initialising the direction line
@@ -82,6 +82,7 @@ void DistanceToObject::setTargetAngle(float a) {
 
 void DistanceToObject::setTargetName(std::string n) {
 	targetName.setString(n);
+	targetName.setOrigin(targetName.getLocalBounds().width / 2, targetName.getLocalBounds().height / 2);
 }
 
 void DistanceToObject::update(float _angle, float _distance, std::string _name, float _shipAngle) {
@@ -90,14 +91,15 @@ void DistanceToObject::update(float _angle, float _distance, std::string _name, 
 
 	// Creating the string
 	char d[15];
-	sprintf_s(d, "%d KM", (int)distance);
+	sprintf_s(d, "%d km", (int)distance);
 	distanceText.setString(d);
-	// Set the centre of the text
-	distanceText.setOrigin(distanceText.getCharacterSize() * strlen(d) / 4, distanceText.getCharacterSize() / 2);
+	distanceText.setOrigin(distanceText.getLocalBounds().width / 2, distanceText.getLocalBounds().height / 2);
+	//distanceText.setOrigin(distanceText.getCharacterSize() * strlen(d) / 4, distanceText.getCharacterSize() / 2);
 
 	// Setting the name of the Object
-	closestName.setOrigin(closestName.getCharacterSize() * _name.size() / 4, closestName.getCharacterSize() / 2);
+	//closestName.setOrigin(closestName.getCharacterSize() * _name.size() / 4, closestName.getCharacterSize() / 2);
 	closestName.setString(_name);
+	closestName.setOrigin(closestName.getLocalBounds().width / 2, closestName.getLocalBounds().height / 2);
 
 	// Setting the coordinates of the direction line
 	line[0] = sf::Vertex(sf::Vector2f(offset + size / 2 - cos(angle) * size / 4, screen.height - size / 2 - offset - sin(angle) * size / 4), sf::Color::Red);
@@ -112,12 +114,13 @@ void DistanceToObject::update(float _angle, float _distance, std::string _name, 
 	if (targetDistance != -1) {
 		// Creating the string
 		char dA[15];
-		sprintf_s(dA, "%d KM", (int)targetDistance);
+		sprintf_s(dA, "%d km", (int)targetDistance);
 		targetText.setString(dA);
-		targetText.setOrigin(targetText.getCharacterSize() * strlen(dA) / 4, targetText.getCharacterSize() / 2);
+		targetText.setOrigin(targetText.getLocalBounds().width / 2, targetText.getLocalBounds().height / 2);
+		//targetText.setOrigin(targetText.getCharacterSize() * strlen(dA) / 4, targetText.getCharacterSize() / 2);
 
 		// Set the centre of the text
-		targetName.setOrigin(targetName.getCharacterSize() * targetName.getString().getSize() / 4, targetName.getCharacterSize() / 2);
+		//targetName.setOrigin(targetName.getCharacterSize() * targetName.getString().getSize() / 4, targetName.getCharacterSize() / 2);
 
 		// Setting the coordinates of the target line
 		targetLine[0] = sf::Vertex(sf::Vector2f(offset + size / 2 - cos(targetAngle) * size / 4, screen.height - size / 2 - offset - sin(targetAngle) * size / 4), sf::Color::Cyan);

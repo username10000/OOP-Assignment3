@@ -16,6 +16,8 @@ Game::Game() {
 
 	// Set framerate limit - maybe temporarily
 	//window.setFramerateLimit(60);
+
+	// Enable V-Sync to remove Screen Thearing
 	window.setVerticalSyncEnabled(true);
 
 	// Open Font
@@ -246,11 +248,18 @@ Game::Game() {
 	bRenderTexture.create(screen.width, screen.height);
 	bRenderTexture.clear(sf::Color::Black);
 
-	int numStars = Functions::randomInt(1000, 2000);
+	int numStars = Functions::randomInt(100, 200);
 	for (int i = 0; i < numStars; i++) {
-		float xStar = Functions::randomFloat(0, screen.width);
-		float yStar = Functions::randomFloat(0, screen.height);
-		float rStar = Functions::randomFloat(0.1, 1);
+		float xStar, yStar;
+		if (Functions::randomInt(0, 3) == 0) {
+			xStar = Functions::randomFloat(screen.width / 4, screen.width - screen.width / 4);
+			yStar = Functions::randomFloat(screen.height / 4, screen.height - screen.height / 4);
+		}
+		else {
+			xStar = Functions::randomFloat(0, screen.width);
+			yStar = Functions::randomFloat(0, screen.height);
+		}
+		float rStar = Functions::randomFloat(1, 1);
 		sf::CircleShape c(rStar);
 		c.setPosition(xStar - 20, yStar - 20);
 		//c.setPointCount(100);
@@ -1161,10 +1170,10 @@ void Game::render() {
 	} else {
 		// Star Field
 		sf::IntRect tR;
-		tR.width = screen.width * ppm;
-		tR.height = screen.height * ppm;
-		tR.left = (screen.width - tR.width) / 2 + 20 * ppm;
-		tR.top = (screen.height - tR.height) / 2 + 20 * ppm;
+		tR.width = bTexture.getSize().x * ppm;
+		tR.height = bTexture.getSize().y * ppm;
+		tR.left = (bTexture.getSize().x - tR.width) / 2 + 20 * ppm;
+		tR.top = (bTexture.getSize().y - tR.height) / 2 + 20 * ppm;
 		background.setTextureRect(tR);
 		window.draw(background);
 
