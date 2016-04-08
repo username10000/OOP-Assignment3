@@ -42,30 +42,30 @@ class AstroObject : public GameObject {
 	public:
 		AstroObject(double x, double y, float _radius, sf::Color _colour, float _rotation);
 		AstroObject();
-		virtual void update() = 0;
-		virtual void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);
+
 		sf::Color getColour();
+		void setSecondColour(sf::Color col);
 		float getRadius();
+		void setMass(float m);
 		double getMass();
+		void setForce(double _force);
 		double getForce();
 		double getG();
-		sf::Vector2<double> getVelocity();
-		void setForce(double _force);
-		void setAcceleration(float _acceleration);
 		void addVelocity(double x, double y);
-		sf::Vector2<double> getDirection();
+		sf::Vector2<double> getVelocity();
+		void setAcceleration(float _acceleration);
 		void setDirection(double x, double y);
-		std::string getName();
+		sf::Vector2<double> getDirection();
 		void setName(std::string);
-		void setMass(float m);
+		std::string getName();
 		sf::FloatRect getBoundingBox();
 		float getRotation();
+		void setHabitable(bool h);
 		bool isHabitable();
 		void AstroObject::setPlanetTexture(sf::Texture *pT);
 		void rotate();
 		void setInhabitants(int h);
 		int getInhabitants();
-		void setSecondColour(sf::Color col);
 		void createCommonObjects(sf::Texture *cT);
 		void updateCommonObject();
 		int getNearSpecial(double x, double y);
@@ -73,7 +73,9 @@ class AstroObject : public GameObject {
 		void setInactive(int index);
 		void setParentPlanet(int pP);
 		int getParentPlanet();
-		void setHabitable(bool h);
+
+		virtual void update() = 0;
+		virtual void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);
 };
 
 #endif

@@ -58,32 +58,32 @@ sf::Color AstroObject::getColour() {
 	return colour;
 }
 
+void AstroObject::setSecondColour(sf::Color col) {
+	ndColour = col;
+}
+
 float AstroObject::getRadius() {
 	return radius;
+}
+
+void AstroObject::setMass(float m) {
+	mass = m;
 }
 
 double AstroObject::getMass() {
 	return mass;
 }
 
-double AstroObject::getForce() {
-	return force;
-}
-
-sf::Vector2<double> AstroObject::getVelocity() {
-	return velocity;
-}
-
-double AstroObject::getG() {
-	return G;
-}
-
 void AstroObject::setForce(double _force) {
 	force = _force;
 }
 
-void AstroObject::setAcceleration(float _acceleration) {
-	acceleration = _acceleration;
+double AstroObject::getForce() {
+	return force;
+}
+
+double AstroObject::getG() {
+	return G;
 }
 
 void AstroObject::addVelocity(double x, double y) {
@@ -91,8 +91,12 @@ void AstroObject::addVelocity(double x, double y) {
 	velocity.y += y;
 }
 
-sf::Vector2<double> AstroObject::getDirection() {
-	return direction;
+sf::Vector2<double> AstroObject::getVelocity() {
+	return velocity;
+}
+
+void AstroObject::setAcceleration(float _acceleration) {
+	acceleration = _acceleration;
 }
 
 void AstroObject::setDirection(double x, double y) {
@@ -100,16 +104,16 @@ void AstroObject::setDirection(double x, double y) {
 	direction.y = y;
 }
 
-std::string AstroObject::getName() {
-	return name;
+sf::Vector2<double> AstroObject::getDirection() {
+	return direction;
 }
 
 void AstroObject::setName(std::string n) {
 	name = n;
 }
 
-void AstroObject::setMass(float m) {
-	mass = m;
+std::string AstroObject::getName() {
+	return name;
 }
 
 sf::FloatRect AstroObject::getBoundingBox() {
@@ -118,6 +122,10 @@ sf::FloatRect AstroObject::getBoundingBox() {
 
 float AstroObject::getRotation() {
 	return rotation;
+}
+
+void AstroObject::setHabitable(bool h) {
+	habitable = h;
 }
 
 bool AstroObject::isHabitable() {
@@ -141,10 +149,6 @@ int AstroObject::getInhabitants() {
 	return inhabitants;
 }
 
-void AstroObject::setSecondColour(sf::Color col) {
-	ndColour = col;
-}
-
 void AstroObject::createCommonObjects(sf::Texture *cT) {
 	float angle = 0, scale = 0, spacing = 0, objSpace = 0, totalEmpty = 0;
 	int numObj = 0, type = 0;
@@ -160,36 +164,6 @@ void AstroObject::createCommonObjects(sf::Texture *cT) {
 		do {
 			// Change type of Object
 			if (numObj == 0) {
-				// Create a Special Object in the Empty Space
-				/*if (totalEmpty != 0) {
-					if (!fuelStation) {
-						scale = 0.3;
-						spacing = 0;
-						objSpace = (20 * scale + spacing) / radius;
-						col = sf::Color::White;
-						tR.top = 41;
-						tR.left = 0;
-						sObjs.push_back(std::unique_ptr<SpecialObject>(new SpecialObject(cT, col, angle - totalEmpty / 2, rotation, radius)));
-						sObjs[sObjs.size() - 1]->setScale(scale);
-						sObjs[sObjs.size() - 1]->setTextureRect(tR);
-						sObjs[sObjs.size() - 1]->setType(0);
-						fuelStation = true;
-					}
-					else {
-						scale = 0.3;
-						spacing = 0;
-						objSpace = (20 * scale + spacing) / radius;
-						col = sf::Color::White;
-						tR.top = 41;
-						tR.left = 21;
-						sObjs.push_back(std::unique_ptr<SpecialObject>(new SpecialObject(cT, col, angle - totalEmpty / 2, rotation, radius)));
-						sObjs[sObjs.size() - 1]->setScale(scale);
-						sObjs[sObjs.size() - 1]->setTextureRect(tR);
-						sObjs[sObjs.size() - 1]->setType(Functions::randomInt(1, 3));
-					}
-					totalEmpty = 0;
-				}*/
-
 				type = Functions::randomInt(0, 2); // (type + 1) % 3;
 				switch (type) {
 				case 0:
@@ -317,10 +291,6 @@ void AstroObject::setParentPlanet(int pP) {
 
 int AstroObject::getParentPlanet() {
 	return parentPlanet;
-}
-
-void AstroObject::setHabitable(bool h) {
-	habitable = h;
 }
 
 void AstroObject::update() {

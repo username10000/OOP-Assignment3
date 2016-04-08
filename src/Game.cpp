@@ -95,50 +95,54 @@ Game::Game() {
 
 	// Genrate Moons
 	for (int i = 1; i < noPlanets; i++) {
-		// Generate random Distance from the Sun, random Radius and random Orbital Phase
-		rDist = Functions::randomInt(30000, 50000);
-		float rR = Functions::randomInt(100, 150);
-		float angle = Functions::randomFloat(0, PI * 2);
-		int rCol = Functions::randomInt(0, 255);
+		rDist = 0;
+		int noMoonsPlanet = Functions::randomInt(0, 3);
+		for (int j = 1; j <= noMoonsPlanet; j++) {
+			// Generate random Distance from the Sun, random Radius and random Orbital Phase
+			rDist += Functions::randomInt(30000, 50000);
+			float rR = Functions::randomInt(100, 150);
+			float angle = Functions::randomFloat(0, PI * 2);
+			int rCol = Functions::randomInt(0, 255);
 
-		// Create the Astro Object in the generated position
-		astro.push_back(std::unique_ptr<AstroObject>(new Moon(astro[i]->getX() - cos(angle) * rDist, astro[i]->getY() - sin(angle) * rDist, rR, sf::Color(rCol, rCol, rCol), Functions::randomFloat(0.005, 0.01))));
+			// Create the Astro Object in the generated position
+			astro.push_back(std::unique_ptr<AstroObject>(new Moon(astro[i]->getX() - cos(angle) * rDist, astro[i]->getY() - sin(angle) * rDist, rR, sf::Color(rCol, rCol, rCol), Functions::randomFloat(0.005, 0.01))));
 
-		noMoons++;
+			noMoons++;
 
-		// Create Common Textures
-		astro[astro.size() - 1]->createCommonObjects(&commonTexture);
+			// Create Common Textures
+			astro[astro.size() - 1]->createCommonObjects(&commonTexture);
 
-		// Set number of Inhabitants
-		astro[astro.size() - 1]->setInhabitants(0);
+			// Set number of Inhabitants
+			astro[astro.size() - 1]->setInhabitants(0);
 
-		// Set the Parent Planet Number
-		astro[astro.size() - 1]->setParentPlanet(i);
+			// Set the Parent Planet Number
+			astro[astro.size() - 1]->setParentPlanet(i);
 
-		// Increase the Angle to match the Direction of the Velocity Vector
-		angle += PI / 2;
+			// Increase the Angle to match the Direction of the Velocity Vector
+			angle += PI / 2;
 
-		// Calculate the Velocity needed to stay in Circular Orbit
-		float aV = sqrt(astro[i]->getG() * astro[i]->getMass() / Functions::dist(astro[i]->getX(), astro[i]->getY(), astro[astro.size() - 1]->getX(), astro[astro.size() - 1]->getY()));
+			// Calculate the Velocity needed to stay in Circular Orbit
+			float aV = sqrt(astro[i]->getG() * astro[i]->getMass() / Functions::dist(astro[i]->getX(), astro[i]->getY(), astro[astro.size() - 1]->getX(), astro[astro.size() - 1]->getY()));
 
-		// Set the velocity of the Astro Object
-		astro[astro.size() - 1]->addVelocity(-cos(angle) * aV, -sin(angle) * aV);
+			// Set the velocity of the Astro Object
+			astro[astro.size() - 1]->addVelocity(-cos(angle) * aV, -sin(angle) * aV);
 
-		// Set the name of the Planets
-		std::ifstream f;
-		f.open("Source/resources/Gods.txt");
-		if (f) {
-			std::string n;
-			for (int j = 0; j < Functions::randomInt(0, 2500); j++) {
-				f >> n;
+			// Set the name of the Planets
+			std::ifstream f;
+			f.open("Source/resources/Gods.txt");
+			if (f) {
+				std::string n;
+				for (int j = 0; j < Functions::randomInt(0, 2500); j++) {
+					f >> n;
+				}
+				int k = 0;
+				do {
+					f >> n;
+					k++;
+				} while (n.size() > 10 && k < 100);
+				f.close();
+				astro[astro.size() - 1]->setName(n);
 			}
-			int k = 0;
-			do {
-				f >> n;
-				k++;
-			} while (n.size() > 10 && k < 100);
-			f.close();
-			astro[astro.size() - 1]->setName(n);
 		}
 	}
 

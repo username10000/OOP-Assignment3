@@ -20,6 +20,7 @@ class AstroMap {
 		int noPlanets;
 	public:
 		AstroMap(float ppm, sf::Font);
+
 		void addAstro(sf::VideoMode screen, double x, double y, sf::Color colour, float radius);
 		void setAstro(sf::RenderWindow &window, sf::VideoMode screen, int p, double x, double y);
 		void setShip(double x, double y);
@@ -27,6 +28,7 @@ class AstroMap {
 		void setNoPlanets(int nP);
 		void setParent(int moon, int planet);
 		int getClickedPlanet();
+
 		void render(sf::RenderWindow &window, sf::VideoMode screen);
 };
 
