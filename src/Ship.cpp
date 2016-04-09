@@ -43,6 +43,16 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 	maxVelocity = 1;
 
 	leftRotate = 0;
+
+	// Dynamic Thrust Test
+	fireTexture.loadFromFile("Source/resources/fire1.png");
+	fire.setTexture(fireTexture);
+	fire.setOrigin(fire.getLocalBounds().width / 2, fire.getLocalBounds().height / 2);
+
+	firePos.x = firePos.y = 0;
+
+	fireLocation.x = 0;
+	fireLocation.y = 0;
 }
 
 Ship::Ship() : Ship(0, 0, 0, 0) {
@@ -268,6 +278,7 @@ void Ship::update() {
 		for (int i = 0; i < 3; i++) {
 			ship[i].rotate(rotation);
 		}
+		fire.rotate(rotation);
 		sprite.rotate(rotation);
 		angle += rotation;
 	}
@@ -371,14 +382,13 @@ void Ship::update() {
 	setOldY(getY());
 	setX(getX() + velocity.x);
 	setY(getY() + velocity.y);
-	//std::cout << acceleration << std::endl;
 
-	//if (landed)
-	//	std::cout << "PLANET" << std::endl;
-	//else
-	//	std::cout << "SPACE" << std::endl;
+	// Fire
+	firePos.x = getX() - 20 + fireLocation.x;
+	firePos.y = getY() - 20 + fireLocation.y;
 
-	//std::cout << sprite.getGlobalBounds().width << " " << sprite.getGlobalBounds().height << "    " << sprite.getLocalBounds().width << " " << sprite.getLocalBounds().height << std::endl;
+	//std::cout << ship[0].getLocalBounds().width << " " << ship[0].getLocalBounds().height << " " << ship[0].getGlobalBounds().width << " " << ship[0].getGlobalBounds().height << std::endl;
+
 }
 
 void Ship::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {
@@ -390,4 +400,11 @@ void Ship::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoM
 	//sprite.setScale(1 / ppm, 1 / ppm);
 	window.draw(ship[spriteNo]);
 	//window.draw(sprite);
+
+	fire.setScale((double)0.15 / ppm, (double)0.15 / ppm);
+	fire.setOrigin(ship[0].getPosition().x, ship[0].getPosition().y);
+	fire.setPosition(fireLocation.x * 0.15 / ppm, fireLocation.y * 0.15 / ppm);
+	//fire.setPosition(ship[0].getPosition().x - 20 * 0.15 / ppm + fireLocation.x * 0.15 / ppm, ship[0].getPosition().y - 20 * 0.15 / ppm + fireLocation.y * 0.15 / ppm);
+	//fire.setPosition((double)(((double)screen.width / 2) + (firePos.x - view.x) / (double)ppm - 20), (double)(((double)screen.height / 2) + (firePos.y - view.y) / (double)ppm - 20));
+	window.draw(fire);
 }

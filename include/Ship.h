@@ -16,8 +16,12 @@ class Ship : public GameObject {
 		sf::Sprite sprite;
 		sf::Texture shipTexture[3];
 		sf::Sprite ship[3];
+		sf::Texture fireTexture;
+		sf::Sprite fire;
 		sf::Vector2<double> velocity;
 		sf::Vector2<double> direction;
+		sf::Vector2<double> firePos;
+		sf::Vector2i fireLocation;
 		float force;
 		float acceleration;
 		float mass;
@@ -41,6 +45,7 @@ class Ship : public GameObject {
 	public:
 		Ship(double x, double y, float screenX, float screenY);
 		Ship();
+
 		void addVelocity();
 		void addVelocity(double x, double y);
 		void setVelocity(double x, double y);
@@ -87,6 +92,7 @@ class Ship : public GameObject {
 		//void setAngleToPlanet(float t);
 		//int getPlanet();
 		//void setPlanet(int p);
+
 		void update();
 		void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);
 };
