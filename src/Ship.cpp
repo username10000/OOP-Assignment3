@@ -49,10 +49,48 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 	fire.setTexture(fireTexture);
 	fire.setOrigin(fire.getLocalBounds().width / 2, fire.getLocalBounds().height / 2);
 
-	firePos.x = firePos.y = 0;
+	// Get the Locations of all the Fires from File ***
+	std::vector<sf::Vector2f> tempLoc;
 
-	fireLocation.x = 0;
-	fireLocation.y = 0;
+	fireLocation.x = 33;
+	fireLocation.y = 37;
+
+	fireLocation.x = Functions::map(fireLocation.x, 0, 39, -19.5, 19.5);
+	fireLocation.y = Functions::map(fireLocation.y, 0, 39, -19.5, 19.5);
+
+	angleToShip = atan2(fireLocation.y, fireLocation.x);
+	angleToShip = angleToShip >= 0 ? angleToShip : angleToShip + 2 * PI;
+	angleToShip += PI / 2;
+
+	distFromShip = sqrt( pow(fireLocation.x, 2) + pow(fireLocation.y, 2) );
+	distFromShip *= 0.15;
+
+	tempLoc.push_back(sf::Vector2f(6, 37));
+	tempLoc.push_back(sf::Vector2f(33, 37));
+	firePos.push_back(tempLoc);
+
+	// Create the number of Sprites that are needed for the Fires and Assign
+	fires.push_back(std::unique_ptr<sf::Sprite>(new sf::Sprite(texture)));
+	fires.push_back(std::unique_ptr<sf::Sprite>(new sf::Sprite(texture)));
+
+	refreshFireLocations(0);
+
+	//fireLocation.x = 33;
+	//fireLocation.y = 37;
+
+	//fireLocation.x = Functions::map(fireLocation.x, 0, 39, -19.5, 19.5);
+	//fireLocation.y = Functions::map(fireLocation.y, 0, 39, -19.5, 19.5);
+
+	////fireLocation.x = (fireLocation.x < 20) ? - (20 - fireLocation.x) : fireLocation.x - 20;
+	////fireLocation.y = (fireLocation.y < 20) ? - (20 - fireLocation.y) : fireLocation.y - 20;
+
+	//angleToShip = atan2(fireLocation.y, fireLocation.x);
+	//angleToShip = angleToShip >= 0 ? angleToShip : angleToShip + 2 * PI;
+	//angleToShip += PI / 2;
+
+	//distFromShip = sqrt( pow(fireLocation.x, 2) + pow(fireLocation.y, 2) );
+	////std::cout << fireLocation.x << " " << fireLocation.y << " " << distFromShip << std::endl;
+	//distFromShip *= 0.15;
 }
 
 Ship::Ship() : Ship(0, 0, 0, 0) {
@@ -273,12 +311,26 @@ float Ship::getRotation() {
 	return ship[0].getRotation() * PI / 180;
 }
 
+void Ship::refreshFireLocations(int index) {
+	fireLocation.x = 33;
+	fireLocation.y = 37;
+
+	fireLocation.x = Functions::map(fireLocation.x, 0, 39, -19.5, 19.5);
+	fireLocation.y = Functions::map(fireLocation.y, 0, 39, -19.5, 19.5);
+
+	angleToShip = atan2(fireLocation.y, fireLocation.x);
+	angleToShip = angleToShip >= 0 ? angleToShip : angleToShip + 2 * PI;
+	angleToShip += PI / 2;
+
+	distFromShip = sqrt(pow(fireLocation.x, 2) + pow(fireLocation.y, 2));
+	distFromShip *= 0.15;
+}
+
 void Ship::update() {
 	if (!landed) {
 		for (int i = 0; i < 3; i++) {
 			ship[i].rotate(rotation);
 		}
-		fire.rotate(rotation);
 		sprite.rotate(rotation);
 		angle += rotation;
 	}
@@ -383,10 +435,6 @@ void Ship::update() {
 	setX(getX() + velocity.x);
 	setY(getY() + velocity.y);
 
-	// Fire
-	firePos.x = getX() - 20 + fireLocation.x;
-	firePos.y = getY() - 20 + fireLocation.y;
-
 	//std::cout << ship[0].getLocalBounds().width << " " << ship[0].getLocalBounds().height << " " << ship[0].getGlobalBounds().width << " " << ship[0].getGlobalBounds().height << std::endl;
 
 }
@@ -401,10 +449,8 @@ void Ship::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoM
 	window.draw(ship[spriteNo]);
 	//window.draw(sprite);
 
-	fire.setScale((double)0.15 / ppm, (double)0.15 / ppm);
-	fire.setOrigin(ship[0].getPosition().x, ship[0].getPosition().y);
-	fire.setPosition(fireLocation.x * 0.15 / ppm, fireLocation.y * 0.15 / ppm);
-	//fire.setPosition(ship[0].getPosition().x - 20 * 0.15 / ppm + fireLocation.x * 0.15 / ppm, ship[0].getPosition().y - 20 * 0.15 / ppm + fireLocation.y * 0.15 / ppm);
-	//fire.setPosition((double)(((double)screen.width / 2) + (firePos.x - view.x) / (double)ppm - 20), (double)(((double)screen.height / 2) + (firePos.y - view.y) / (double)ppm - 20));
-	window.draw(fire);
+	//fire.setScale((double)0.15 / ppm, (double)0.15 / ppm);
+	//fire.setRotation(ship[0].getRotation());
+	//fire.setPosition(ship[0].getPosition().x + sin(angleToShip + ship[0].getRotation() * PI / 180) * distFromShip / ppm, ship[0].getPosition().y - cos(angleToShip + ship[0].getRotation() * PI / 180) * distFromShip / ppm);
+	//window.draw(fire);
 }

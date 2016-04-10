@@ -8,6 +8,7 @@
 #include <GameObject.h>
 #include <Functions.h>
 #include <cmath>
+#include <memory>
 
 // Ship
 class Ship : public GameObject {
@@ -20,8 +21,7 @@ class Ship : public GameObject {
 		sf::Sprite fire;
 		sf::Vector2<double> velocity;
 		sf::Vector2<double> direction;
-		sf::Vector2<double> firePos;
-		sf::Vector2i fireLocation;
+		sf::Vector2f fireLocation;
 		float force;
 		float acceleration;
 		float mass;
@@ -34,6 +34,8 @@ class Ship : public GameObject {
 		float maxThrust;
 		float maxVelocity;
 		float leftRotate;
+		float angleToShip;
+		float distFromShip;
 		//float angleToPlanet;
 		bool accelerating;
 		bool landed;
@@ -42,6 +44,9 @@ class Ship : public GameObject {
 		int spriteNo;
 		int closestPlanet;
 		sf::Clock lastChange;
+		std::vector<std::vector<sf::Vector2f>> firePos;
+		std::vector<std::unique_ptr<sf::Sprite>> ships;
+		std::vector<std::unique_ptr<sf::Sprite>> fires;
 	public:
 		Ship(double x, double y, float screenX, float screenY);
 		Ship();
@@ -88,6 +93,7 @@ class Ship : public GameObject {
 		void setStraight(float a);
 		void setLeftRotate(float r);
 		float getRotation();
+		void refreshFireLocations(int index);
 		//float getAngleToPlanet();
 		//void setAngleToPlanet(float t);
 		//int getPlanet();
