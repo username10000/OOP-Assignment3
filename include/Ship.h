@@ -4,6 +4,7 @@
 
 // Dependencies
 #include <iostream>
+#include <fstream>
 #include <SFML/Graphics.hpp>
 #include <GameObject.h>
 #include <Functions.h>
@@ -36,6 +37,7 @@ class Ship : public GameObject {
 		float leftRotate;
 		float angleToShip;
 		float distFromShip;
+		float fireScale;
 		//float angleToPlanet;
 		bool accelerating;
 		bool landed;
@@ -43,6 +45,7 @@ class Ship : public GameObject {
 		//int planet;
 		int spriteNo;
 		int closestPlanet;
+		int curShip;
 		sf::Clock lastChange;
 		std::vector<std::vector<sf::Vector2f>> firePos;
 		std::vector<std::unique_ptr<sf::Sprite>> ships;
@@ -93,7 +96,6 @@ class Ship : public GameObject {
 		void setStraight(float a);
 		void setLeftRotate(float r);
 		float getRotation();
-		void refreshFireLocations(int index);
 		//float getAngleToPlanet();
 		//void setAngleToPlanet(float t);
 		//int getPlanet();

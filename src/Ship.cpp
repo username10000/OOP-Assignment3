@@ -1,12 +1,17 @@
 #include <Ship.h>
 
 Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) {
-	texture.loadFromFile("ship.png");
+	// Load the Ship Sprites
+	texture.loadFromFile("Source/resources/shipSheet.png");
 	sprite.setTexture(texture);
-	//setScreenPosition(screenX, screenY);
+	sf::IntRect shipRect;
+	shipRect.top = 0;
+	shipRect.left = 0;
+	shipRect.width = 40;
+	shipRect.height = 40;
+	sprite.setTextureRect(shipRect);
 	sprite.setPosition(screenX - 20, screenY - 20);
 	sprite.setOrigin(20, 20);
-	//sprite.setScale(sf::Vector2f(10.0f, 10.0f));
 
 	// Load Sprites
 	shipTexture[0].loadFromFile("Source/resources/ship.png");
@@ -45,35 +50,62 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 	leftRotate = 0;
 
 	// Dynamic Thrust Test
-	fireTexture.loadFromFile("Source/resources/fire1.png");
-	fire.setTexture(fireTexture);
-	fire.setOrigin(fire.getLocalBounds().width / 2, fire.getLocalBounds().height / 2);
+	//fireTexture.loadFromFile("Source/resources/fire1.png");
+	//fire.setTexture(fireTexture);
+	//fire.setOrigin(fire.getLocalBounds().width / 2, fire.getLocalBounds().height / 2);
 
 	// Get the Locations of all the Fires from File ***
-	std::vector<sf::Vector2f> tempLoc;
+	std::ifstream f;
+	f.open("Source/resources/Ships.txt");
+	if (f) {
+		while (!f.eof()) {
+			std::vector<sf::Vector2f> tempLoc;
+			sf::Vector2f fireLocation;
+			int numThrusters;
 
-	fireLocation.x = 33;
-	fireLocation.y = 37;
+			f >> numThrusters;
+			for (int i = 1; i <= numThrusters; i++) {
+				f >> fireLocation.x >> fireLocation.y;
 
-	fireLocation.x = Functions::map(fireLocation.x, 0, 39, -19.5, 19.5);
-	fireLocation.y = Functions::map(fireLocation.y, 0, 39, -19.5, 19.5);
+				fireLocation.x = Functions::map(fireLocation.x, 0, 39, -19.5, 19.5);
+				fireLocation.y = Functions::map(fireLocation.y, 0, 39, -19.5, 19.5);
 
-	angleToShip = atan2(fireLocation.y, fireLocation.x);
-	angleToShip = angleToShip >= 0 ? angleToShip : angleToShip + 2 * PI;
-	angleToShip += PI / 2;
+				float angleToShip = atan2(fireLocation.y, fireLocation.x);
+				angleToShip = angleToShip >= 0 ? angleToShip : angleToShip + 2 * PI;
+				angleToShip += PI / 2;
 
-	distFromShip = sqrt( pow(fireLocation.x, 2) + pow(fireLocation.y, 2) );
-	distFromShip *= 0.15;
+				float distFromShip = sqrt( pow(fireLocation.x, 2) + pow(fireLocation.y, 2) );
+				distFromShip *= 0.15;
 
-	tempLoc.push_back(sf::Vector2f(6, 37));
-	tempLoc.push_back(sf::Vector2f(33, 37));
-	firePos.push_back(tempLoc);
+				fireLocation.x = angleToShip;
+				fireLocation.y = distFromShip;
 
-	// Create the number of Sprites that are needed for the Fires and Assign
-	fires.push_back(std::unique_ptr<sf::Sprite>(new sf::Sprite(texture)));
-	fires.push_back(std::unique_ptr<sf::Sprite>(new sf::Sprite(texture)));
+				tempLoc.push_back(fireLocation);
+			}
+			firePos.push_back(tempLoc);
+		}
+	}
+	f.close();
 
-	refreshFireLocations(0);
+	// Create the Fire Sprites
+	fireTexture.loadFromFile("Source/resources/fireSheet.png");
+	fires.push_back(std::unique_ptr<sf::Sprite>(new sf::Sprite(fireTexture)));
+	fires.push_back(std::unique_ptr<sf::Sprite>(new sf::Sprite(fireTexture)));
+	fires.push_back(std::unique_ptr<sf::Sprite>(new sf::Sprite(fireTexture)));
+
+	sf::IntRect fireRect;
+	fireRect.top = 0;
+	fireRect.left = 0;
+	fireRect.width = 5;
+	fireRect.height = 5;
+	for (int i = 0; i < fires.size(); i++) {
+		fires[i]->setTextureRect(fireRect);
+		fires[i]->setOrigin(fires[i]->getLocalBounds().width / 2, fires[i]->getLocalBounds().height / 2);
+	}
+
+	curShip = 0;
+
+	fireScale = 1;
 
 	//fireLocation.x = 33;
 	//fireLocation.y = 37;
@@ -190,7 +222,7 @@ void Ship::resetVelocity() {
 }
 
 float Ship::getRadius() {
-	return ship[0].getLocalBounds().width * sqrt(2);
+	return sprite.getLocalBounds().width * sqrt(2);
 }
 
 bool Ship::getLanded() {
@@ -234,9 +266,10 @@ int Ship::getClosestPlanet() {
 }
 
 void Ship::setRotation(float r) {
-	for (int i = 0; i < 3; i++) {
-		ship[i].rotate(r);
-	}
+	//for (int i = 0; i < 3; i++) {
+	//	ship[i].rotate(r);
+	//}
+	sprite.rotate(r);
 	angle += r;
 }
 
@@ -297,9 +330,10 @@ float Ship::getMaxFuel() {
 }
 
 void Ship::setStraight(float a) {
-	for (int i = 0; i < 3; i++) {
-		ship[i].setRotation(a * 180 / PI);
-	}
+	//for (int i = 0; i < 3; i++) {
+	//	ship[i].setRotation(a * 180 / PI);
+	//}
+	sprite.setRotation(a * 180 / PI);
 	angle = a;
 }
 
@@ -308,29 +342,14 @@ void Ship::setLeftRotate(float r) {
 }
 
 float Ship::getRotation() {
-	return ship[0].getRotation() * PI / 180;
-}
-
-void Ship::refreshFireLocations(int index) {
-	fireLocation.x = 33;
-	fireLocation.y = 37;
-
-	fireLocation.x = Functions::map(fireLocation.x, 0, 39, -19.5, 19.5);
-	fireLocation.y = Functions::map(fireLocation.y, 0, 39, -19.5, 19.5);
-
-	angleToShip = atan2(fireLocation.y, fireLocation.x);
-	angleToShip = angleToShip >= 0 ? angleToShip : angleToShip + 2 * PI;
-	angleToShip += PI / 2;
-
-	distFromShip = sqrt(pow(fireLocation.x, 2) + pow(fireLocation.y, 2));
-	distFromShip *= 0.15;
+	return sprite.getRotation() * PI / 180;
 }
 
 void Ship::update() {
 	if (!landed) {
-		for (int i = 0; i < 3; i++) {
-			ship[i].rotate(rotation);
-		}
+		//for (int i = 0; i < 3; i++) {
+		//	ship[i].rotate(rotation);
+		//}
 		sprite.rotate(rotation);
 		angle += rotation;
 	}
@@ -348,9 +367,10 @@ void Ship::update() {
 				angle += rot;
 			}
 			//std::cout << leftRotate << " " << rot << std::endl;
-			for (int i = 0; i < 3; i++) {
-				ship[i].rotate(rot);
-			}
+			//for (int i = 0; i < 3; i++) {
+			//	ship[i].rotate(rot);
+			//}
+			sprite.rotate(rot);
 		} else {
 			float rot = -1;
 			//std::cout << leftRotate << " " << rot << "  ";
@@ -364,9 +384,10 @@ void Ship::update() {
 				angle += rot;
 			}
 			//std::cout << leftRotate << " " << rot << std::endl;
-			for (int i = 0; i < 3; i++) {
-				ship[i].rotate(rot);
-			}
+			//for (int i = 0; i < 3; i++) {
+			//	ship[i].rotate(rot);
+			//}
+			sprite.rotate(rot);
 		}
 	}
 
@@ -391,35 +412,49 @@ void Ship::update() {
 	else
 		accelerating = false;
 
-	// Animate Sprite
+	// Animate Fire Sprite
 	if (accelerating) {
-		if (spriteNo == 0) {
-			spriteNo = 1;
-			lastChange.restart();
-		} else {
-			if (lastChange.getElapsedTime().asSeconds() > 0.2) {
-				if (spriteNo == 1)
-					spriteNo = 2;
-				else
-					spriteNo = 1;
-				lastChange.restart();
+		sf::IntRect fireRect;
+		fireRect = fires[0]->getTextureRect();
+
+		if (lastChange.getElapsedTime().asSeconds() > 0.2) {
+			fireRect.left = (fireRect.left + 6) % 18;
+			for (int i = 0; i < fires.size(); i++) {
+				fires[i]->setTextureRect(fireRect);
 			}
+			lastChange.restart();
 		}
-	} else {
-		 spriteNo = 0;
-	 }
+	}
+	//if (accelerating) {
+	//	if (spriteNo == 0) {
+	//		spriteNo = 1;
+	//		lastChange.restart();
+	//	} else {
+	//		if (lastChange.getElapsedTime().asSeconds() > 0.2) {
+	//			if (spriteNo == 1)
+	//				spriteNo = 2;
+	//			else
+	//				spriteNo = 1;
+	//			lastChange.restart();
+	//		}
+	//	}
+	//} else {
+	//	 spriteNo = 0;
+	// }
 
 	if (fuel > thrust * 0.1) {
 		// Add Thrust Velocity
 		velocity.x += sin(angle * PI / 180) * thrust * speed;
 		velocity.y += -cos(angle * PI / 180) * thrust * speed;
 		fuel -= thrust * 0.1;
+		fireScale = Functions::map(thrust, 0, maxThrust, 0.1, 1);
 	} else {
 		if (fuel > 0) {
 			// Add Thrust Velocity for the remaining Fuel
 			velocity.x += sin(angle * PI / 180) * (fuel / 0.1) * speed;
 			velocity.y += -cos(angle * PI / 180) * (fuel / 0.1) * speed;
 			fuel = 0;
+			fireScale = Functions::map(fuel / 0.1, 0, maxThrust, 0.1, 1);
 		}
 	}
 		
@@ -440,14 +475,27 @@ void Ship::update() {
 }
 
 void Ship::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {
-	for (int i = 0; i < 3; i++) {
-		ship[i].setScale((double)0.15 / ppm, (double)0.15 / ppm);
-		ship[i].setPosition((double)(((double)screen.width / 2) + (getX() - view.x) / (double)ppm - 20), (double)(((double)screen.height / 2) + (getY() - view.y) / (double)ppm - 20));
-		//ship[i].setPosition((double)(((double)screen.width / 2) + (getX() - view.x) / (double)ppm - ship[i].getGlobalBounds().width / 2), (double)(((double)screen.height / 2) + (getY() - view.y) / (double)ppm - ship[i].getGlobalBounds().width / 2));
-	}
+	//for (int i = 0; i < 3; i++) {
+	//	ship[i].setScale((double)0.15 / ppm, (double)0.15 / ppm);
+	//	ship[i].setPosition((double)(((double)screen.width / 2) + (getX() - view.x) / (double)ppm - 20), (double)(((double)screen.height / 2) + (getY() - view.y) / (double)ppm - 20));
+	//	//ship[i].setPosition((double)(((double)screen.width / 2) + (getX() - view.x) / (double)ppm - ship[i].getGlobalBounds().width / 2), (double)(((double)screen.height / 2) + (getY() - view.y) / (double)ppm - ship[i].getGlobalBounds().width / 2));
+	//}
 	//sprite.setScale(1 / ppm, 1 / ppm);
-	window.draw(ship[spriteNo]);
+	//window.draw(ship[spriteNo]);
 	//window.draw(sprite);
+
+	sprite.setScale((double)0.15 / ppm, (double)0.15 / ppm);
+	sprite.setPosition((double)(((double)screen.width / 2) + (getX() - view.x) / (double)ppm - 20), (double)(((double)screen.height / 2) + (getY() - view.y) / (double)ppm - 20));
+	window.draw(sprite);
+
+	if (accelerating) {
+		for (int i = 0; i < firePos[curShip].size(); i++) {
+			fires[i]->setScale((double)0.15 * (double)fireScale / ppm, (double)0.15 / ppm);
+			fires[i]->setRotation(sprite.getRotation());
+			fires[i]->setPosition(sprite.getPosition().x + sin(firePos[curShip][i].x + sprite.getRotation() * PI / 180) * firePos[curShip][i].y / ppm, sprite.getPosition().y - cos(firePos[curShip][i].x + sprite.getRotation() * PI / 180) * firePos[curShip][i].y / ppm);
+			window.draw(*fires[i]);
+		}
+	}
 
 	//fire.setScale((double)0.15 / ppm, (double)0.15 / ppm);
 	//fire.setRotation(ship[0].getRotation());
