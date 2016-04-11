@@ -25,6 +25,7 @@
 #include <Human.h>
 #include <Message.h>
 #include <InfoPanel.h>
+#include <SpeedLine.h>
 
 // Game
 class Game {
@@ -43,6 +44,7 @@ class Game {
 		float fps;
 		std::vector<std::unique_ptr<AstroObject>> astro;
 		std::vector<std::unique_ptr<Ship>> ships;
+		std::vector<std::unique_ptr<SpeedLine>> speedLines;
 		std::unordered_map<std::string, bool> menu;
 		int stars[200][3];
 		//std::vector<std::unique_ptr<sf::CircleShape>> stars;

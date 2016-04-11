@@ -275,6 +275,8 @@ Game::Game() {
 
 	background.setSize(sf::Vector2f(screen.width, screen.height));
 	background.setTexture(&bTexture);
+
+	speedLines.push_back( std::unique_ptr<SpeedLine>( new SpeedLine( screen, ships[0]->getRotation() ) ) );
 }
 
 Game::~Game() {
@@ -1125,6 +1127,11 @@ void Game::update() {
 		}
 		infoPanel->update(idText.getString(), ships[0]->getThrust(), ships[0]->getMaxThrust(), ships[0]->getFuel(), ships[0]->getMaxFuel(), (float)sqrt( pow( ships[0]->getVelocity().x, 2 ) + pow( ships[0]->getVelocity().y, 2 ) ), getRelativeVelocity(),  relToTarget, ships[0]->getMaxVelocity());
 
+		// Speed Lines
+		for (int i = 0; i < speedLines.size(); i++) {
+			speedLines[i]->update();
+		}
+
 		if (gameOver) {
 			message->update("GAME OVER! Press \'Esc\' to Exit", sf::Color::Red);
 			ships[0]->cutThrust();
@@ -1181,6 +1188,11 @@ void Game::render() {
 		background.setTextureRect(tR);
 		window.draw(background);
 
+		// Speed Lines
+		for (int i = 0; i < speedLines.size(); i++) {
+			speedLines[i]->render(window);
+		}
+
 		// Astronomical Object
 		for (int i = 0; i < astro.size(); i++) {
 			if (i == closestPlanet || i == 0)
@@ -1194,7 +1206,8 @@ void Game::render() {
 
 		// Locals
 		for (int i = 0; i < astro[closestPlanet]->getInhabitants(); i++) {
-			locals[i]->render(window, view, screen, ppm);
+			if (Functions::dist(locals[i]->getX(), locals[i]->getY(), view.x, view.y) <= screen.width / ppm / 2 + 15)
+				locals[i]->render(window, view, screen, ppm);
 		}
 
 		// Human
