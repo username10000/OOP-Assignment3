@@ -1,39 +1,50 @@
 #include <SpeedLine.h>
 
-SpeedLine::SpeedLine(sf::VideoMode screen, float angle) {
-	this->angle = angle;
+SpeedLine::SpeedLine(sf::VideoMode screen, float angle, float speed) {
+	if (angle == 0)
+		up = true;
+	else
+		up = false;
 
-	angle += PI / 4;
-	float x2 = screen.width / 2 + sin(angle) * screen.height / 2;
-	float y2 = screen.height / 2 - cos(angle) * screen.height / 2;
+	if ((float)angle == (float)PI)
+		down = true;
+	else
+		down = false;
+
+	float x2 = screen.width / 2 + sin(angle) * screen.width / 2;
+	float y2 = screen.height / 2 - cos(angle) * screen.width / 2;
 	
 	slope = (y2 - screen.height / 2) / (x2 - screen.width / 2);
 
 	float rDif = Functions::randomFloat(-PI / 2, PI / 2);
 	angle = (angle + rDif < 0) ? (2 * PI + angle + rDif) : (angle + rDif);
-	position.x = screen.width / 2 + sin(angle) * screen.height / 2;
-	position.y = screen.height / 2 - cos(angle) * screen.height / 2;
+	position.x = screen.width / 2 + sin(angle) * screen.width / 2;
+	position.y = screen.height / 2 - cos(angle) * screen.width / 2;
 
 	yintercept = position.y - position.x * slope;
 
-	circle.setRadius(10);
+	circle.setRadius(5);
 	circle.setPosition(position.x, position.y);
 
-	speed = 0.1;
-	if (position.x > screen.width / 2)
-		speed *= -1;
+	this->speed = speed;
+	if (position.x > screen.width / 2 || down)
+		this->speed *= -1;
 
-	//direction.x = (screen.width / 2 - position.x) / 100;
-	//direction.y = (screen.height / 2 - position.y) / 100;
+	isAlive = true;
+}
+
+bool SpeedLine::getIsAlive() {
+	return isAlive;
 }
 
 void SpeedLine::update() {
-	position.x += speed;
-	position.y = slope * position.x + yintercept;
-
-	std::cout << position.x << " " << position.y << std::endl;
+	if (!up && !down) {
+		position.x += speed;
+		position.y = slope * position.x + yintercept;
+	} else {
+		position.y += speed;
+	}
 	circle.setPosition(position.x, position.y);
-	//circle.setPosition(circle.getPosition().x + direction.x, circle.getPosition().y + direction.y);
 }
 
 void SpeedLine::render(sf::RenderWindow &window) {

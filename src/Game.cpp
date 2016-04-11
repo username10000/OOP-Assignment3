@@ -275,8 +275,6 @@ Game::Game() {
 
 	background.setSize(sf::Vector2f(screen.width, screen.height));
 	background.setTexture(&bTexture);
-
-	speedLines.push_back( std::unique_ptr<SpeedLine>( new SpeedLine( screen, ships[0]->getRotation() ) ) );
 }
 
 Game::~Game() {
@@ -1127,10 +1125,22 @@ void Game::update() {
 		}
 		infoPanel->update(idText.getString(), ships[0]->getThrust(), ships[0]->getMaxThrust(), ships[0]->getFuel(), ships[0]->getMaxFuel(), (float)sqrt( pow( ships[0]->getVelocity().x, 2 ) + pow( ships[0]->getVelocity().y, 2 ) ), getRelativeVelocity(),  relToTarget, ships[0]->getMaxVelocity());
 
-		// Speed Lines
-		for (int i = 0; i < speedLines.size(); i++) {
-			speedLines[i]->update();
-		}
+		//// Create Speed Lines
+		//float vel = sqrt(pow(ships[0]->getVelocity().x, 2) + pow(ships[0]->getVelocity().y, 2));
+		//if (vel != 0 && !onPlanet)
+		//	speedLines.push_back(std::unique_ptr<SpeedLine>(new SpeedLine(screen, ships[0]->getRotation(), Functions::map(vel, 0, 299792458, 10, 100))));
+
+		//// Speed Lines
+		//for (int i = 0; i < speedLines.size(); i++) {
+		//	speedLines[i]->update();
+		//}
+
+		//// Remove Speed Lines
+		//for (int i = speedLines.size() - 1; i >= 0; i--) {
+		//	if (!speedLines[i]->getIsAlive()) {
+		//		speedLines.erase(speedLines.begin() + i);
+		//	}
+		//}
 
 		if (gameOver) {
 			message->update("GAME OVER! Press \'Esc\' to Exit", sf::Color::Red);
@@ -1188,10 +1198,10 @@ void Game::render() {
 		background.setTextureRect(tR);
 		window.draw(background);
 
-		// Speed Lines
-		for (int i = 0; i < speedLines.size(); i++) {
-			speedLines[i]->render(window);
-		}
+		//// Speed Lines
+		//for (int i = 0; i < speedLines.size(); i++) {
+		//	speedLines[i]->render(window);
+		//}
 
 		// Astronomical Object
 		for (int i = 0; i < astro.size(); i++) {
