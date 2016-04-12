@@ -63,12 +63,14 @@ class Game {
 		sf::Clock clock;
 		sf::Clock frameTime;
 		sf::Clock stateTime;
+		sf::Clock lastSpeedLine;
 		sf::Text frameRate;
 		sf::Text distance;
 		sf::Text idText;
 		float dt;
 		float accumulator;
 		int targetAstro;
+		int noSpeedLines;
 		bool onPlanet;
 		bool jump;
 		bool gameOver;

@@ -151,7 +151,8 @@ int AstroObject::getInhabitants() {
 
 void AstroObject::createCommonObjects(sf::Texture *cT) {
 	float angle = 0, scale = 0, spacing = 0, objSpace = 0, totalEmpty = 0;
-	int numObj = 0, type = 0;
+	int numObj = 0, type = 0, gValue = 100;
+	float sBuildAng = 0, eBuildAng = 0;
 	//bool fuelStation = false;
 	sf::Color col;
 	sf::IntRect tR;
@@ -164,6 +165,23 @@ void AstroObject::createCommonObjects(sf::Texture *cT) {
 		do {
 			// Change type of Object
 			if (numObj == 0) {
+				//if (type == 1) {
+				//	numObj = Functions::randomInt(5, 9);
+				//	for (int b = 0; b < numObj; b++) {
+				//		eBuildAng = angle;
+				//		scale = Functions::randomFloat(0.5, 0.7);
+				//		spacing = Functions::randomFloat(10, 20) * scale;
+				//		objSpace = (20 * scale + spacing) / radius;
+				//		gValue = Functions::randomInt(50, 200);
+				//		col = sf::Color(gValue, gValue, gValue);
+				//		tR.top = 0;
+				//		tR.left = Functions::randomInt(1, 5) * 21;
+				//		// Create the Object
+				//		objs.push_back(std::unique_ptr<CommonObject>(new CommonObject(cT, col, Functions::randomFloat(sBuildAng, eBuildAng), rotation, radius)));
+				//		objs[objs.size() - 1]->setScale(scale);
+				//		objs[objs.size() - 1]->setTextureRect(tR);
+				//	}
+				//}
 				type = Functions::randomInt(0, 2); // (type + 1) % 3;
 				switch (type) {
 				case 0:
@@ -173,6 +191,7 @@ void AstroObject::createCommonObjects(sf::Texture *cT) {
 				case 1:
 					// Building
 					numObj = Functions::randomInt(5, 9);
+					sBuildAng = angle;
 					break;
 				default:
 					// Empty Space
@@ -194,10 +213,11 @@ void AstroObject::createCommonObjects(sf::Texture *cT) {
 					break;
 				case 1:
 					// Building
-					scale = Functions::randomFloat(0.5, 0.9);
-					spacing = Functions::randomFloat(10, 20) * scale;
+					scale = Functions::randomFloat(0.5, 0.7);
+					spacing = Functions::randomFloat(1, 2) * scale;
 					objSpace = (20 * scale + spacing) / radius;
-					col = sf::Color(Functions::randomInt(0, 255), Functions::randomInt(0, 255), Functions::randomInt(0, 255));
+					gValue = Functions::randomInt(50, 200);
+					col = sf::Color(gValue, gValue, gValue);
 					tR.top = 0;
 					tR.left = Functions::randomInt(1, 5) * 21;
 					break;

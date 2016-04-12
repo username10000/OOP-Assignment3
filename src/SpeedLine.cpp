@@ -1,6 +1,7 @@
 #include <SpeedLine.h>
 
 SpeedLine::SpeedLine(sf::VideoMode screen, float angle, float speed) {
+	this->screen = screen;
 	if (angle == 0)
 		up = true;
 	else
@@ -31,6 +32,8 @@ SpeedLine::SpeedLine(sf::VideoMode screen, float angle, float speed) {
 		this->speed *= -1;
 
 	isAlive = true;
+
+	onScreen = false;
 }
 
 bool SpeedLine::getIsAlive() {
@@ -45,6 +48,11 @@ void SpeedLine::update() {
 		position.y += speed;
 	}
 	circle.setPosition(position.x, position.y);
+
+	if (!onScreen && position.x > 0 && position.x < screen.width && position.y > 0 && position.y < screen.height)
+		onScreen = true;
+	else if (onScreen && (position.x < 0 || position.x > screen.width || position.y < 0 || position.y > screen.height))
+		isAlive = false;
 }
 
 void SpeedLine::render(sf::RenderWindow &window) {

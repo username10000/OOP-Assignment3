@@ -275,6 +275,8 @@ Game::Game() {
 
 	background.setSize(sf::Vector2f(screen.width, screen.height));
 	background.setTexture(&bTexture);
+
+	noSpeedLines = 0;
 }
 
 Game::~Game() {
@@ -1127,8 +1129,17 @@ void Game::update() {
 
 		//// Create Speed Lines
 		//float vel = sqrt(pow(ships[0]->getVelocity().x, 2) + pow(ships[0]->getVelocity().y, 2));
-		//if (vel != 0 && !onPlanet)
-		//	speedLines.push_back(std::unique_ptr<SpeedLine>(new SpeedLine(screen, ships[0]->getRotation(), Functions::map(vel, 0, 299792458, 10, 100))));
+		//if (vel > 1 && !onPlanet && lastSpeedLine.getElapsedTime().asSeconds() > 1) {
+		//	noSpeedLines = 5;
+		//	lastSpeedLine.restart();
+		//}
+		//if (noSpeedLines > 0) {
+		//	float velAngle = atan2(ships[0]->getVelocity().y, ships[0]->getVelocity().x);
+		//	velAngle = velAngle >= 0 ? velAngle : velAngle + 2 * PI;
+		//	velAngle += PI / 2;
+		//	speedLines.push_back(std::unique_ptr<SpeedLine>(new SpeedLine(screen, velAngle, Functions::map(vel, 0, 299792458, 10, 10))));
+		//	noSpeedLines--;
+		//}
 
 		//// Speed Lines
 		//for (int i = 0; i < speedLines.size(); i++) {
