@@ -25,6 +25,8 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 		ship[i].setOrigin(ship[i].getGlobalBounds().width / 2, ship[i].getGlobalBounds().width / 2);
 	}
 
+	explosion.loadFromFile("Source/resources/explosionSheet.png");
+
 	velocity.x = velocity.y = 0;
 	rotation = angle = 0;
 	force = acceleration = 0;
@@ -106,6 +108,8 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 	curShip = 1;
 
 	fireScale = 1;
+
+	isAlive = true;
 
 	//fireLocation.x = 33;
 	//fireLocation.y = 37;
@@ -345,6 +349,16 @@ float Ship::getRotation() {
 	return sprite.getRotation() * PI / 180;
 }
 
+void Ship::destroy() {
+	isAlive = false;
+	sprite.setTexture(explosion);
+	sf::IntRect expRect;
+	expRect.top = 0;
+	expRect.left = 0;
+	expRect.width = 40;
+	expRect.height = 40;
+}
+
 void Ship::update() {
 	if (!landed) {
 		sprite.rotate(rotation);
@@ -441,6 +455,21 @@ void Ship::update() {
 	setOldY(getY());
 	setX(getX() + velocity.x);
 	setY(getY() + velocity.y);
+
+	if (!isAlive) {
+		sf::IntRect expRect = sprite.getTextureRect();
+		expRect.left += 41;
+		if (expRect.left > explosion.getSize().x) {
+			expRect.left = 0;
+			expRect.top += 41;
+			if (expRect.top > explosion.getSize().y) {
+				expRect.top -= 41;
+				sprite.setColor(sf::Color::Transparent);
+				isAlive = true;
+			}
+		}
+		sprite.setTextureRect(expRect);
+	}
 }
 
 void Ship::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {

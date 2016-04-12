@@ -1156,6 +1156,7 @@ void Game::update() {
 		if (gameOver) {
 			message->update("GAME OVER! Press \'Esc\' to Exit", sf::Color::Red);
 			ships[0]->cutThrust();
+			ships[0]->destroy();
 		}
 
 		//frameTime.restart();

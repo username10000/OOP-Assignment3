@@ -20,6 +20,7 @@ class Ship : public GameObject {
 		sf::Sprite ship[3];
 		sf::Texture fireTexture;
 		sf::Sprite fire;
+		sf::Texture explosion;
 		sf::Vector2<double> velocity;
 		sf::Vector2<double> direction;
 		sf::Vector2f fireLocation;
@@ -42,6 +43,7 @@ class Ship : public GameObject {
 		bool accelerating;
 		bool landed;
 		bool inertiaDamper;
+		bool isAlive;
 		//int planet;
 		int spriteNo;
 		int closestPlanet;
@@ -96,6 +98,7 @@ class Ship : public GameObject {
 		void setStraight(float a);
 		void setLeftRotate(float r);
 		float getRotation();
+		void destroy();
 		//float getAngleToPlanet();
 		//void setAngleToPlanet(float t);
 		//int getPlanet();
