@@ -49,9 +49,9 @@ Game::Game() {
 	for (int i = 1; i < noPlanets; i++) {
 		// Generate random Distance from the Sun, random Radius and random Orbital Phase
 		if (i == 1)
-			rDist += Functions::randomInt(250000, 300000);
+			rDist += Functions::randomInt(350000, 350000);
 		else
-			rDist += Functions::randomInt(100000, 150000);
+			rDist += Functions::randomInt(150000, 175000);
 		float rR = Functions::randomInt(300, 500);
 		float angle = Functions::randomFloat(0, PI * 2);
 		
@@ -62,7 +62,7 @@ Game::Game() {
 		astro[i]->createCommonObjects(&commonTexture);
 
 		// Set number of Inhabitants
-		astro[i]->setInhabitants(Functions::randomInt(10, 99));
+		astro[i]->setInhabitants(Functions::randomInt(10, 50));
 
 		// Increase the Angle to match the Direction of the Velocity Vector
 		angle += PI / 2;
@@ -99,7 +99,11 @@ Game::Game() {
 		int noMoonsPlanet = Functions::randomInt(0, 3);
 		for (int j = 1; j <= noMoonsPlanet; j++) {
 			// Generate random Distance from the Sun, random Radius and random Orbital Phase
-			rDist += Functions::randomInt(30000, 50000);
+			if (j == 1) {
+				rDist += Functions::randomInt(50000, 60000);
+			} else {
+				rDist += Functions::randomInt(40000, 50000);
+			}
 			float rR = Functions::randomInt(100, 150);
 			float angle = Functions::randomFloat(0, PI * 2);
 			int rCol = Functions::randomInt(0, 255);
@@ -175,6 +179,11 @@ Game::Game() {
 	// Add Message
 	message = std::unique_ptr<Message>(new Message(screen, font));
 
+	shipTexture.loadFromFile("Source/resources/shipSheet.png");
+
+	// Add Shop
+	shop = std::unique_ptr<Shop>(new Shop(screen, font, &shipTexture));
+
 	// Pixels Per Meter
 	ppm = 1;
 
@@ -210,6 +219,7 @@ Game::Game() {
 	menu["fuel"] = true;
 	menu["distance"] = true;
 	menu["velocity"] = true;
+	menu["shop"] = false;
 
 	//ppm = dist(0, 0, astro[noPlanets - 1] -> getX(), astro[noPlanets - 1] -> getY()) / (screen.height / 2);
 
@@ -277,6 +287,14 @@ Game::Game() {
 	background.setTexture(&bTexture);
 
 	noSpeedLines = 0;
+
+	money = 10000;
+
+	moneyText.setFont(font);
+	moneyText.setCharacterSize(15);
+	moneyText.setString(Functions::toStringWithComma(money) + " $");
+	moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
+	moneyText.setPosition(moneyText.getGlobalBounds().width / 2, moneyText.getGlobalBounds().height / 2);
 }
 
 Game::~Game() {
@@ -344,6 +362,9 @@ void Game::events() {
 						case 3:
 							ships[0]->addMaxVelocity(0.5);
 							astro[closestPlanet]->setInactive(cS);
+							break;
+						case 10:
+							menu["shop"] = !menu["shop"];
 						default:
 							break;
 					}
@@ -802,6 +823,9 @@ void Game::nearObjects() {
 				case 3:
 					message->update("Press \'E\' to Increase the Durability");
 					break;
+				case 10:
+					message->update("Press \'E\' to Enter Shop");
+					break;
 				default:
 					message->update("Allan please add details");
 					break;
@@ -1127,6 +1151,10 @@ void Game::update() {
 		}
 		infoPanel->update(idText.getString(), ships[0]->getThrust(), ships[0]->getMaxThrust(), ships[0]->getFuel(), ships[0]->getMaxFuel(), (float)sqrt( pow( ships[0]->getVelocity().x, 2 ) + pow( ships[0]->getVelocity().y, 2 ) ), getRelativeVelocity(),  relToTarget, ships[0]->getMaxVelocity());
 
+		if (menu["shop"]) {
+			shop->update(window);
+		}
+
 		//// Create Speed Lines
 		//float vel = sqrt(pow(ships[0]->getVelocity().x, 2) + pow(ships[0]->getVelocity().y, 2));
 		//if (vel > 1 && !onPlanet && lastSpeedLine.getElapsedTime().asSeconds() > 1) {
@@ -1174,7 +1202,7 @@ void Game::render() {
 
 	if (menu["map"]) {
 		// Astro Map
-		astroMap -> render(window, screen);
+		astroMap->render(window, screen);
 
 		// Velocity Vector
 		if (menu["velocity"]) {
@@ -1200,7 +1228,8 @@ void Game::render() {
 		if (menu["infoPanel"]) {
 			infoPanel->render(window);
 		}
-	} else {
+	}
+	else {
 		// Star Field
 		sf::IntRect tR;
 		tR.width = bTexture.getSize().x * ppm;
@@ -1235,7 +1264,9 @@ void Game::render() {
 		// Human
 		if (onPlanet) {
 			human->render(window, view, screen, ppm);
-		} else {
+			window.draw(moneyText);
+		}
+		else {
 			// Velocity Vector
 			if (menu["velocity"]) {
 				velocityVector->render(window);
@@ -1268,6 +1299,10 @@ void Game::render() {
 		// Message
 		if (message->getIsVisible()) {
 			message->render(window);
+		}
+
+		if (menu["shop"]) {
+			shop->render(window);
 		}
 	}
 

@@ -16,6 +16,13 @@ Button::Button(sf::RectangleShape shape) : Button() {
 	rect = true;
 }
 
+//Button::Button(sf::Texture &texture) : Button() {
+//	this->texture = texture;
+//	sprite.setTexture(this->texture);
+//	isSprite = true;
+//	rect = true;
+//}
+
 void Button::setPosition(double x, double y) {
 	if (!rect)
 		circle.setPosition(x, y);

@@ -13,7 +13,11 @@ void AstroMap::addAstro(sf::VideoMode screen, double x, double y, sf::Color colo
 	//astroColour.push_back(colour);
 	//astroRadius.push_back(radius);
 
-	sf::CircleShape circle(radius / 30);
+	sf::CircleShape circle;
+	if (radius > 1500)
+		circle.setRadius(radius / 75);
+	else
+		circle.setRadius(radius / 50);
 	circle.setFillColor(colour);
 	circle.setPosition((double)(((double)screen.width / 2) + x / (double)ppm - circle.getRadius() - 20), (double)(((double)screen.height / 2) + y / (double)ppm - circle.getRadius() - 20));
 	buttons.push_back( std::unique_ptr<Button>( new Button(circle) ) );

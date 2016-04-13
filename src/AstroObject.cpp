@@ -153,6 +153,7 @@ void AstroObject::createCommonObjects(sf::Texture *cT) {
 	float angle = 0, scale = 0, spacing = 0, objSpace = 0, totalEmpty = 0;
 	int numObj = 0, type = 0, gValue = 100;
 	float sBuildAng = 0, eBuildAng = 0;
+	bool shop = false;
 	//bool fuelStation = false;
 	sf::Color col;
 	sf::IntRect tR;
@@ -165,6 +166,18 @@ void AstroObject::createCommonObjects(sf::Texture *cT) {
 		do {
 			// Change type of Object
 			if (numObj == 0) {
+				if (type == 2 && !shop) {
+					scale = 0.4;
+					tR.top = 41;
+					tR.left = 42;
+					col = sf::Color::White;
+					sObjs.push_back(std::unique_ptr<SpecialObject>(new SpecialObject(cT, col, angle - totalEmpty / 2, rotation, radius)));
+					sObjs[sObjs.size() - 1]->setScale(scale);
+					sObjs[sObjs.size() - 1]->setTextureRect(tR);
+					sObjs[sObjs.size() - 1]->setType(10);
+					totalEmpty = 0;
+					shop = true;
+				}
 				//if (type == 1) {
 				//	numObj = Functions::randomInt(5, 9);
 				//	for (int b = 0; b < numObj; b++) {
@@ -238,9 +251,9 @@ void AstroObject::createCommonObjects(sf::Texture *cT) {
 				objs[objs.size() - 1]->setTextureRect(tR);
 			}
 
-			//if (type == 2) {
-			//	totalEmpty += objSpace;
-			//}
+			if (type == 2) {
+				totalEmpty += objSpace;
+			}
 
 			angle += objSpace;
 			numObj--;

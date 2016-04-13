@@ -26,6 +26,7 @@
 #include <Message.h>
 #include <InfoPanel.h>
 #include <SpeedLine.h>
+#include <Shop.h>
 
 // Game
 class Game {
@@ -56,6 +57,7 @@ class Game {
 		std::unique_ptr<Human> human;
 		std::unique_ptr<Message> message;
 		std::unique_ptr<InfoPanel> infoPanel;
+		std::unique_ptr<Shop> shop;
 		SolarSystem solarSystem;
 		sf::Vector2<double> view;
 		float ppm;
@@ -67,16 +69,19 @@ class Game {
 		sf::Text frameRate;
 		sf::Text distance;
 		sf::Text idText;
+		sf::Text moneyText;
 		float dt;
 		float accumulator;
 		int targetAstro;
 		int noSpeedLines;
+		int money;
 		bool onPlanet;
 		bool jump;
 		bool gameOver;
 		bool panel;
 		sf::Texture humanTexture;
 		sf::Texture commonTexture;
+		sf::Texture shipTexture;
 		std::vector<std::unique_ptr<Human>> locals;
 		int closestPlanet;
 		//AstroMap astroMap(0);
