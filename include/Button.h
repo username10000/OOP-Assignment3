@@ -27,6 +27,7 @@ class Button {
 		double getX();
 		double getY();
 		double getWidth();
+		double getHeight();
 		bool isActive();
 		void update(sf::RenderWindow &window);
 		void render(sf::RenderWindow &window);

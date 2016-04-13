@@ -51,6 +51,13 @@ double Button::getWidth() {
 		return rectangle.getLocalBounds().width;
 }
 
+double Button::getHeight() {
+	if (!rect)
+		return circle.getRadius() * 2;
+	else
+		return rectangle.getLocalBounds().height;
+}
+
 bool Button::isActive() {
 	return active;
 }
@@ -72,6 +79,18 @@ void Button::update(sf::RenderWindow &window) {
 		}
 	} else {
 		// Rectangle
+		if (mouse.getPosition(window).x > getX() - getWidth() && mouse.getPosition(window).x < getX() && mouse.getPosition(window).y > getY() - getHeight() && mouse.getPosition(window).y < getY()) {
+			if (mouse.isButtonPressed(sf::Mouse::Left)) {
+				hover = false;
+				active = true;
+			} else {
+				hover = true;
+				active = false;
+			}
+		} else {
+			hover = false;
+			active = false;
+		}
 	}
 
 	if (!rect) {
@@ -87,6 +106,15 @@ void Button::update(sf::RenderWindow &window) {
 		}
 	} else {
 		// Check Rectangle
+		if (hover) {
+			rectangle.setOutlineThickness(3);
+		}
+		if (active) {
+			rectangle.setOutlineThickness(2);
+		}
+		if (!hover && !active) {
+			rectangle.setOutlineThickness(0);
+		}
 	}
 }
 
