@@ -4,14 +4,15 @@ Shop::Shop(sf::VideoMode screen, sf::Font font, sf::Texture *shipTextures) {
 	this->font = font;
 	this->shipTextures = *shipTextures;
 	
-	background.setSize(sf::Vector2f(screen.width / 2, screen.height / 2));
 	background.setFillColor(sf::Color(0, 0, 0, 150));
-	background.setPosition(screen.width / 4, screen.height / 4);
+	background.setPosition(screen.width / 10, screen.height / 10);
+	background.setSize(sf::Vector2f(screen.width - 2 * background.getPosition().x, screen.height - 2 * background.getPosition().y));
 
 	for (int i = 0; i < shipTextures->getSize().x / 40; i++) {
 		sf::RectangleShape shipRect;
 		sf::IntRect shipTextureRect;
-		shipRect.setSize(sf::Vector2f(100, 100));
+		float shipSize = background.getSize().y / 5.5;
+		shipRect.setSize(sf::Vector2f(shipSize, shipSize));
 		shipRect.setTexture(shipTextures);
 		shipTextureRect.top = 0;
 		shipTextureRect.left = i * 41;
@@ -19,25 +20,52 @@ Shop::Shop(sf::VideoMode screen, sf::Font font, sf::Texture *shipTextures) {
 		shipTextureRect.height = 40;
 		shipRect.setTextureRect(shipTextureRect);
 		shipRect.setOrigin(shipRect.getLocalBounds().width / 2, shipRect.getLocalBounds().height / 2);
-		float xPos = Functions::map(i, 0, (int)(this->shipTextures.getSize().x / 40) - 1, screen.width / 4 + shipRect.getSize().x, screen.width - screen.width / 4 - shipRect.getSize().x);
-		float yPos = screen.height / 4 + shipRect.getSize().y;
+		float xPos = Functions::map(i, 0, (int)(this->shipTextures.getSize().x / 40) - 1, background.getPosition().x + shipRect.getSize().x, background.getPosition().x + background.getSize().x - shipRect.getSize().x);
+		float yPos = Functions::map(0, 0, 3, background.getPosition().y + shipRect.getSize().y, background.getPosition().y + background.getSize().y + shipRect.getSize().y / 2);
 		buttons.push_back(std::unique_ptr<Button>(new Button(shipRect)));
 		buttons[buttons.size() - 1]->setPosition(xPos, yPos);
 
+		priceNum.push_back(Functions::randomInt(10000, 50000));
+
 		sf::Text name;
 
-		names.push_back(name);
-		names[names.size() - 1].setFont(this->font);
-		names[names.size() - 1].setCharacterSize(15);
-		names[names.size() - 1].setString(Functions::toStringWithComma(Functions::randomInt(10000, 50000)));
-		names[names.size() - 1].setOrigin(names[names.size() - 1].getLocalBounds().width / 2, names[names.size() - 1].getLocalBounds().height / 2);
-		names[names.size() - 1].setPosition(xPos, yPos + 40 + names[names.size() - 1].getCharacterSize());
+		prices.push_back(name);
+		prices[prices.size() - 1].setFont(this->font);
+		prices[prices.size() - 1].setCharacterSize(15);
+		prices[prices.size() - 1].setString(Functions::toStringWithComma(priceNum[priceNum.size() - 1]));
+		prices[prices.size() - 1].setOrigin(prices[prices.size() - 1].getLocalBounds().width / 2, prices[prices.size() - 1].getLocalBounds().height / 2);
+		prices[prices.size() - 1].setPosition(xPos, yPos + 40 + prices[prices.size() - 1].getCharacterSize());
+
+		purchased.push_back(false);
 	}
+	purchased[0] = true;
+	prices[0].setString("Purchased");
+	prices[0].setOrigin(prices[0].getLocalBounds().width / 2, prices[0].getLocalBounds().height / 2);
+
+	purchase = -1;
 }
 
-void Shop::update(sf::RenderWindow &window) {
+int Shop::update(sf::RenderWindow &window) {
+	int returnValue = -1;
 	for (int i = 0; i < buttons.size(); i++) {
 		buttons[i]->update(window);
+		if (buttons[i]->isActive()) {
+			if (!purchased[i]) {
+				returnValue = priceNum[i];
+				purchase = i;
+			} else {
+				returnValue = i;
+			}
+		}
+	}
+	return returnValue;
+}
+
+void Shop::confirmPurchase() {
+	if (purchase >= 0 && purchase < prices.size()) {
+		prices[purchase].setString("Purchased");
+		prices[purchase].setOrigin(prices[purchase].getLocalBounds().width / 2, prices[purchase].getLocalBounds().height / 2);
+		purchased[purchase] = true;
 	}
 }
 
@@ -45,6 +73,6 @@ void Shop::render(sf::RenderWindow &window) {
 	window.draw(background);
 	for (int i = 0; i < buttons.size(); i++) {
 		buttons[i]->render(window);
-		window.draw(names[i]);
+		window.draw(prices[i]);
 	}
 }

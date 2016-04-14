@@ -6,7 +6,7 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 	sprite.setTexture(texture);
 	sf::IntRect shipRect;
 	shipRect.top = 0;
-	shipRect.left = 41;
+	shipRect.left = 0;
 	shipRect.width = 40;
 	shipRect.height = 40;
 	sprite.setTextureRect(shipRect);
@@ -105,7 +105,7 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 		fires[i]->setOrigin(fires[i]->getLocalBounds().width / 2, fires[i]->getLocalBounds().height / 2);
 	}
 
-	curShip = 1;
+	curShip = 0;
 
 	fireScale = 1;
 
@@ -357,6 +357,15 @@ void Ship::destroy() {
 	expRect.left = 0;
 	expRect.width = 40;
 	expRect.height = 40;
+}
+
+void Ship::setShip(int num) {
+	if (num < texture.getSize().x / 40) {
+		sf::IntRect shipRect = sprite.getTextureRect();
+		shipRect.left = num * 41;
+		sprite.setTextureRect(shipRect);
+		curShip = num;
+	}
 }
 
 void Ship::update() {

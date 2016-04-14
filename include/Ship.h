@@ -99,6 +99,7 @@ class Ship : public GameObject {
 		void setLeftRotate(float r);
 		float getRotation();
 		void destroy();
+		void setShip(int num);
 		//float getAngleToPlanet();
 		//void setAngleToPlanet(float t);
 		//int getPlanet();

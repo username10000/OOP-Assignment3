@@ -288,7 +288,7 @@ Game::Game() {
 
 	noSpeedLines = 0;
 
-	money = 10000;
+	money = 100000;
 
 	moneyText.setFont(font);
 	moneyText.setCharacterSize(15);
@@ -1152,7 +1152,19 @@ void Game::update() {
 		infoPanel->update(idText.getString(), ships[0]->getThrust(), ships[0]->getMaxThrust(), ships[0]->getFuel(), ships[0]->getMaxFuel(), (float)sqrt( pow( ships[0]->getVelocity().x, 2 ) + pow( ships[0]->getVelocity().y, 2 ) ), getRelativeVelocity(),  relToTarget, ships[0]->getMaxVelocity());
 
 		if (menu["shop"]) {
-			shop->update(window);
+			int shopStatus = shop->update(window);
+			if (shopStatus <= 100 && shopStatus >= 0) {
+				// Use Item
+				ships[0]->setShip(shopStatus);
+			}
+			if (shopStatus > 100) {
+				if (money >= shopStatus) {
+					money -= shopStatus;
+					moneyText.setString(Functions::toStringWithComma(money) + " $");
+					moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
+					shop->confirmPurchase();
+				}
+			}
 		}
 
 		//// Create Speed Lines
