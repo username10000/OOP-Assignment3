@@ -265,17 +265,18 @@ Game::Game() {
 	int numStars = Functions::randomInt(100, 200);
 	for (int i = 0; i < numStars; i++) {
 		float xStar, yStar;
-		if (Functions::randomInt(0, 3) == 0) {
-			xStar = Functions::randomFloat(screen.width / 4, screen.width - screen.width / 4);
-			yStar = Functions::randomFloat(screen.height / 4, screen.height - screen.height / 4);
-		}
-		else {
-			xStar = Functions::randomFloat(0, screen.width);
-			yStar = Functions::randomFloat(0, screen.height);
-		}
-		float rStar = Functions::randomFloat(1, 1);
+		//if (Functions::randomInt(0, 3) == 0) {
+		//	xStar = Functions::randomFloat(screen.width / 4, screen.width - screen.width / 4);
+		//	yStar = Functions::randomFloat(screen.height / 4, screen.height - screen.height / 4);
+		//}
+		//else {
+			xStar = Functions::randomInt(0, screen.width);
+			yStar = Functions::randomInt(0, screen.height);
+		//}
+		float rStar = 1; //Functions::randomFloat(1, 1);
 		sf::CircleShape c(rStar);
-		c.setPosition(xStar - 20, yStar - 20);
+		c.setPosition(xStar, yStar);
+		//c.setPosition(xStar - 20, yStar - 20);
 		//c.setPointCount(100);
 		bRenderTexture.draw(c);
 	}
@@ -284,6 +285,8 @@ Game::Game() {
 	bTexture = bRenderTexture.getTexture();
 
 	background.setSize(sf::Vector2f(screen.width, screen.height));
+	background.setOrigin(background.getLocalBounds().width / 2, background.getLocalBounds().height / 2);
+	background.setPosition(screen.width / 2, screen.height / 2);
 	background.setTexture(&bTexture);
 
 	noSpeedLines = 0;
@@ -1167,6 +1170,9 @@ void Game::update() {
 			}
 		}
 
+		float vel = sqrt(pow(ships[0]->getVelocity().x, 2) + pow(ships[0]->getVelocity().y, 2));
+		//ppm = Functions::map(vel, 0, 50, 0.1, 1);
+
 		//// Create Speed Lines
 		//float vel = sqrt(pow(ships[0]->getVelocity().x, 2) + pow(ships[0]->getVelocity().y, 2));
 		//if (vel > 1 && !onPlanet && lastSpeedLine.getElapsedTime().asSeconds() > 1) {
@@ -1243,13 +1249,28 @@ void Game::render() {
 	}
 	else {
 		// Star Field
-		sf::IntRect tR;
-		tR.width = bTexture.getSize().x * ppm;
-		tR.height = bTexture.getSize().y * ppm;
-		tR.left = (bTexture.getSize().x - tR.width) / 2 + 20 * ppm;
-		tR.top = (bTexture.getSize().y - tR.height) / 2 + 20 * ppm;
-		background.setTextureRect(tR);
+		//float textureWidth = bTexture.getSize().x * ppm;
+		//float textureHeight = bTexture.getSize().y * ppm;
+		//float textureLeft = (bTexture.getSize().x - textureWidth) / 2 + 20 * ppm;
+		//float textureTop = (bTexture.getSize().y - textureHeight) / 2 + 20 * ppm;
+		//sf::IntRect tR;
+		//tR.width = round(textureWidth);
+		//tR.height = round(textureHeight);
+		//tR.left = round(textureLeft);
+		//tR.top = round(textureTop);
+		////tR.width = bTexture.getSize().x * ppm;
+		////tR.height = bTexture.getSize().y * ppm;
+		////tR.left = (bTexture.getSize().x - tR.width) / 2 + 20 * ppm;
+		////tR.top = (bTexture.getSize().y - tR.height) / 2 + 20 * ppm;
+		//background.setTextureRect(tR);
+		//background.setScale(Functions::map(ppm, 0.05, 1, 3, 1), Functions::map(ppm, 0.05, 1, 3, 1));
+		background.setScale(1 / ppm, 1 / ppm);
+		//std::cout << ppm << std::endl;
 		window.draw(background);
+
+		//std::cout << textureLeft << " " << tR.left << std::endl;
+		//std::cout << textureTop << "  " << tR.top << std::endl;
+		//std::cout << tR.width << " " << tR.height << " " << tR.left << " " << tR.top << std::endl;
 
 		//// Speed Lines
 		//for (int i = 0; i < speedLines.size(); i++) {

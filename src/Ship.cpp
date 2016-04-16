@@ -440,20 +440,24 @@ void Ship::update() {
 
 	if (fuel > thrust * 0.1) {
 		// Add Thrust Velocity
-		velocity.x += sin(angle * PI / 180) * thrust * speed;
-		velocity.y += -cos(angle * PI / 180) * thrust * speed;
+		if ((sqrt(pow(velocity.x, 2) + pow(velocity.y, 2)) + sqrt(pow(sin(angle * PI / 180) * thrust * speed, 2) + pow(-cos(angle * PI / 180) * thrust * speed, 2))) * 60 < 299792458) {
+			velocity.x += sin(angle * PI / 180) * thrust * speed;
+			velocity.y += -cos(angle * PI / 180) * thrust * speed;
+		}
 		fuel -= thrust * 0.1;
 		fireScale = Functions::map(thrust, 0, maxThrust, 0.1, 1);
 	} else {
 		if (fuel > 0) {
 			// Add Thrust Velocity for the remaining Fuel
-			velocity.x += sin(angle * PI / 180) * (fuel / 0.1) * speed;
-			velocity.y += -cos(angle * PI / 180) * (fuel / 0.1) * speed;
+			if ((sqrt(pow(velocity.x, 2) + pow(velocity.y, 2)) + sqrt(pow(sin(angle * PI / 180) * (fuel / 0.1) * speed, 2) + pow(-cos(angle * PI / 180) * (fuel / 0.1) * speed, 2))) * 60 < 299792458) {
+				velocity.x += sin(angle * PI / 180) * (fuel / 0.1) * speed;
+				velocity.y += -cos(angle * PI / 180) * (fuel / 0.1) * speed;
+			}
 			fuel = 0;
 			fireScale = Functions::map(fuel / 0.1, 0, maxThrust, 0.1, 1);
 		}
 	}
-	
+
 	// Force
 	float acceleration = getForce() / getMass();
 	sf::Vector2<double> direction = getDirection();

@@ -34,7 +34,7 @@ Shop::Shop(sf::VideoMode screen, sf::Font font, sf::Texture *shipTextures) {
 		prices[prices.size() - 1].setCharacterSize(15);
 		prices[prices.size() - 1].setString(Functions::toStringWithComma(priceNum[priceNum.size() - 1]));
 		prices[prices.size() - 1].setOrigin(prices[prices.size() - 1].getLocalBounds().width / 2, prices[prices.size() - 1].getLocalBounds().height / 2);
-		prices[prices.size() - 1].setPosition(xPos, yPos + 40 + prices[prices.size() - 1].getCharacterSize());
+		prices[prices.size() - 1].setPosition(xPos, yPos + shipSize / 2 + prices[prices.size() - 1].getCharacterSize());
 
 		purchased.push_back(false);
 	}

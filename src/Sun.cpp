@@ -1,7 +1,7 @@
 #include <Sun.h>
 
 Sun::Sun(double x, double y, float _radius, sf::Color _colour, float _rotation) : AstroObject(x, y, _radius, _colour, _rotation) {
-	setMass(_radius * 9.3 * 30);
+	setMass(_radius * 9.3 * 10);
 	setHabitable(false);
 	//circle.setRadius(_radius);
 	//circle.setPointCount(100);
