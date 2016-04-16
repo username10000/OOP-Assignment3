@@ -27,6 +27,7 @@
 #include <InfoPanel.h>
 #include <SpeedLine.h>
 #include <Shop.h>
+#include <Quest.h>
 
 // Game
 class Game {
@@ -84,6 +85,7 @@ class Game {
 		sf::Texture shipTexture;
 		std::vector<std::unique_ptr<Human>> locals;
 		int closestPlanet;
+		std::vector<std::string> goods;
 		//AstroMap astroMap(0);
 	public:
 		Game();

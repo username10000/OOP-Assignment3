@@ -5,7 +5,7 @@ Human::Human(double x, double y, sf::Texture *texture) : GameObject(x, y) {
 	sprite.setTexture(*texture);
 	sf::IntRect textureRect;
 	textureRect.top = 0;
-	textureRect.left = 15;
+	textureRect.left = 0;
 	textureRect.width = 15;
 	textureRect.height = 40;
 	sprite.setTextureRect(textureRect);
@@ -25,6 +25,10 @@ Human::Human(double x, double y, sf::Texture *texture) : GameObject(x, y) {
 	nextStateChange = 0;
 
 	closestSpecial = -1;
+
+	sprite.setColor(sf::Color(Functions::randomInt(0, 255), Functions::randomInt(0, 255), Functions::randomInt(0, 255)));
+
+	speed = 1;
 }
 
 sf::Vector2<double> Human::getVelocity() {
@@ -72,10 +76,10 @@ void Human::setAngle(float a) {
 void Human::setDir(int d) {
 	sf::IntRect tR = sprite.getTextureRect();
 	if (dir == d) {
-		if (clock.getElapsedTime().asSeconds() > 0.05) {
-			tR.left = tR.left + 15;
-			if (tR.left == 75)
-				tR.left = 15;
+		if (clock.getElapsedTime().asSeconds() > 0.1 * speed) {
+			tR.left = tR.left + 16;
+			if (tR.left >= sprite.getTexture()->getSize().x)
+				tR.left = 16;
 			clock.restart();
 		}
 	} else {
@@ -88,7 +92,7 @@ void Human::setDir(int d) {
 void Human::setDirJump(int d) {
 	dir = d;
 	sf::IntRect tR = sprite.getTextureRect();
-	tR.left = 15;
+	tR.left = 16;
 	sprite.setTextureRect(tR);
 }
 
@@ -130,6 +134,14 @@ void Human::setClosestSpecial(int cS) {
 
 int Human::getClosestSpecial() {
 	return closestSpecial;
+}
+
+void Human::setColour(sf::Color colour) {
+	sprite.setColor(colour);
+}
+
+void Human::setSpeed(float speed) {
+	this->speed = speed;
 }
 
 void Human::update() {

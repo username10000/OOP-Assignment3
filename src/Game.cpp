@@ -159,6 +159,7 @@ Game::Game() {
 	// Add Human
 	humanTexture.loadFromFile("Source/resources/humanSheet.png");
 	human = std::unique_ptr<Human>(new Human(0, 0, &humanTexture));
+	human->setColour(sf::Color::White);
 
 	// Add Velocity Vector
 	velocityVector = std::unique_ptr<VelocityVector>(new VelocityVector(screen));
@@ -298,6 +299,18 @@ Game::Game() {
 	moneyText.setString(Functions::toStringWithComma(money) + " $");
 	moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
 	moneyText.setPosition(moneyText.getGlobalBounds().width / 2, moneyText.getGlobalBounds().height / 2);
+
+	std::ifstream f;
+	f.open("Source/resources/QuestItems.txt");
+	int goodsNo;
+	f >> goodsNo;
+	for (int i = 0; i < goodsNo; i++) {
+		std::string item;
+		std::getline(f, item);
+		if (i != 0)
+			goods.push_back(item);
+	}
+	f.close();
 }
 
 Game::~Game() {
@@ -574,6 +587,9 @@ void Game::keyPressed() {
 	// Shift
 	if (keys[38]) {
 		speedMult = 5;
+		human->setSpeed(0.5);
+	} else {
+		human->setSpeed(1);
 	}
 
 	// +

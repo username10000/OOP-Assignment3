@@ -2,8 +2,10 @@
 #define HUMAN_H
 
 // Dependencies
+#include <iostream>
 #include <SFML/Graphics.hpp>
 #include <GameObject.h>
+#include <Functions.h>
 
 // Human
 class Human : public GameObject {
@@ -21,7 +23,9 @@ class Human : public GameObject {
 		int state;
 		int nextStateChange;
 		int closestSpecial;
+		float speed;
 		bool jump;
+		std::string questItem;
 	public:
 		Human(double x, double y, sf::Texture *texture);
 		sf::Vector2<double> getVelocity();
@@ -45,6 +49,8 @@ class Human : public GameObject {
 		bool getJump();
 		void setClosestSpecial(int cS);
 		int getClosestSpecial();
+		void setColour(sf::Color colour);
+		void setSpeed(float speed);
 		//void setPlanetRotation(float r);
 		void update();
 		void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);
