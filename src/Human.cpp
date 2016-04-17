@@ -26,6 +26,7 @@ Human::Human(double x, double y, sf::Texture *texture) : GameObject(x, y) {
 	nextStateChange = 0;
 
 	closestSpecial = -1;
+	closestLocal = -1;
 
 	sprite.setColor(sf::Color(Functions::randomInt(0, 255), Functions::randomInt(0, 255), Functions::randomInt(0, 255)));
 
@@ -176,6 +177,14 @@ float Human::getWidth() {
 
 float Human::getHeight() {
 	return sprite.getGlobalBounds().height;
+}
+
+int Human::getClosestLocal() {
+	return closestLocal;
+}
+
+void Human::setClosestLocal(int l) {
+	closestLocal = l;
 }
 
 void Human::update() {

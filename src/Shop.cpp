@@ -7,6 +7,8 @@ Shop::Shop(sf::VideoMode screen, sf::Font font, sf::Texture *shipTextures) {
 	background.setFillColor(sf::Color(0, 0, 0, 150));
 	background.setPosition(screen.width / 10, screen.height / 10);
 	background.setSize(sf::Vector2f(screen.width - 2 * background.getPosition().x, screen.height - 2 * background.getPosition().y));
+	background.setOutlineThickness(1);
+	background.setOutlineColor(sf::Color::White);
 
 	for (int i = 0; i < shipTextures->getSize().x / 40; i++) {
 		sf::RectangleShape shipRect;

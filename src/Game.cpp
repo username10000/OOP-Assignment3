@@ -221,6 +221,7 @@ Game::Game() {
 	menu["distance"] = true;
 	menu["velocity"] = true;
 	menu["shop"] = false;
+	menu["quests"] = false;
 
 	//ppm = dist(0, 0, astro[noPlanets - 1] -> getX(), astro[noPlanets - 1] -> getY()) / (screen.height / 2);
 
@@ -271,7 +272,7 @@ Game::Game() {
 		locals[i]->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
 
 		//if (Functions::randomInt(0, 5) == 0) {
-			locals[i]->setQuest(0, Functions::randomInt(0, goods.size() - 1), Functions::randomInt(2, 20), Functions::randomInt(1, astro.size() - 1), Functions::randomInt(100, 1000));
+			locals[i]->setQuest(0, Functions::randomInt(0, goods.size() - 1), Functions::randomInt(2, 20), Functions::randomInt(1, noPlanets - 1), Functions::randomInt(100, 1000));
 		//}
 	}
 
@@ -315,6 +316,35 @@ Game::Game() {
 	moneyText.setString(Functions::toStringWithComma(money) + " $");
 	moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
 	moneyText.setPosition(moneyText.getGlobalBounds().width / 2, moneyText.getGlobalBounds().height / 2);
+
+	//questBackground.setFillColor(sf::Color(0, 0, 0, 150));
+	//questBackground.setPosition(screen.width / 10, screen.height / 10);
+	//questBackground.setSize(sf::Vector2f(screen.width - 2 * questBackground.getPosition().x, screen.height - 2 * questBackground.getPosition().y));
+	//questBackground.setOutlineThickness(1);
+	//questBackground.setOutlineColor(sf::Color::White);
+
+	questRect[0].setFillColor(sf::Color(0, 0, 0, 150));
+	questRect[0].setPosition(screen.width / 5, screen.height / 5);
+	questRect[0].setSize(sf::Vector2f(screen.width - 2 * questRect[0].getPosition().x, (screen.height - 2 * questRect[0].getPosition().y) / 10));
+	questRect[0].setOutlineThickness(1);
+	questRect[0].setOutlineColor(sf::Color::White);
+	for (int i = 1; i < 10; i++) {
+		questRect[i].setFillColor(sf::Color(0, 0, 0, 150));
+		questRect[i].setPosition(questRect[0].getPosition().x, questRect[0].getPosition().y + i * questRect[0].getSize().y);
+		questRect[i].setSize(sf::Vector2f(screen.width - 2 * questRect[0].getPosition().x, (screen.height - 2 * questRect[0].getPosition().y) / 10));
+		questRect[i].setOutlineThickness(1);
+		questRect[i].setOutlineColor(sf::Color::White);
+	}
+
+	for (int i = 0; i < 10; i++) {
+		questDesc[i].setFont(font);
+		questDesc[i].setCharacterSize(20);
+		questDesc[i].setString("Quest Description");
+		questDesc[i].setOrigin(questDesc[i].getLocalBounds().width / 2, questDesc[i].getLocalBounds().height / 2);
+		questDesc[i].setPosition(screen.width / 2, questRect[i].getPosition().y + questRect[i].getSize().y / 2);
+	}
+
+	startQuest = 0;
 }
 
 Game::~Game() {
@@ -389,6 +419,12 @@ void Game::events() {
 							break;
 					}
 				}
+
+				if (human->getClosestLocal() != -1) {
+					//std::unique_ptr<Quest> quest = locals[human->getClosestLocal()]->getQuest();
+					quests.push_back(locals[human->getClosestLocal()]->getQuest());
+					locals[human->getClosestLocal()]->setHasQuest(false);
+				}
 				
 				//if (onPlanet) {
 				//	int cP = ships[0]->getClosestPlanet();
@@ -434,6 +470,11 @@ void Game::events() {
 				//} else {
 				//	ships[0]->setLeftRotate(-(theta - curTheta) * 180 / PI);
 				//}
+			}
+
+			// Q - Quest Menu
+			if (event.key.code == 16) {
+				menu["quests"] = !menu["quests"];
 			}
 
 			// X - Cut Thrust
@@ -507,11 +548,22 @@ void Game::events() {
 			//view.y += (int)(event.mouseButton.y - screen.height / 2) * ppm;
 			break;
 		case sf::Event::MouseWheelMoved:
-			ppm -= event.mouseWheel.delta * 0.05;
-			if (ppm <= 0.05)
-				ppm = 0.05f;
-			if (ppm > 1)
-				ppm = 1;
+			if (!menu["quests"]) {
+				ppm -= event.mouseWheel.delta * 0.05;
+				if (ppm <= 0.05)
+					ppm = 0.05f;
+				if (ppm > 1)
+					ppm = 1;
+			} else {
+				if (event.mouseWheel.delta > 0)
+					startQuest--;
+				else
+					startQuest++;
+				if (startQuest < 0)
+					startQuest = 0;
+				if (startQuest > quests.size() - 1)
+					startQuest = quests.size() - 1;
+			}
 			break;
 		default:
 			break;
@@ -859,9 +911,10 @@ void Game::nearObjects() {
 			human->setClosestSpecial(-1);
 		}
 
+		human->setClosestLocal(-1);
 		for (int i = 0; i < astro[closestPlanet]->getInhabitants(); i++) {
 			// Close to a person with a Quest
-			if (Functions::dist(view.x, view.y, locals[i]->getX(), locals[i]->getY()) < locals[i]->getWidth() / 18) {
+			if (Functions::dist(view.x, view.y, locals[i]->getX(), locals[i]->getY()) < locals[i]->getWidth() / 18 && locals[i]->getHasQuest()) {
 				std::unique_ptr<Quest> quest = locals[i]->getQuest();
 				std::string m;
 				switch (quest->getType()) {
@@ -874,6 +927,7 @@ void Game::nearObjects() {
 					break;
 				}
 				message->update(m, sf::Color::Green);
+				human->setClosestLocal(i);
 			}
 		}
 	}
@@ -1133,9 +1187,9 @@ void Game::update() {
 				locals[i]->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
 
 				locals[i]->setHasQuest(false);
-				if (Functions::randomInt(0, 5) == 0) {
-					locals[i]->setQuest(0, Functions::randomInt(0, goods.size() - 1), Functions::randomInt(2, 20), Functions::randomInt(1, astro.size() - 1), Functions::randomInt(100, 1000));
-				}
+				//if (Functions::randomInt(0, 5) == 0) {
+					locals[i]->setQuest(0, Functions::randomInt(0, goods.size() - 1), Functions::randomInt(2, 20), Functions::randomInt(1, noPlanets - 1), Functions::randomInt(100, 1000));
+				//}
 			}
 
 			// *** Add Quest Returns
@@ -1244,6 +1298,19 @@ void Game::update() {
 		//	}
 		//}
 
+		if (menu["quests"]) {
+			for (int i = 0; i < 10; i++) {
+				std::string desc;
+				if (startQuest + i < quests.size()) {
+					desc = "Deliver " + std::to_string(quests[startQuest + i]->getNoItems()) + " " + goods[quests[startQuest + i]->getItem()] + " to " + astro[quests[startQuest + i]->getDestination()]->getName() + " (" + std::to_string(quests[startQuest + i]->getReward()) + "$)";
+				} else {
+					desc = "";
+				}
+				questDesc[i].setString(desc);
+				questDesc[i].setOrigin(questDesc[i].getLocalBounds().width / 2, questDesc[i].getLocalBounds().height / 2);
+			}
+		}
+
 		if (gameOver) {
 			message->update("GAME OVER! Press \'Esc\' to Exit", sf::Color::Red);
 			ships[0]->cutThrust();
@@ -1343,8 +1410,7 @@ void Game::render() {
 		if (onPlanet) {
 			human->render(window, view, screen, ppm);
 			window.draw(moneyText);
-		}
-		else {
+		} else {
 			// Velocity Vector
 			if (menu["velocity"]) {
 				velocityVector->render(window);
@@ -1372,6 +1438,14 @@ void Game::render() {
 
 			// Inertia Damper
 			//window.draw(idText);
+		}
+
+		// Quest Menu
+		if (menu["quests"]) {
+			for (int i = 0; i < 10; i++) {
+				window.draw(questRect[i]);
+				window.draw(questDesc[i]);
+			}
 		}
 
 		// Message

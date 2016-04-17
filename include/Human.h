@@ -26,6 +26,7 @@ class Human : public GameObject {
 		int state;
 		int nextStateChange;
 		int closestSpecial;
+		int closestLocal;
 		int questType;
 		bool jump;
 		bool hasQuest;
@@ -62,6 +63,8 @@ class Human : public GameObject {
 		std::unique_ptr<Quest> getQuest();
 		float getWidth();
 		float getHeight();
+		int getClosestLocal();
+		void setClosestLocal(int l);
 		//void setPlanetRotation(float r);
 		void update();
 		void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);

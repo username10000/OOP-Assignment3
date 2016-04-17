@@ -46,6 +46,8 @@ class Game {
 		float fps;
 		std::vector<std::unique_ptr<AstroObject>> astro;
 		std::vector<std::unique_ptr<Ship>> ships;
+		std::vector<std::unique_ptr<Human>> locals;
+		std::vector<std::unique_ptr<Quest>> quests;
 		std::vector<std::unique_ptr<SpeedLine>> speedLines;
 		std::unordered_map<std::string, bool> menu;
 		int stars[200][3];
@@ -83,9 +85,11 @@ class Game {
 		sf::Texture humanTexture;
 		sf::Texture commonTexture;
 		sf::Texture shipTexture;
-		std::vector<std::unique_ptr<Human>> locals;
 		int closestPlanet;
 		std::vector<std::string> goods;
+		sf::RectangleShape questRect[10];
+		sf::Text questDesc[10];
+		int startQuest;
 		//AstroMap astroMap(0);
 	public:
 		Game();
