@@ -31,7 +31,7 @@ void Message::update(std::string string) {
 	text.setString(string);
 	text.setOrigin(text.getLocalBounds().width / 2, text.getLocalBounds().height / 2);
 	text.setColor(sf::Color::White);
-	background.setSize(sf::Vector2f(text.getLocalBounds().width + text.getCharacterSize() * 2, background.getSize().y));
+	background.setSize(sf::Vector2f(text.getLocalBounds().width + text.getCharacterSize() * 2, text.getLocalBounds().height + text.getCharacterSize() * 2)); // background.getSize().y
 	background.setOrigin(background.getLocalBounds().width / 2, background.getLocalBounds().height / 2);
 	show();
 }

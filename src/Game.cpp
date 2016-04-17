@@ -250,6 +250,18 @@ Game::Game() {
 
 	closestPlanet = 1;
 
+	std::ifstream f;
+	f.open("Source/resources/QuestItems.txt");
+	int goodsNo;
+	f >> goodsNo;
+	for (int i = 0; i < goodsNo; i++) {
+		std::string item;
+		std::getline(f, item);
+		if (i != 0)
+			goods.push_back(item);
+	}
+	f.close();
+
 	// Create Vector to store the Locals
 	for (int i = 0; i < 100; i++) {
 		locals.push_back(std::unique_ptr<Human>(new Human(0, 0, &humanTexture)));
@@ -257,6 +269,10 @@ Game::Game() {
 		float theta = Functions::randomFloat(0, 2 * PI);
 		locals[i]->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
 		locals[i]->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
+
+		//if (Functions::randomInt(0, 5) == 0) {
+			locals[i]->setQuest(0, Functions::randomInt(0, goods.size() - 1), Functions::randomInt(2, 20), Functions::randomInt(1, astro.size() - 1), Functions::randomInt(100, 1000));
+		//}
 	}
 
 	// Star Field - generate stars
@@ -299,18 +315,6 @@ Game::Game() {
 	moneyText.setString(Functions::toStringWithComma(money) + " $");
 	moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
 	moneyText.setPosition(moneyText.getGlobalBounds().width / 2, moneyText.getGlobalBounds().height / 2);
-
-	std::ifstream f;
-	f.open("Source/resources/QuestItems.txt");
-	int goodsNo;
-	f >> goodsNo;
-	for (int i = 0; i < goodsNo; i++) {
-		std::string item;
-		std::getline(f, item);
-		if (i != 0)
-			goods.push_back(item);
-	}
-	f.close();
 }
 
 Game::~Game() {
@@ -854,6 +858,24 @@ void Game::nearObjects() {
 		} else {
 			human->setClosestSpecial(-1);
 		}
+
+		for (int i = 0; i < astro[closestPlanet]->getInhabitants(); i++) {
+			// Close to a person with a Quest
+			if (Functions::dist(view.x, view.y, locals[i]->getX(), locals[i]->getY()) < locals[i]->getWidth() / 18) {
+				std::unique_ptr<Quest> quest = locals[i]->getQuest();
+				std::string m;
+				switch (quest->getType()) {
+				case 0:
+					m = "Deliver " + std::to_string(quest->getNoItems()) + " " + goods[quest->getItem()] + " to " + astro[quest->getDestination()]->getName();
+					m += "\nReward: " + std::to_string(quest->getReward()) + " $";
+					m += "\nPress 'E' to accept";
+					break;
+				default:
+					break;
+				}
+				message->update(m, sf::Color::Green);
+			}
+		}
 	}
 
 	if (!onPlanet) {
@@ -1109,7 +1131,13 @@ void Game::update() {
 				float theta = Functions::randomFloat(0, 2 * PI);
 				locals[i]->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
 				locals[i]->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
+
+				locals[i]->setHasQuest(false);
+				if (Functions::randomInt(0, 5) == 0) {
+					locals[i]->setQuest(0, Functions::randomInt(0, goods.size() - 1), Functions::randomInt(2, 20), Functions::randomInt(1, astro.size() - 1), Functions::randomInt(100, 1000));
+				}
 			}
+
 			// *** Add Quest Returns
 		}
 
@@ -1187,7 +1215,7 @@ void Game::update() {
 			}
 		}
 
-		float vel = sqrt(pow(ships[0]->getVelocity().x, 2) + pow(ships[0]->getVelocity().y, 2));
+		//float vel = sqrt(pow(ships[0]->getVelocity().x, 2) + pow(ships[0]->getVelocity().y, 2));
 		//ppm = Functions::map(vel, 0, 50, 0.1, 1);
 
 		//// Create Speed Lines

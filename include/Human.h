@@ -56,7 +56,12 @@ class Human : public GameObject {
 		int getClosestSpecial();
 		void setColour(sf::Color colour);
 		void setSpeed(float speed);
-		void setQuest(int type, std::string name);
+		void setQuest(int type, int item, int noItems, int destination, int reward);
+		bool getHasQuest();
+		void setHasQuest(bool hQ);
+		std::unique_ptr<Quest> getQuest();
+		float getWidth();
+		float getHeight();
 		//void setPlanetRotation(float r);
 		void update();
 		void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);

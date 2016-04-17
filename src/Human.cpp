@@ -9,7 +9,8 @@ Human::Human(double x, double y, sf::Texture *texture) : GameObject(x, y) {
 	textureRect.width = 15;
 	textureRect.height = 40;
 	sprite.setTextureRect(textureRect);
-	sprite.setOrigin(10, 20);
+	sprite.setOrigin(sprite.getLocalBounds().width / 2, sprite.getLocalBounds().height / 2);
+	//sprite.setOrigin(10, 20);
 
 	mass = 0.01;
 	velocity.x = velocity.y = 0;
@@ -31,6 +32,7 @@ Human::Human(double x, double y, sf::Texture *texture) : GameObject(x, y) {
 	speed = 1;
 
 	hasQuest = false;
+	quest = std::unique_ptr<Quest>(new Quest(0, 0, 0, 0, 0));
 }
 
 sf::Vector2<double> Human::getVelocity() {
@@ -146,10 +148,34 @@ void Human::setSpeed(float speed) {
 	this->speed = speed;
 }
 
-void Human::setQuest(int type, std::string name) {
+void Human::setQuest(int type, int item, int noItems, int destination, int reward) {
 	hasQuest = true;
-	questType = type;
-	questItem = name;
+	quest->setType(type);
+	quest->setItem(item);
+	quest->setDestination(destination);
+	quest->setReward(reward);
+	quest->setNoItems(noItems);
+}
+
+bool Human::getHasQuest() {
+	return hasQuest;
+}
+
+void Human::setHasQuest(bool hQ) {
+	hasQuest = hQ;
+}
+
+std::unique_ptr<Quest> Human::getQuest() {
+	std::unique_ptr<Quest> rQuest(new Quest(quest->getType(), quest->getItem(), quest->getNoItems(), quest->getDestination(), quest->getReward()));
+	return rQuest;
+}
+
+float Human::getWidth() {
+	return sprite.getGlobalBounds().width;
+}
+
+float Human::getHeight() {
+	return sprite.getGlobalBounds().height;
 }
 
 void Human::update() {
