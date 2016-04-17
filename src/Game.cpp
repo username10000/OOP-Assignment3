@@ -1110,6 +1110,7 @@ void Game::update() {
 				locals[i]->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
 				locals[i]->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
 			}
+			// *** Add Quest Returns
 		}
 
 		// Update the view

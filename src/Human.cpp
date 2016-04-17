@@ -29,6 +29,8 @@ Human::Human(double x, double y, sf::Texture *texture) : GameObject(x, y) {
 	sprite.setColor(sf::Color(Functions::randomInt(0, 255), Functions::randomInt(0, 255), Functions::randomInt(0, 255)));
 
 	speed = 1;
+
+	hasQuest = false;
 }
 
 sf::Vector2<double> Human::getVelocity() {
@@ -142,6 +144,12 @@ void Human::setColour(sf::Color colour) {
 
 void Human::setSpeed(float speed) {
 	this->speed = speed;
+}
+
+void Human::setQuest(int type, std::string name) {
+	hasQuest = true;
+	questType = type;
+	questItem = name;
 }
 
 void Human::update() {
