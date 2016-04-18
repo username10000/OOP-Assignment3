@@ -89,6 +89,8 @@ class Game {
 		sf::Texture shipTexture;
 		int closestPlanet;
 		std::vector<std::string> goods;
+		sf::RectangleShape scrollBar;
+		sf::RectangleShape scrollBarBg;
 		sf::RectangleShape questRect[10];
 		sf::Text questDesc[10];
 		int startQuest;

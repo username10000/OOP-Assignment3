@@ -351,6 +351,16 @@ Game::Game() {
 
 	startQuest = 0;
 	consoleInput = "";
+
+	scrollBar.setFillColor(sf::Color(127, 127, 127));
+	scrollBar.setPosition(questRect[0].getPosition().x + questRect[0].getSize().x, questRect[0].getPosition().y);
+	scrollBar.setSize(sf::Vector2f(questRect[0].getSize().y / 2, questRect[0].getSize().y * 10));
+	scrollBar.setOutlineThickness(1);
+
+	scrollBarBg.setFillColor(sf::Color::Transparent);
+	scrollBarBg.setPosition(scrollBar.getPosition().x, scrollBar.getPosition().y);
+	scrollBarBg.setSize(scrollBar.getSize());
+	scrollBarBg.setOutlineThickness(1);
 }
 
 Game::~Game() {
@@ -392,7 +402,7 @@ void Game::events() {
 				}
 
 				// E - Exit / Enter
-				if (event.key.code == 4 && !gameOver) {
+				if (event.key.code == 4 && !menu["quests"] && !gameOver) {
 
 					if (!onPlanet && ships[0]->getLanded()) {
 						// Initial Settings when the Player Exits the Ship
@@ -506,6 +516,9 @@ void Game::events() {
 				// Q - Quest Menu
 				if (event.key.code == 16) {
 					menu["quests"] = !menu["quests"];
+					if (!menu["quests"]) {
+						startQuest = 0;
+					}
 				}
 
 				// X - Cut Thrust
@@ -523,17 +536,17 @@ void Game::events() {
 				}
 
 				// Up Arrow
-				if (event.key.code == 73) {
+				if (event.key.code == 73 && startQuest > 0 && quests.size() > 10) {
 					startQuest--;
-					if (startQuest < 0)
-						startQuest = 0;
+					//if (startQuest < 0)
+						//startQuest = 0;
 				}
 
 				// Down Arrow
-				if (event.key.code == 74) {
+				if (event.key.code == 74 && startQuest < quests.size() - 10 && quests.size() > 10) {
 					startQuest++;
-					if (startQuest > quests.size() - 1)
-						startQuest = quests.size() - 1;
+					//if (startQuest > quests.size() - 1)
+						//startQuest = quests.size() - 1;
 				}
 
 				// 0
@@ -602,14 +615,14 @@ void Game::events() {
 				if (ppm > 1)
 					ppm = 1;
 			} else {
-				if (event.mouseWheel.delta > 0)
+				if (event.mouseWheel.delta > 0 && startQuest > 0 && quests.size() > 10)
 					startQuest--;
-				else
+				if (event.mouseWheel.delta < 0 && startQuest < quests.size() - 10 && quests.size() > 10)
 					startQuest++;
-				if (startQuest < 0)
-					startQuest = 0;
-				if (startQuest > quests.size() - 1)
-					startQuest = quests.size() - 1;
+				//if (startQuest < 0)
+				//	startQuest = 0;
+				//if (startQuest > quests.size() - 1)
+				//	startQuest = quests.size() - 1;
 			}
 			break;
 		case sf::Event::TextEntered:
@@ -776,6 +789,7 @@ void Game::executeCommand(std::string command) {
 			astroNum = astroNum * 10 + (command[i] - '0');
 		}
 		if (i == command.size() && astroNum > -1 && astroNum < astro.size()) {
+			onPlanet = false;
 			ships[0]->setX(astro[astroNum]->getX());
 			ships[0]->setY(astro[astroNum]->getY() - astro[astroNum]->getRadius());
 		}
@@ -796,6 +810,15 @@ void Game::executeCommand(std::string command) {
 		}
 	}
 
+	com = "GoToShip";
+	if (command.compare(com) == 0) {
+		onPlanet = false;
+	}
+
+	com = "RefuelShip";
+	if (command.compare(com) == 0) {
+		ships[0]->refuel();
+	}
 
 	com = "exit";
 	if (command.compare(com) == 0) {
@@ -1370,6 +1393,11 @@ void Game::update() {
 				questDesc[i].setString(desc);
 				questDesc[i].setOrigin(questDesc[i].getLocalBounds().width / 2, questDesc[i].getLocalBounds().height / 2);
 			}
+			int dif = quests.size() - 10;
+			dif = dif < 0 ? 0 : dif;
+			scrollBar.setSize(sf::Vector2f(scrollBar.getSize().x, Functions::map(dif, 0, 89, questRect[0].getSize().y * 10, 1)));
+			if (dif != 0)
+				scrollBar.setPosition(scrollBar.getPosition().x, questRect[0].getPosition().y + startQuest * ((questRect[0].getSize().y * 10 - scrollBar.getSize().y) / dif));
 		}
 
 		if (menu["console"]) {
@@ -1507,6 +1535,8 @@ void Game::render() {
 			for (int i = 0; i < 10; i++) {
 				window.draw(questRect[i]);
 				window.draw(questDesc[i]);
+				window.draw(scrollBarBg);
+				window.draw(scrollBar);
 			}
 		}
 
