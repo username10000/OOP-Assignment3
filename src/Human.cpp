@@ -33,7 +33,10 @@ Human::Human(double x, double y, sf::Texture *texture) : GameObject(x, y) {
 	speed = 1;
 
 	hasQuest = false;
+	hasReturn = false;
 	quest = std::unique_ptr<Quest>(new Quest(0, 0, 0, 0, 0));
+
+	returnQuest = 0;
 }
 
 sf::Vector2<double> Human::getVelocity() {
@@ -185,6 +188,23 @@ int Human::getClosestLocal() {
 
 void Human::setClosestLocal(int l) {
 	closestLocal = l;
+}
+
+bool Human::getHasReturn() {
+	return hasReturn;
+}
+
+void Human::setHasReturn(bool hR) {
+	hasReturn = hR;
+}
+
+int Human::getReturnQuest() {
+	return returnQuest;
+}
+
+void Human::setReturnQuest(int rQ) {
+	hasReturn = true;
+	returnQuest = rQ;
 }
 
 void Human::update() {

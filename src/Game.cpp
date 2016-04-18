@@ -185,6 +185,9 @@ Game::Game() {
 	// Add Shop
 	shop = std::unique_ptr<Shop>(new Shop(screen, font, &shipTexture));
 
+	// Add Console
+	console = std::unique_ptr<Console>(new Console(screen, font));
+
 	// Pixels Per Meter
 	ppm = 1;
 
@@ -222,6 +225,7 @@ Game::Game() {
 	menu["velocity"] = true;
 	menu["shop"] = false;
 	menu["quests"] = false;
+	menu["console"] = false;
 
 	//ppm = dist(0, 0, astro[noPlanets - 1] -> getX(), astro[noPlanets - 1] -> getY()) / (screen.height / 2);
 
@@ -345,6 +349,7 @@ Game::Game() {
 	}
 
 	startQuest = 0;
+	consoleInput = "";
 }
 
 Game::~Game() {
@@ -373,31 +378,40 @@ void Game::events() {
 			// Close the Window if Escape is pressed
 			if (event.key.code == sf::Keyboard::Escape)
 				stop = 1;
-			// M - Open Map
-			if (event.key.code == 12) {
-				menu["map"] = !menu["map"];
+			
+			// ~ - Console
+			if (event.key.code == 54) {
+				menu["console"] = !menu["console"];
 			}
-			// E - Exit / Enter
-			if (event.key.code == 4 && !gameOver) {
 
-				if (!onPlanet && ships[0]->getLanded()) {
-					// Initial Settings when the Player Exits the Ship
-					onPlanet = true;
-					int cP = ships[0]->getClosestPlanet();
-					float dy = astro[cP]->getY() - ships[0]->getY();
-					float dx = astro[cP]->getX() - ships[0]->getX();
-					float theta = atan2(dy, dx);
-					theta = theta >= 0 ? theta : theta + 2 * PI;
-					//theta += 0.01;
-					human->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
-					human->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
-				} else if (onPlanet && Functions::dist(human->getX(), human->getY(), ships[0]->getX(), ships[0]->getY()) < 20 * 0.15) {
-					onPlanet = false;
+			if (!menu["console"]) {
+				// M - Open Map
+				if (event.key.code == 12) {
+					menu["map"] = !menu["map"];
 				}
 
-				int cS = human->getClosestSpecial();
-				if (cS != -1) {
-					switch (astro[closestPlanet]->getType(human->getClosestSpecial())) {
+				// E - Exit / Enter
+				if (event.key.code == 4 && !gameOver) {
+
+					if (!onPlanet && ships[0]->getLanded()) {
+						// Initial Settings when the Player Exits the Ship
+						onPlanet = true;
+						int cP = ships[0]->getClosestPlanet();
+						float dy = astro[cP]->getY() - ships[0]->getY();
+						float dx = astro[cP]->getX() - ships[0]->getX();
+						float theta = atan2(dy, dx);
+						theta = theta >= 0 ? theta : theta + 2 * PI;
+						//theta += 0.01;
+						human->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
+						human->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
+					}
+					else if (onPlanet && Functions::dist(human->getX(), human->getY(), ships[0]->getX(), ships[0]->getY()) < 20 * 0.15) {
+						onPlanet = false;
+					}
+
+					int cS = human->getClosestSpecial();
+					if (cS != -1) {
+						switch (astro[closestPlanet]->getType(human->getClosestSpecial())) {
 						case 0:
 							ships[0]->refuel();
 							break;
@@ -417,126 +431,158 @@ void Game::events() {
 							menu["shop"] = !menu["shop"];
 						default:
 							break;
+						}
+					}
+
+					if (human->getClosestLocal() != -1) {
+						int closestLocal = human->getClosestLocal();
+						if (locals[closestLocal]->getHasQuest()) {
+							quests.push_back(locals[closestLocal]->getQuest());
+							locals[closestLocal]->setHasQuest(false);
+						}
+						else if (locals[closestLocal]->getHasReturn()) {
+							int returnQuest = locals[closestLocal]->getReturnQuest();
+							money += quests[returnQuest]->getReward();
+							moneyText.setString(Functions::toStringWithComma(money) + " $");
+							moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
+							for (int i = 0; i < astro[closestPlanet]->getInhabitants(); i++) {
+								if (locals[i]->getHasReturn() && locals[i]->getReturnQuest() > returnQuest) {
+									locals[i]->setReturnQuest(locals[i]->getReturnQuest() - 1);
+								}
+							}
+							quests.erase(quests.begin() + returnQuest);
+							locals[closestLocal]->setHasReturn(false);
+						}
+					}
+
+					//if (onPlanet) {
+					//	int cP = ships[0]->getClosestPlanet();
+					//	float dy = astro[cP]->getY() - ships[0]->getY();
+					//	float dx = astro[cP]->getX() - ships[0]->getX();
+					//	float theta = atan2(dy, dx);
+					//	theta = theta >= 0 ? theta : theta + 2 * PI;
+					//	//theta += 0.01;
+					//	human->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
+					//	human->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
+					//}
+				}
+
+				// F - Set Ship Straight
+				if (event.key.code == 5 && onPlanet && !gameOver) {
+					// Get the Angle between the Ship and the Object
+					float dy = astro[closestPlanet]->getY() - ships[0]->getY();
+					float dx = astro[closestPlanet]->getX() - ships[0]->getX();
+					float theta = atan2(dy, dx);
+					theta = theta >= 0 ? theta : theta + 2 * PI;
+					theta -= PI / 2;
+					float curTheta = ships[0]->getRotation();
+
+					float dif1 = curTheta - theta;
+					dif1 = dif1 < 0 ? dif1 + PI * 2 : dif1;
+					float dif2 = theta - curTheta;
+					dif2 = dif2 < 0 ? dif2 + PI * 2 : dif2;
+
+					if (dif1 < dif2) {
+						if (dif1 > 0.01) {
+							//ships[0]->setLeftRotate(dif1 * 180 / PI);
+							ships[0]->setLeftRotate(1);
+						}
+					}
+					else {
+						if (dif2 > 0.01) {
+							//ships[0]->setLeftRotate(-dif2 * 180 / PI);
+							ships[0]->setLeftRotate(-1);
+						}
+					}
+
+					//if (abs(curTheta - theta) < abs(theta - curTheta)) {
+					//	ships[0]->setLeftRotate(-(curTheta - theta) * 180 / PI);
+					//} else {
+					//	ships[0]->setLeftRotate(-(theta - curTheta) * 180 / PI);
+					//}
+				}
+
+				// Q - Quest Menu
+				if (event.key.code == 16) {
+					menu["quests"] = !menu["quests"];
+				}
+
+				// X - Cut Thrust
+				if (event.key.code == 23 && !gameOver) {
+					ships[0]->cutThrust();
+				}
+
+				// I - Toggle Inertia Damper
+				if (event.key.code == 8 && !gameOver) {
+					ships[0]->setInertiaDamper(!ships[0]->getInertiaDamper());
+					if (ships[0]->getInertiaDamper())
+						idText.setString("Inertia Damper: ON");
+					else
+						idText.setString("Inertia Damper: OFF");
+				}
+
+				// Up Arrow
+				if (event.key.code == 73) {
+					startQuest--;
+					if (startQuest < 0)
+						startQuest = 0;
+				}
+
+				// Down Arrow
+				if (event.key.code == 74) {
+					startQuest++;
+					if (startQuest > quests.size() - 1)
+						startQuest = quests.size() - 1;
+				}
+
+				// 0
+				if (event.key.code == 26) {
+					if (!menu["distance"] && !menu["velocity"] && !menu["infoPanel"] && !menu["thrust"] && !menu["fuel"]) {
+						menu["distance"] = true;
+						menu["velocity"] = true;
+						menu["infoPanel"] = true;
+						menu["thrust"] = true;
+						menu["fuel"] = true;
+					}
+					else {
+						menu["distance"] = false;
+						menu["velocity"] = false;
+						menu["infoPanel"] = false;
+						menu["thrust"] = false;
+						menu["fuel"] = false;
 					}
 				}
 
-				if (human->getClosestLocal() != -1) {
-					//std::unique_ptr<Quest> quest = locals[human->getClosestLocal()]->getQuest();
-					quests.push_back(locals[human->getClosestLocal()]->getQuest());
-					locals[human->getClosestLocal()]->setHasQuest(false);
-				}
-				
-				//if (onPlanet) {
-				//	int cP = ships[0]->getClosestPlanet();
-				//	float dy = astro[cP]->getY() - ships[0]->getY();
-				//	float dx = astro[cP]->getX() - ships[0]->getX();
-				//	float theta = atan2(dy, dx);
-				//	theta = theta >= 0 ? theta : theta + 2 * PI;
-				//	//theta += 0.01;
-				//	human->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
-				//	human->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
-				//}
-			}
-
-			// F - Set Ship Straight
-			if (event.key.code == 5 && onPlanet && !gameOver) {
-				// Get the Angle between the Ship and the Object
-				float dy = astro[closestPlanet]->getY() - ships[0]->getY();
-				float dx = astro[closestPlanet]->getX() - ships[0]->getX();
-				float theta = atan2(dy, dx);
-				theta = theta >= 0 ? theta : theta + 2 * PI;
-				theta -= PI / 2;
-				float curTheta = ships[0]->getRotation();
-
-				float dif1 = curTheta - theta;
-				dif1 = dif1 < 0 ? dif1 + PI * 2 : dif1;
-				float dif2 = theta - curTheta;
-				dif2 = dif2 < 0 ? dif2 + PI * 2 : dif2;
-
-				if (dif1 < dif2) {
-					if (dif1 > 0.01) {
-						//ships[0]->setLeftRotate(dif1 * 180 / PI);
-						ships[0]->setLeftRotate(1);
-					}
-				} else {
-					if (dif2 > 0.01) {
-						//ships[0]->setLeftRotate(-dif2 * 180 / PI);
-						ships[0]->setLeftRotate(-1);
-					}
+				// 1
+				if (event.key.code == 27) {
+					menu["distance"] = !menu["distance"];
 				}
 
-				//if (abs(curTheta - theta) < abs(theta - curTheta)) {
-				//	ships[0]->setLeftRotate(-(curTheta - theta) * 180 / PI);
-				//} else {
-				//	ships[0]->setLeftRotate(-(theta - curTheta) * 180 / PI);
-				//}
-			}
-
-			// Q - Quest Menu
-			if (event.key.code == 16) {
-				menu["quests"] = !menu["quests"];
-			}
-
-			// X - Cut Thrust
-			if (event.key.code == 23 && !gameOver) {
-				ships[0]->cutThrust();
-			}
-
-			// I - Toggle Inertia Damper
-			if (event.key.code == 8 && !gameOver) {
-				ships[0]->setInertiaDamper(!ships[0]->getInertiaDamper());
-				if (ships[0]->getInertiaDamper())
-					idText.setString("Inertia Damper: ON");
-				else
-					idText.setString("Inertia Damper: OFF");
-			}
-
-			// 0
-			if (event.key.code == 26) {
-				if (!menu["distance"] && !menu["velocity"] && !menu["infoPanel"] && !menu["thrust"] && !menu["fuel"]) {
-					menu["distance"] = true;
-					menu["velocity"] = true;
-					menu["infoPanel"] = true;
-					menu["thrust"] = true;
-					menu["fuel"] = true;
-				} else {
-					menu["distance"] = false;
-					menu["velocity"] = false;
-					menu["infoPanel"] = false;
-					menu["thrust"] = false;
-					menu["fuel"] = false;
+				// 2
+				if (event.key.code == 28) {
+					menu["velocity"] = !menu["velocity"];
 				}
-			}
 
-			// 1
-			if (event.key.code == 27) {
-				menu["distance"] = !menu["distance"];
-			}
+				// 3
+				if (event.key.code == 29) {
+					menu["infoPanel"] = !menu["infoPanel"];
+				}
 
-			// 2
-			if (event.key.code == 28) {
-				menu["velocity"] = !menu["velocity"];
-			}
+				// 4
+				if (event.key.code == 30) {
+					menu["thrust"] = !menu["thrust"];
+				}
 
-			// 3
-			if (event.key.code == 29) {
-				menu["infoPanel"] = !menu["infoPanel"];
-			}
+				// 5
+				if (event.key.code == 31) {
+					menu["fuel"] = !menu["fuel"];
+				}
 
-			// 4
-			if (event.key.code == 30) {
-				menu["thrust"] = !menu["thrust"];
+				//window.close();
+				// Set the pressed key
+				keys[event.key.code] = 1;
+				//std::cout << "Key Pressed: " << event.key.code << std::endl;
 			}
-
-			// 5
-			if (event.key.code == 31) {
-				menu["fuel"] = !menu["fuel"];
-			}
-
-			//window.close();
-			// Set the pressed key
-			keys[event.key.code] = 1;
-			//std::cout << "Key Pressed: " << event.key.code << std::endl;
 			break;
 		case sf::Event::KeyReleased:
 			// Unset the released key
@@ -565,78 +611,23 @@ void Game::events() {
 					startQuest = quests.size() - 1;
 			}
 			break;
+		case sf::Event::TextEntered:
+			if (menu["console"] && event.text.unicode < 128 && event.text.unicode != '`') {
+				if (event.text.unicode == '\b') {
+					if (consoleInput.size() > 0)
+						consoleInput.erase(consoleInput.size() - 1, 1);
+				} else if (event.text.unicode == '\n' || event.text.unicode == '\r') {
+					executeCommand(consoleInput);
+					consoleInput = "";
+				} else {
+					consoleInput += event.text.unicode;
+				}
+			}
 		default:
 			break;
 		}
 	}
 }
-//
-//int Game::randomInt(int start, int stop) {
-//	return rand() % (stop - start + 1) + start;
-//}
-//
-//float Game::randomFloat(float start, float stop) {
-//	return start + (float)(rand() / (float)(RAND_MAX / (stop - start)));
-//}
-
-/*
-float Game::semiMajorAxis(int i) {
-	// Distance from Sun to Planet
-	float r = dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY());
-
-	// Sun Mass
-	float m1 = astro[0]->getMass();
-
-	// Planet Mass
-	float m2 = astro[i]->getMass();
-
-	// G
-	float G = astro[0]->getG();
-
-	// Relative Orbital Speed
-	float v = sqrt(G * (m1 + m2) / r);
-
-	// Standard Gravitational Parameter
-	float u = r * pow(v, 2);
-
-	// Specific Orbital Energy
-	float E = (pow(v, 2) / 2) - (u / r);
-
-	// Semi-Major Axis
-	float a = - u / 2 * E;
-
-	return a;
-}
-
-float Game::eccentricityVector(int i) {
-	// Distance from Sun to Planet
-	float r = dist(astro[0]->getX(), astro[0]->getY(), astro[i]->getX(), astro[i]->getY());
-
-	// Sun Mass
-	float m1 = astro[0]->getMass();
-
-	// Planet Mass
-	float m2 = astro[i]->getMass();
-
-	// G
-	float G = astro[0]->getG();
-
-	// Relative Orbital Speed
-	float v = sqrt(G * (m1 + m2) / r);
-
-	// Standard Gravitational Parameter
-	float u = r * pow(v, 2);
-
-	// Eccentricity Vector
-	float e = (pow(v, 2) * r / u) - ((r * v) * v / u) - (r / abs(r));
-
-	return e;
-}
-
-float Game::apoapsis(int i) {
-	return semiMajorAxis(i) * (1 + abs(eccentricityVector(i)));
-}
-*/
 
 void Game::keyPressed() {
 	float speedMult = 1;
@@ -769,6 +760,16 @@ void Game::keyPressed() {
 			}
 		}
 	}
+}
+
+void Game::executeCommand(std::string command) {
+	std::string com;
+	int pos;
+
+	com = "GoToPlanet ";
+	pos = command.find(com);
+	if (pos == 0 && command.size() == com.size() + 1)
+		std::cout << "Go To Planet!" << std::endl;
 }
 
 void Game::fastForwardObject(int i, int loops) {
@@ -914,20 +915,34 @@ void Game::nearObjects() {
 		human->setClosestLocal(-1);
 		for (int i = 0; i < astro[closestPlanet]->getInhabitants(); i++) {
 			// Close to a person with a Quest
-			if (Functions::dist(view.x, view.y, locals[i]->getX(), locals[i]->getY()) < locals[i]->getWidth() / 18 && locals[i]->getHasQuest()) {
-				std::unique_ptr<Quest> quest = locals[i]->getQuest();
-				std::string m;
-				switch (quest->getType()) {
-				case 0:
-					m = "Deliver " + std::to_string(quest->getNoItems()) + " " + goods[quest->getItem()] + " to " + astro[quest->getDestination()]->getName();
-					m += "\nReward: " + std::to_string(quest->getReward()) + " $";
-					m += "\nPress 'E' to accept";
-					break;
-				default:
-					break;
+			if (Functions::dist(view.x, view.y, locals[i]->getX(), locals[i]->getY()) < locals[i]->getWidth() / 18) {
+				if (locals[i]->getHasQuest()) {
+					std::unique_ptr<Quest> quest = locals[i]->getQuest();
+					std::string m;
+					switch (quest->getType()) {
+						case 0:
+							m = "Deliver " + std::to_string(quest->getNoItems()) + " " + goods[quest->getItem()] + " to " + astro[quest->getDestination()]->getName();
+							m += "\nReward: " + std::to_string(quest->getReward()) + " $";
+							m += "\nPress \'E\' to accept";
+							break;
+						default:
+							break;
+					}
+					message->update(m, sf::Color::Green);
+					human->setClosestLocal(i);
+				} else if (locals[i]->getHasReturn()) {
+					int questNo = locals[i]->getReturnQuest();
+					std::string m;
+					switch (quests[questNo]->getType()) {
+						case 0:
+							m = "Press \'E\' to deliver " + std::to_string(quests[questNo]->getNoItems()) + " " + goods[quests[questNo]->getItem()];
+							m += "\nReward: " + std::to_string(quests[questNo]->getReward()) + "$";
+						default:
+							break;
+					}
+					message->update(m, sf::Color::Cyan);
+					human->setClosestLocal(i);
 				}
-				message->update(m, sf::Color::Green);
-				human->setClosestLocal(i);
 			}
 		}
 	}
@@ -1179,6 +1194,7 @@ void Game::update() {
 
 		// Move Locals to the Closest Planet
 		if (ships[0]->getClosestPlanet() != closestPlanet && ships[0]->getClosestPlanet() != 0) {
+			float returnIndex = 0;
 			closestPlanet = ships[0]->getClosestPlanet();
 			for (int i = 0; i < astro[closestPlanet]->getInhabitants(); i++) {
 				int cP = closestPlanet;
@@ -1187,12 +1203,26 @@ void Game::update() {
 				locals[i]->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
 
 				locals[i]->setHasQuest(false);
-				//if (Functions::randomInt(0, 5) == 0) {
-					locals[i]->setQuest(0, Functions::randomInt(0, goods.size() - 1), Functions::randomInt(2, 20), Functions::randomInt(1, noPlanets - 1), Functions::randomInt(100, 1000));
-				//}
-			}
+				locals[i]->setHasReturn(false);
 
-			// *** Add Quest Returns
+				while (returnIndex < quests.size()) {
+					if (quests[returnIndex]->getDestination() == closestPlanet) {
+						locals[i]->setReturnQuest(returnIndex);
+						returnIndex++;
+						//std::cout << "RETURN QUEST" << std::endl;
+						break;
+					}
+					returnIndex++;
+				}
+
+				//std::cout << returnIndex << " " << astro[closestPlanet]->getInhabitants() << std::endl;
+
+				if (returnIndex == quests.size()) {
+					//if (Functions::randomInt(0, 5) == 0) {
+						locals[i]->setQuest(0, Functions::randomInt(0, goods.size() - 1), Functions::randomInt(2, 20), Functions::randomInt(1, noPlanets - 1), Functions::randomInt(100, 1000));
+					//}
+				}
+			}
 		}
 
 		// Update the view
@@ -1309,6 +1339,10 @@ void Game::update() {
 				questDesc[i].setString(desc);
 				questDesc[i].setOrigin(questDesc[i].getLocalBounds().width / 2, questDesc[i].getLocalBounds().height / 2);
 			}
+		}
+
+		if (menu["console"]) {
+			console->update(consoleInput);
 		}
 
 		if (gameOver) {
@@ -1435,9 +1469,6 @@ void Game::render() {
 			if (menu["infoPanel"]) {
 				infoPanel->render(window);
 			}
-
-			// Inertia Damper
-			//window.draw(idText);
 		}
 
 		// Quest Menu
@@ -1460,6 +1491,11 @@ void Game::render() {
 
 	// Draw the frameRate
 	window.draw(frameRate);
+
+	// Draw the Console
+	if (menu["console"]) {
+		console->render(window);
+	}
 
 
 	/* --------------- Draw --------------- */

@@ -28,6 +28,7 @@
 #include <SpeedLine.h>
 #include <Shop.h>
 #include <Quest.h>
+#include <Console.h>
 
 // Game
 class Game {
@@ -61,6 +62,7 @@ class Game {
 		std::unique_ptr<Message> message;
 		std::unique_ptr<InfoPanel> infoPanel;
 		std::unique_ptr<Shop> shop;
+		std::unique_ptr<Console> console;
 		SolarSystem solarSystem;
 		sf::Vector2<double> view;
 		float ppm;
@@ -90,6 +92,7 @@ class Game {
 		sf::RectangleShape questRect[10];
 		sf::Text questDesc[10];
 		int startQuest;
+		std::string consoleInput;
 		//AstroMap astroMap(0);
 	public:
 		Game();
@@ -106,6 +109,7 @@ class Game {
 		void fastForwardObject(int i, int loops);
 		double getRelativeVelocity();
 		double getRelativeVelocity(int index);
+		void executeCommand(std::string command);
 		//int randomInt(int start, int stop);
 		//float randomFloat(float start, float stop);
 		//double map(double v, double lmin, double lmax, double rmin, double rmax);

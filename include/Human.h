@@ -28,8 +28,10 @@ class Human : public GameObject {
 		int closestSpecial;
 		int closestLocal;
 		int questType;
+		int returnQuest;
 		bool jump;
 		bool hasQuest;
+		bool hasReturn;
 		std::string questItem;
 		std::unique_ptr<Quest> quest;
 	public:
@@ -60,11 +62,15 @@ class Human : public GameObject {
 		void setQuest(int type, int item, int noItems, int destination, int reward);
 		bool getHasQuest();
 		void setHasQuest(bool hQ);
+		bool getHasReturn();
+		void setHasReturn(bool hR);
 		std::unique_ptr<Quest> getQuest();
 		float getWidth();
 		float getHeight();
 		int getClosestLocal();
 		void setClosestLocal(int l);
+		int getReturnQuest();
+		void setReturnQuest(int rQ);
 		//void setPlanetRotation(float r);
 		void update();
 		void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);
