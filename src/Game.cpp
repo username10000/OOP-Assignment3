@@ -318,8 +318,9 @@ Game::Game() {
 	moneyText.setFont(font);
 	moneyText.setCharacterSize(15);
 	moneyText.setString(Functions::toStringWithComma(money) + " $");
-	moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
-	moneyText.setPosition(moneyText.getGlobalBounds().width / 2, moneyText.getGlobalBounds().height / 2);
+	//moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
+	moneyText.setPosition(0, 0);
+	//moneyText.setPosition(moneyText.getGlobalBounds().width / 2, moneyText.getGlobalBounds().height / 2);
 
 	//questBackground.setFillColor(sf::Color(0, 0, 0, 150));
 	//questBackground.setPosition(screen.width / 10, screen.height / 10);
@@ -444,7 +445,7 @@ void Game::events() {
 							int returnQuest = locals[closestLocal]->getReturnQuest();
 							money += quests[returnQuest]->getReward();
 							moneyText.setString(Functions::toStringWithComma(money) + " $");
-							moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
+							//moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
 							for (int i = 0; i < astro[closestPlanet]->getInhabitants(); i++) {
 								if (locals[i]->getHasReturn() && locals[i]->getReturnQuest() > returnQuest) {
 									locals[i]->setReturnQuest(locals[i]->getReturnQuest() - 1);
@@ -766,10 +767,40 @@ void Game::executeCommand(std::string command) {
 	std::string com;
 	int pos;
 
-	com = "GoToPlanet ";
+	com = "GoToAstro ";
 	pos = command.find(com);
-	if (pos == 0 && command.size() == com.size() + 1)
-		std::cout << "Go To Planet!" << std::endl;
+	if (pos == 0 && command.size() > com.size()) {
+		int i;
+		int astroNum = 0;
+		for (i = com.size(); i < command.size() && command[i] >= '0' && command[i] <= '9'; i++) {
+			astroNum = astroNum * 10 + (command[i] - '0');
+		}
+		if (i == command.size() && astroNum > -1 && astroNum < astro.size()) {
+			ships[0]->setX(astro[astroNum]->getX());
+			ships[0]->setY(astro[astroNum]->getY() - astro[astroNum]->getRadius());
+		}
+	}
+
+	com = "AddMoney ";
+	pos = command.find(com);
+	if (pos == 0 && command.size() > com.size()) {
+		int i;
+		int mon = 0;
+		for (i = com.size(); i < command.size() && command[i] >= '0' && command[i] <= '9'; i++) {
+			mon = mon * 10 + (command[i] - '0');
+		}
+		if (i == command.size()) {
+			money += mon;
+			moneyText.setString(Functions::toStringWithComma(money) + " $");
+			//moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
+		}
+	}
+
+
+	com = "exit";
+	if (command.compare(com) == 0) {
+		stop = 1;
+	}
 }
 
 void Game::fastForwardObject(int i, int loops) {
@@ -1293,7 +1324,7 @@ void Game::update() {
 				if (money >= shopStatus) {
 					money -= shopStatus;
 					moneyText.setString(Functions::toStringWithComma(money) + " $");
-					moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
+					//moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
 					shop->confirmPurchase();
 				}
 			}
