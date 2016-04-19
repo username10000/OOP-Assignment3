@@ -35,6 +35,8 @@ class Ship : public GameObject {
 		float thrust;
 		float maxThrust;
 		float maxVelocity;
+		int cargo;
+		int maxCargo;
 		float leftRotate;
 		float angleToShip;
 		float distFromShip;
@@ -100,6 +102,10 @@ class Ship : public GameObject {
 		float getRotation();
 		void destroy();
 		void setShip(int num);
+		int getCargo();
+		void setCargo(int c);
+		int getMaxCargo();
+		void setMaxCargo(int mC);
 		//float getAngleToPlanet();
 		//void setAngleToPlanet(float t);
 		//int getPlanet();

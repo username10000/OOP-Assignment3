@@ -275,9 +275,9 @@ Game::Game() {
 		locals[i]->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
 		locals[i]->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
 
-		//if (Functions::randomInt(0, 5) == 0) {
+		if (Functions::randomInt(0, 3) == 0) {
 			locals[i]->setQuest(0, Functions::randomInt(0, goods.size() - 1), Functions::randomInt(2, 20), Functions::randomInt(1, noPlanets - 1), Functions::randomInt(100, 1000));
-		//}
+		}
 	}
 
 	// Star Field - generate stars
@@ -313,7 +313,7 @@ Game::Game() {
 
 	noSpeedLines = 0;
 
-	money = 100000;
+	money = 0;
 
 	moneyText.setFont(font);
 	moneyText.setCharacterSize(15);
@@ -321,6 +321,12 @@ Game::Game() {
 	//moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
 	moneyText.setPosition(0, 0);
 	//moneyText.setPosition(moneyText.getGlobalBounds().width / 2, moneyText.getGlobalBounds().height / 2);
+
+	cargoText.setFont(font);
+	cargoText.setCharacterSize(15);
+	cargoText.setString(Functions::toStringWithComma(ships[0]->getCargo()) + " / " + Functions::toStringWithComma(ships[0]->getMaxCargo()));
+	cargoText.setPosition(screen.width, 0);
+	cargoText.setOrigin(cargoText.getLocalBounds().width, 0);
 
 	//questBackground.setFillColor(sf::Color(0, 0, 0, 150));
 	//questBackground.setPosition(screen.width / 10, screen.height / 10);
@@ -445,16 +451,24 @@ void Game::events() {
 						}
 					}
 
+					// Accept or Return Quest
 					if (human->getClosestLocal() != -1) {
 						int closestLocal = human->getClosestLocal();
-						if (locals[closestLocal]->getHasQuest()) {
+						if (locals[closestLocal]->getHasQuest() && quests.size() < 99 && ships[0]->getCargo() + locals[closestLocal]->getQuest()->getNoItems() <= ships[0]->getMaxCargo()) {
 							quests.push_back(locals[closestLocal]->getQuest());
+							ships[0]->setCargo(ships[0]->getCargo() + locals[closestLocal]->getQuest()->getNoItems());
+							cargoText.setString(Functions::toStringWithComma(ships[0]->getCargo()) + " / " + Functions::toStringWithComma(ships[0]->getMaxCargo()));
+							cargoText.setOrigin(cargoText.getLocalBounds().width, 0);
 							locals[closestLocal]->setHasQuest(false);
+							//human->setClosestLocal(-1);
 						}
 						else if (locals[closestLocal]->getHasReturn()) {
 							int returnQuest = locals[closestLocal]->getReturnQuest();
 							money += quests[returnQuest]->getReward();
 							moneyText.setString(Functions::toStringWithComma(money) + " $");
+							ships[0]->setCargo(ships[0]->getCargo() - quests[returnQuest]->getNoItems());
+							cargoText.setString(Functions::toStringWithComma(ships[0]->getCargo()) + " / " + Functions::toStringWithComma(ships[0]->getMaxCargo()));
+							cargoText.setOrigin(cargoText.getLocalBounds().width, 0);
 							//moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
 							for (int i = 0; i < astro[closestPlanet]->getInhabitants(); i++) {
 								if (locals[i]->getHasReturn() && locals[i]->getReturnQuest() > returnQuest) {
@@ -463,6 +477,7 @@ void Game::events() {
 							}
 							quests.erase(quests.begin() + returnQuest);
 							locals[closestLocal]->setHasReturn(false);
+							//human->setClosestLocal(-1);
 						}
 					}
 
@@ -984,6 +999,7 @@ void Game::nearObjects() {
 					}
 					message->update(m, sf::Color::Green);
 					human->setClosestLocal(i);
+					locals[i]->setState(0);
 				} else if (locals[i]->getHasReturn()) {
 					int questNo = locals[i]->getReturnQuest();
 					std::string m;
@@ -996,6 +1012,7 @@ void Game::nearObjects() {
 					}
 					message->update(m, sf::Color::Cyan);
 					human->setClosestLocal(i);
+					locals[i]->setState(0);
 				}
 			}
 		}
@@ -1132,7 +1149,7 @@ void Game::update() {
 			int cP;
 
 			// Movement
-			if (stateTime.getElapsedTime().asSeconds() > locals[i]->getNextStateChange()) {
+			if (stateTime.getElapsedTime().asSeconds() > locals[i]->getNextStateChange() && i != human->getClosestLocal()) {
 				locals[i]->setNextStateChange(stateTime.getElapsedTime().asSeconds() + Functions::randomFloat(0, 10));
 				locals[i]->setState(Functions::randomInt(0, 3));
 			} else {
@@ -1272,9 +1289,9 @@ void Game::update() {
 				//std::cout << returnIndex << " " << astro[closestPlanet]->getInhabitants() << std::endl;
 
 				if (returnIndex == quests.size()) {
-					//if (Functions::randomInt(0, 5) == 0) {
+					if (Functions::randomInt(0, 3) == 0) {
 						locals[i]->setQuest(0, Functions::randomInt(0, goods.size() - 1), Functions::randomInt(2, 20), Functions::randomInt(1, noPlanets - 1), Functions::randomInt(100, 1000));
-					//}
+					}
 				}
 			}
 		}
@@ -1335,7 +1352,7 @@ void Game::update() {
 		} else {
 			relToTarget = -1;
 		}
-		infoPanel->update(idText.getString(), ships[0]->getThrust(), ships[0]->getMaxThrust(), ships[0]->getFuel(), ships[0]->getMaxFuel(), (float)sqrt( pow( ships[0]->getVelocity().x, 2 ) + pow( ships[0]->getVelocity().y, 2 ) ), getRelativeVelocity(),  relToTarget, ships[0]->getMaxVelocity());
+		infoPanel->update(idText.getString(), ships[0]->getThrust(), ships[0]->getMaxThrust(), ships[0]->getFuel(), ships[0]->getMaxFuel(), (float)sqrt( pow( ships[0]->getVelocity().x, 2 ) + pow( ships[0]->getVelocity().y, 2 ) ), getRelativeVelocity(),  relToTarget, ships[0]->getMaxVelocity(), ships[0]->getCargo(), ships[0]->getMaxCargo());
 
 		if (menu["shop"]) {
 			int shopStatus = shop->update(window);
@@ -1503,6 +1520,7 @@ void Game::render() {
 		if (onPlanet) {
 			human->render(window, view, screen, ppm);
 			window.draw(moneyText);
+			window.draw(cargoText);
 		} else {
 			// Velocity Vector
 			if (menu["velocity"]) {

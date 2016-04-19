@@ -6,7 +6,7 @@ InfoPanel::InfoPanel(sf::VideoMode _screen, sf::Font _font) {
 
 	offset = 10;
 
-	noLines = 7;
+	noLines = 8;
 
 	for (int i = 0; i < noLines; i++) {
 		sf::Text line;
@@ -24,7 +24,7 @@ InfoPanel::InfoPanel(sf::VideoMode _screen, sf::Font _font) {
 	container.setSize(sf::Vector2f(screen.height / 5, lines[0].getCharacterSize() * noLines * 1.5 + offset * 2));
 }
 
-void InfoPanel::update(std::string inertia, float thrust, float maxThrust, float fuel, float maxFuel, float speed, float speedToClosest, float speedToTarget, float maxSpeed) {
+void InfoPanel::update(std::string inertia, float thrust, float maxThrust, float fuel, float maxFuel, float speed, float speedToClosest, float speedToTarget, float maxSpeed, int cargo, int maxCargo) {
 	float length = 0;
 	
 	lines[0].setString(inertia);
@@ -37,6 +37,7 @@ void InfoPanel::update(std::string inertia, float thrust, float maxThrust, float
 	else
 		lines[5].setString("Speed to Target: N / A");
 	lines[6].setString("Max Relative Speed: " + Functions::toStringWithComma((int)(maxSpeed * 60 * 1000)) + " m / s");
+	lines[7].setString("Cargo: " + Functions::toStringWithComma(cargo) + " / " + Functions::toStringWithComma(maxCargo));
 
 	// Increase the Container's Size to fit the Text
 	for (int i = 0; i < lines.size(); i++) {

@@ -42,6 +42,9 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 
 	fuel = maxFuel = 100000;
 
+	cargo = 0;
+	maxCargo = 20;
+
 	thrust = 0;
 	maxThrust = 75;
 
@@ -366,6 +369,21 @@ void Ship::setShip(int num) {
 		sprite.setTextureRect(shipRect);
 		curShip = num;
 	}
+}
+
+int Ship::getCargo() {
+	return cargo;
+}
+
+void Ship::setCargo(int c) {
+	cargo = c;
+}
+int Ship::getMaxCargo() {
+	return maxCargo;
+}
+
+void Ship::setMaxCargo(int mC) {
+	maxCargo = mC;
 }
 
 void Ship::update() {

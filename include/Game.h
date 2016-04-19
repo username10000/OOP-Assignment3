@@ -75,6 +75,7 @@ class Game {
 		sf::Text distance;
 		sf::Text idText;
 		sf::Text moneyText;
+		sf::Text cargoText;
 		float dt;
 		float accumulator;
 		int targetAstro;

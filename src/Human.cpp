@@ -12,6 +12,11 @@ Human::Human(double x, double y, sf::Texture *texture) : GameObject(x, y) {
 	sprite.setOrigin(sprite.getLocalBounds().width / 2, sprite.getLocalBounds().height / 2);
 	//sprite.setOrigin(10, 20);
 
+	questSprite.setTexture(*texture);
+	textureRect.top = 41;
+	questSprite.setTextureRect(textureRect);
+	questSprite.setOrigin(questSprite.getLocalBounds().width / 2, questSprite.getLocalBounds().height / 2);
+
 	mass = 0.01;
 	velocity.x = velocity.y = 0;
 	direction.x = direction.y = 0;
@@ -217,6 +222,13 @@ void Human::update() {
 	setOldY(getY());
 	setX(getX() + velocity.x);
 	setY(getY() + velocity.y);
+
+	if (hasQuest) {
+		questSprite.setColor(sf::Color::Green);
+	}
+	if (hasReturn) {
+		questSprite.setColor(sf::Color::Cyan);
+	}
 }
 
 void Human::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {
@@ -224,4 +236,12 @@ void Human::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::Video
 	sprite.setScale((double)0.07 * dir / ppm, (double)0.07 / ppm);
 	sprite.setPosition((double)(((double)screen.width / 2) + (getX() - view.x) / (double)ppm - 20), (double)(((double)screen.height / 2) + (getY() - view.y) / (double)ppm - 20));
 	window.draw(sprite);
+
+	if (hasQuest || hasReturn) {
+		questSprite.setRotation(sprite.getRotation());
+		questSprite.setScale(sprite.getScale().y, sprite.getScale().y);
+		float questAngle = sprite.getRotation() * PI / 180;
+		questSprite.setPosition(sprite.getPosition().x + sin(questAngle) * 40 * sprite.getScale().y, sprite.getPosition().y - cos(questAngle) * 40 * sprite.getScale().y);
+		window.draw(questSprite);
+	}
 }

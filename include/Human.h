@@ -14,6 +14,7 @@ class Human : public GameObject {
 	private:
 		//sf::Texture texture;
 		sf::Sprite sprite;
+		sf::Sprite questSprite;
 		sf::Vector2<double> velocity;
 		sf::Vector2<double> direction;
 		sf::Clock clock;
