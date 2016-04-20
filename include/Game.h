@@ -72,6 +72,8 @@ class Game {
 		sf::Clock frameTime;
 		sf::Clock stateTime;
 		sf::Clock lastSpeedLine;
+		sf::Clock mouseTimeout;
+		sf::Vector2f oldMouse;
 		sf::Text frameRate;
 		sf::Text distance;
 		sf::Text idText;
@@ -105,6 +107,7 @@ class Game {
 		sf::Sound sound;
 		int astroType;
 		int loadingState;
+		sf::Mouse mouse;
 		//std::vector<sf::Music> sounds;
 		//AstroMap astroMap(0);
 	public:

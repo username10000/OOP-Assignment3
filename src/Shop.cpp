@@ -23,11 +23,12 @@ Shop::Shop(sf::VideoMode screen, sf::Font font, sf::Texture *shipTextures) {
 		shipRect.setTextureRect(shipTextureRect);
 		shipRect.setOrigin(shipRect.getLocalBounds().width / 2, shipRect.getLocalBounds().height / 2);
 		float xPos = Functions::map(i, 0, (int)(this->shipTextures.getSize().x / 40) - 1, background.getPosition().x + shipRect.getSize().x, background.getPosition().x + background.getSize().x - shipRect.getSize().x);
-		float yPos = Functions::map(0, 0, 3, background.getPosition().y + shipRect.getSize().y, background.getPosition().y + background.getSize().y + shipRect.getSize().y / 2);
+		float yPos = background.getPosition().y + background.getSize().y / 2;
+		//float yPos = Functions::map(0, 0, 3, background.getPosition().y + shipRect.getSize().y, background.getPosition().y + background.getSize().y + shipRect.getSize().y / 2);
 		buttons.push_back(std::unique_ptr<Button>(new Button(shipRect)));
 		buttons[buttons.size() - 1]->setPosition(xPos, yPos);
 
-		priceNum.push_back(Functions::randomInt(10000, 50000));
+		priceNum.push_back(Functions::randomInt(1000, 10000));
 
 		sf::Text name;
 

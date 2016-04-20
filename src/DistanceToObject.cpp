@@ -85,6 +85,10 @@ void DistanceToObject::setTargetName(std::string n) {
 	targetName.setOrigin(targetName.getLocalBounds().width / 2, targetName.getLocalBounds().height / 2);
 }
 
+float DistanceToObject::getTargetAngle() {
+	return targetAngle;
+}
+
 bool DistanceToObject::getHovered() {
 	if (Functions::dist(mouse.getPosition().x, mouse.getPosition().y, circle.getPosition().x + circle.getRadius(), circle.getPosition().y + circle.getRadius()) < circle.getRadius())
 		return true;

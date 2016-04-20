@@ -37,6 +37,7 @@ class DistanceToObject : public UI {
 		void setTargetDistance(float d);
 		void setTargetAngle(float a);
 		void setTargetName(std::string n);
+		float getTargetAngle();
 		bool getHovered();
 		std::string getDescription();
 		void update(float _angle, float _distance, std::string _name, float _shipAngle);

@@ -23,6 +23,9 @@ Game::Game() {
 	// Open Font
 	font.loadFromFile("OpenSans-Regular.ttf");
 
+	oldMouse.x = mouse.getPosition().x;
+	oldMouse.y = mouse.getPosition().y;
+
 	// Loading Message
 	loadingMessage.setFont(font);
 	loadingMessage.setPosition(screen.width / 2, screen.height / 2);
@@ -47,12 +50,13 @@ Game::Game() {
 	srand(time(NULL));
 
 	// Load Sounds
-	setLoadingMessage("Loading Sounds");
+	setLoadingMessage("Loading Music");
 	music[0].openFromFile("Source/resources/Audio/planet.ogg");
 	music[1].openFromFile("Source/resources/Audio/moon.ogg");
 	music[0].setLoop(true);
 	music[0].play();
 
+	setLoadingMessage("Loading Sounds");
 	std::string filenames[5] = { "acceptQuest.ogg", "returnQuest.ogg", "gameOver.ogg", "error.ogg", "warning.ogg" };
 	for (int i = 0; i < 5; i++) {
 		buffers.push_back(sf::SoundBuffer());
@@ -239,10 +243,10 @@ Game::Game() {
 	//distance.setString("0");
 
 	// Inertia Dampers Text
-	//idText.setFont(font);
-	//idText.setCharacterSize(12);
-	//idText.setString("Inertia Damper: ON");
-	//idText.setPosition(0, frameRate.getCharacterSize() * 1.5);
+	idText.setFont(font);
+	idText.setCharacterSize(12);
+	idText.setString("Inertia Damper: ON");
+	idText.setPosition(0, frameRate.getCharacterSize() * 1.5);
 
 	accumulator = 0;
 
@@ -359,14 +363,14 @@ Game::Game() {
 	setLoadingMessage("Generating More UI");
 	moneyText.setFont(font);
 	moneyText.setCharacterSize(15);
-	moneyText.setString(Functions::toStringWithComma(money) + " $");
+	moneyText.setString("Money: " + Functions::toStringWithComma(money) + " $");
 	//moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
 	moneyText.setPosition(0, 0);
 	//moneyText.setPosition(moneyText.getGlobalBounds().width / 2, moneyText.getGlobalBounds().height / 2);
 
 	cargoText.setFont(font);
 	cargoText.setCharacterSize(15);
-	cargoText.setString(Functions::toStringWithComma(ships[0]->getCargo()) + " / " + Functions::toStringWithComma(ships[0]->getMaxCargo()));
+	cargoText.setString("Cargo: " + Functions::toStringWithComma(ships[0]->getCargo()) + " / " + Functions::toStringWithComma(ships[0]->getMaxCargo()));
 	cargoText.setPosition(screen.width, 0);
 	cargoText.setOrigin(cargoText.getLocalBounds().width, 0);
 
@@ -447,10 +451,34 @@ void Game::events() {
 			break;
 		case sf::Event::KeyPressed:
 			// Close the Window if Escape is pressed
-			if (event.key.code == sf::Keyboard::Escape)
-				menu["exit"] = !menu["exit"];
-				//stop = 1;
+			if (event.key.code == sf::Keyboard::Escape) {
+				if (menu["quests"] || menu["map"] || menu["shop"] || menu["console"]) {
+					menu["quests"] = false;
+					menu["map"] = false;
+					menu["shop"] = false;
+					menu["console"] = false;
+				} else {
+					menu["exit"] = !menu["exit"];
+				}
+			}
 			
+			if (!onPlanet && !ships[0]->getLanded() && !menu["console"]) {
+				if (event.key.code == sf::Keyboard::T) {
+					float tDist = distanceObject->getTargetAngle() - PI / 2;
+					tDist = tDist < 0 ? 2 * PI + tDist : tDist;
+					float leftRotate = ships[0]->getAngle() - tDist;
+					ships[0]->setLeftRotate(leftRotate * 180 / PI);
+				}
+
+				if (event.key.code == sf::Keyboard::R) {
+					float tDist = distanceObject->getTargetAngle() - PI / 2 + PI;
+					tDist = tDist < 0 ? 2 * PI + tDist : tDist;
+					//std::cout << tDist * 180 / PI << " " << ships[0]->getAngle() * 180 / PI << std::endl;
+					float leftRotate = ships[0]->getAngle() - tDist;
+					ships[0]->setLeftRotate(leftRotate * 180 / PI);
+				}
+			}
+
 			// ~ - Console
 			if (event.key.code == 54) {
 				menu["console"] = !menu["console"];
@@ -503,7 +531,7 @@ void Game::events() {
 								break;
 							case 4:
 								ships[0]->setMaxCargo(ships[0]->getMaxCargo() + 50);
-								cargoText.setString(Functions::toStringWithComma(ships[0]->getCargo()) + " / " + Functions::toStringWithComma(ships[0]->getMaxCargo()));
+								cargoText.setString("Cargo: " + Functions::toStringWithComma(ships[0]->getCargo()) + " / " + Functions::toStringWithComma(ships[0]->getMaxCargo()));
 								cargoText.setOrigin(cargoText.getLocalBounds().width, 0);
 								astro[closestPlanet]->setInactive(cS);
 								break;
@@ -519,33 +547,59 @@ void Game::events() {
 					if (human->getClosestLocal() != -1) {
 						int closestLocal = human->getClosestLocal();
 						if (locals[closestLocal]->getHasQuest() && quests.size() < 99) {
+							// Accept Quest
 							if (ships[0]->getCargo() + locals[closestLocal]->getQuest()->getNoItems() <= ships[0]->getMaxCargo()) {
+								// Store the Quest
 								quests.push_back(locals[closestLocal]->getQuest());
+								
+								// Update Cargo
 								ships[0]->setCargo(ships[0]->getCargo() + locals[closestLocal]->getQuest()->getNoItems());
-								cargoText.setString(Functions::toStringWithComma(ships[0]->getCargo()) + " / " + Functions::toStringWithComma(ships[0]->getMaxCargo()));
+								cargoText.setString("Cargo: " + Functions::toStringWithComma(ships[0]->getCargo()) + " / " + Functions::toStringWithComma(ships[0]->getMaxCargo()));
 								cargoText.setOrigin(cargoText.getLocalBounds().width, 0);
 								locals[closestLocal]->setHasQuest(false);
+
+								// Return on Same Planet
+								if (closestPlanet == quests[quests.size() - 1]->getDestination()) {
+									for (int i = 0; i < astro[closestPlanet]->getInhabitants(); i++) {
+										if (i != closestLocal && !locals[i]->getHasQuest() && !locals[i]->getHasReturn()) {
+											locals[i]->setReturnQuest(quests.size() - 1);
+											break;
+										}
+									}
+									std::cout << "QUEST ON THE SAME PLANET" << std::endl;
+								}
+								
+								// Play Sound
 								sound.setBuffer(buffers[0]);
 								sound.play();
 							} else {
+								// Play Error Sound
 								sound.setBuffer(buffers[3]);
 								sound.play();
 							}
 						} else if (locals[closestLocal]->getHasReturn()) {
+							// Return Quest
 							int returnQuest = locals[closestLocal]->getReturnQuest();
+
+							// Update Money
 							money += quests[returnQuest]->getReward();
-							moneyText.setString(Functions::toStringWithComma(money) + " $");
+							moneyText.setString("Money: " + Functions::toStringWithComma(money) + " $");
+
+							// Update Cargo
 							ships[0]->setCargo(ships[0]->getCargo() - quests[returnQuest]->getNoItems());
-							cargoText.setString(Functions::toStringWithComma(ships[0]->getCargo()) + " / " + Functions::toStringWithComma(ships[0]->getMaxCargo()));
+							cargoText.setString("Cargo: " + Functions::toStringWithComma(ships[0]->getCargo()) + " / " + Functions::toStringWithComma(ships[0]->getMaxCargo()));
 							cargoText.setOrigin(cargoText.getLocalBounds().width, 0);
-							//moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
 							for (int i = 0; i < astro[closestPlanet]->getInhabitants(); i++) {
 								if (locals[i]->getHasReturn() && locals[i]->getReturnQuest() > returnQuest) {
 									locals[i]->setReturnQuest(locals[i]->getReturnQuest() - 1);
 								}
 							}
+
+							// Remove the Quest
 							quests.erase(quests.begin() + returnQuest);
 							locals[closestLocal]->setHasReturn(false);
+
+							// Play Sound
 							sound.setBuffer(buffers[1]);
 							sound.play();
 						}
@@ -635,7 +689,7 @@ void Game::events() {
 				}
 
 				// Exit
-				if (event.key.code == sf::Keyboard::Return && menu["exit"]) {
+				if ((event.key.code == sf::Keyboard::Return && menu["exit"]) || (event.key.code == sf::Keyboard::Escape && gameOver)) {
 					stop = 1;
 				}
 
@@ -735,7 +789,7 @@ void Game::events() {
 
 void Game::setLoadingMessage(std::string m) {
 	loadingState++;
-	loadStatus.setSize(sf::Vector2f(Functions::map(loadingState, 0, 13, 0, loadingBar.getSize().x), loadingBar.getSize().y));
+	loadStatus.setSize(sf::Vector2f(Functions::map(loadingState, 0, 14, 0, loadingBar.getSize().x), loadingBar.getSize().y));
 	loadingMessage.setString(m);
 	loadingMessage.setOrigin(loadingMessage.getLocalBounds().width / 2, loadingMessage.getLocalBounds().height / 2);
 	window.clear(sf::Color::Black);
@@ -916,7 +970,7 @@ void Game::executeCommand(std::string command) {
 		}
 		if (i == command.size()) {
 			money += mon;
-			moneyText.setString(Functions::toStringWithComma(money) + " $");
+			moneyText.setString("Money: " + Functions::toStringWithComma(money) + " $");
 			//moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
 		}
 	}
@@ -1479,7 +1533,7 @@ void Game::update() {
 			if (shopStatus > 100) {
 				if (money >= shopStatus) {
 					money -= shopStatus;
-					moneyText.setString(Functions::toStringWithComma(money) + " $");
+					moneyText.setString("Money: " + Functions::toStringWithComma(money) + " $");
 					//moneyText.setOrigin(moneyText.getLocalBounds().width / 2, moneyText.getLocalBounds().height / 2);
 					shop->confirmPurchase();
 				}
@@ -1520,16 +1574,17 @@ void Game::update() {
 				std::string desc;
 				if (startQuest + i < quests.size()) {
 					desc = "Deliver " + std::to_string(quests[startQuest + i]->getNoItems()) + " " + goods[quests[startQuest + i]->getItem()] + " to " + astro[quests[startQuest + i]->getDestination()]->getName() + " (" + std::to_string(quests[startQuest + i]->getReward()) + "$)";
+					if (quests[startQuest + i]->getDestination() == closestPlanet) {
+						questDesc[i].setStyle(sf::Text::Bold);
+					}
+					else {
+						questDesc[i].setStyle(sf::Text::Regular);
+					}
 				} else {
 					desc = "";
 				}
 				questDesc[i].setString(desc);
 				questDesc[i].setOrigin(questDesc[i].getLocalBounds().width / 2, questDesc[i].getLocalBounds().height / 2);
-				if (quests[startQuest + i]->getDestination() == closestPlanet) {
-					questDesc[i].setStyle(sf::Text::Bold);
-				} else {
-					questDesc[i].setStyle(sf::Text::Regular);
-				}
 			}
 			int dif = quests.size() - 10;
 			dif = dif < 0 ? 0 : dif;
@@ -1568,6 +1623,14 @@ void Game::update() {
 			message->update("Press \'ENTER\' to Exit", sf::Color::Red);
 		}
 
+		// Show the Mouse if it was moved
+		if (oldMouse.x != mouse.getPosition().x && oldMouse.y != mouse.getPosition().y) {
+			mouseTimeout.restart();
+			window.setMouseCursorVisible(true);
+			oldMouse.x = mouse.getPosition().x;
+			oldMouse.y = mouse.getPosition().y;
+		}
+
 		if (gameOver) {
 			message->update("GAME OVER! Press \'Esc\' to Exit", sf::Color::Red);
 			ships[0]->cutThrust();
@@ -1587,11 +1650,9 @@ void Game::render() {
 
 	/* --------------- Draw --------------- */
 
-	//if (menu["shop"] || menu["map"]) {
-	//	window.setMouseCursorVisible(true);
-	//} else {
-	//	window.setMouseCursorVisible(false);
-	//}
+	if (mouseTimeout.getElapsedTime().asSeconds() > 1) {
+		window.setMouseCursorVisible(false);
+	}
 
 	if (menu["map"]) {
 		// Astro Map
