@@ -33,6 +33,19 @@ Game::Game() {
 	// Setting the random seed
 	srand(time(NULL));
 
+	// Load Sounds
+	music[0].openFromFile("Source/resources/Audio/planet.ogg");
+	music[1].openFromFile("Source/resources/Audio/moon.ogg");
+	music[0].setLoop(true);
+	music[0].play();
+
+	std::string filenames[5] = { "acceptQuest.ogg", "returnQuest.ogg", "gameOver.ogg", "error.ogg", "warning.ogg" };
+	for (int i = 0; i < 5; i++) {
+		buffers.push_back(sf::SoundBuffer());
+		buffers[buffers.size() - 1].loadFromFile("Source/resources/Audio/" + filenames[i]);
+	}
+	sound.setBuffer(buffers[0]);
+
 	// Load Textures for the Objects
 	commonTexture.loadFromFile("Source/resources/objectsSheet.png");
 
@@ -63,6 +76,9 @@ Game::Game() {
 
 		// Set number of Inhabitants
 		astro[i]->setInhabitants(Functions::randomInt(10, 50));
+
+		// Set the Music File
+		//astro[i]->setAudio(&sounds[0]);
 
 		// Increase the Angle to match the Direction of the Velocity Vector
 		angle += PI / 2;
@@ -367,6 +383,10 @@ Game::Game() {
 	scrollBarBg.setPosition(scrollBar.getPosition().x, scrollBar.getPosition().y);
 	scrollBarBg.setSize(scrollBar.getSize());
 	scrollBarBg.setOutlineThickness(1);
+
+	astroType = 0;
+
+	window.setMouseCursorVisible(false);
 }
 
 Game::~Game() {
@@ -428,41 +448,49 @@ void Game::events() {
 
 					int cS = human->getClosestSpecial();
 					if (cS != -1) {
+						sound.setBuffer(buffers[1]);
+						sound.play();
 						switch (astro[closestPlanet]->getType(human->getClosestSpecial())) {
-						case 0:
-							ships[0]->refuel();
-							break;
-						case 1:
-							ships[0]->addMaxFuel(10000);
-							astro[closestPlanet]->setInactive(cS);
-							break;
-						case 2:
-							ships[0]->addMaxThrust(10);
-							astro[closestPlanet]->setInactive(cS);
-							break;
-						case 3:
-							ships[0]->addMaxVelocity(0.5);
-							astro[closestPlanet]->setInactive(cS);
-							break;
-						case 10:
-							menu["shop"] = !menu["shop"];
-						default:
-							break;
+							case 0:
+								ships[0]->refuel();
+								break;
+							case 1:
+								ships[0]->addMaxFuel(10000);
+								astro[closestPlanet]->setInactive(cS);
+								break;
+							case 2:
+								ships[0]->addMaxThrust(10);
+								astro[closestPlanet]->setInactive(cS);
+								break;
+							case 3:
+								ships[0]->addMaxVelocity(0.5);
+								astro[closestPlanet]->setInactive(cS);
+								break;
+							case 10:
+								menu["shop"] = !menu["shop"];
+							default:
+								break;
 						}
+						cS = -1;
 					}
 
 					// Accept or Return Quest
 					if (human->getClosestLocal() != -1) {
 						int closestLocal = human->getClosestLocal();
-						if (locals[closestLocal]->getHasQuest() && quests.size() < 99 && ships[0]->getCargo() + locals[closestLocal]->getQuest()->getNoItems() <= ships[0]->getMaxCargo()) {
-							quests.push_back(locals[closestLocal]->getQuest());
-							ships[0]->setCargo(ships[0]->getCargo() + locals[closestLocal]->getQuest()->getNoItems());
-							cargoText.setString(Functions::toStringWithComma(ships[0]->getCargo()) + " / " + Functions::toStringWithComma(ships[0]->getMaxCargo()));
-							cargoText.setOrigin(cargoText.getLocalBounds().width, 0);
-							locals[closestLocal]->setHasQuest(false);
-							//human->setClosestLocal(-1);
-						}
-						else if (locals[closestLocal]->getHasReturn()) {
+						if (locals[closestLocal]->getHasQuest() && quests.size() < 99) {
+							if (ships[0]->getCargo() + locals[closestLocal]->getQuest()->getNoItems() <= ships[0]->getMaxCargo()) {
+								quests.push_back(locals[closestLocal]->getQuest());
+								ships[0]->setCargo(ships[0]->getCargo() + locals[closestLocal]->getQuest()->getNoItems());
+								cargoText.setString(Functions::toStringWithComma(ships[0]->getCargo()) + " / " + Functions::toStringWithComma(ships[0]->getMaxCargo()));
+								cargoText.setOrigin(cargoText.getLocalBounds().width, 0);
+								locals[closestLocal]->setHasQuest(false);
+								sound.setBuffer(buffers[0]);
+								sound.play();
+							} else {
+								sound.setBuffer(buffers[3]);
+								sound.play();
+							}
+						} else if (locals[closestLocal]->getHasReturn()) {
 							int returnQuest = locals[closestLocal]->getReturnQuest();
 							money += quests[returnQuest]->getReward();
 							moneyText.setString(Functions::toStringWithComma(money) + " $");
@@ -477,7 +505,8 @@ void Game::events() {
 							}
 							quests.erase(quests.begin() + returnQuest);
 							locals[closestLocal]->setHasReturn(false);
-							//human->setClosestLocal(-1);
+							sound.setBuffer(buffers[1]);
+							sound.play();
 						}
 					}
 
@@ -728,7 +757,6 @@ void Game::keyPressed() {
 			theta -= PI / 2;
 			float acceleration = f / human->getMass();
 			human->addVelocity(-cos(theta) * acceleration, -sin(theta) * acceleration);
-			
 			moved = true;
 		}
 	}
@@ -764,6 +792,11 @@ void Game::keyPressed() {
 	// Reset the Sprite if the Human is not moving and he's not mid air
 	if (!moved && !jump) {
 		human->resetSprite();
+	}
+
+	// If the human moved play footsteps
+	if (moved && !jump) {
+		human->playSound();
 	}
 
 	// SPACE
@@ -861,8 +894,11 @@ void Game::collisions() {
 		for (int j = 0; j < ships.size(); j++) {
 			if (Functions::dist(astro[i]->getX(), astro[i]->getY(), ships[j]->getX(), ships[j]->getY()) < astro[i]->getRadius() + 20 * 0.15) {
 				// Check if it's Game Over
-				if (getRelativeVelocity() > ships[0]->getMaxVelocity())
+				if (getRelativeVelocity() > ships[0]->getMaxVelocity() && !gameOver) {
 					gameOver = true;
+					sound.setBuffer(buffers[2]);
+					sound.play();
+				}
 
 				// Get the Angle between the Ship and the Object
 				float dy = astro[i]->getY() - ships[j]->getY();
@@ -984,7 +1020,7 @@ void Game::nearObjects() {
 		human->setClosestLocal(-1);
 		for (int i = 0; i < astro[closestPlanet]->getInhabitants(); i++) {
 			// Close to a person with a Quest
-			if (Functions::dist(view.x, view.y, locals[i]->getX(), locals[i]->getY()) < locals[i]->getWidth() / 18) {
+			if (Functions::dist(view.x, view.y, locals[i]->getX(), locals[i]->getY()) < 40 * ppm) {
 				if (locals[i]->getHasQuest()) {
 					std::unique_ptr<Quest> quest = locals[i]->getQuest();
 					std::string m;
@@ -1021,6 +1057,13 @@ void Game::nearObjects() {
 	if (!onPlanet) {
 		if (Functions::dist(ships[0]->getX(), ships[0]->getY(), astro[closestPlanet]->getX(), astro[closestPlanet]->getY()) - astro[closestPlanet]->getRadius() - 20 * 0.15 < 1000 && getRelativeVelocity() > ships[0]->getMaxVelocity()) {
 			message->update("WARNING! HIGH SPEED!", sf::Color::Red);
+			if (sound.getBuffer() != &buffers[4] || sound.getStatus() != sf::Sound::Playing) {
+				sound.setBuffer(buffers[4]);
+				sound.setLoop(true);
+				sound.play();
+			}
+		} else if (sound.getBuffer() == &buffers[4]) {
+			sound.stop();
 		}
 	}
 }
@@ -1280,13 +1323,10 @@ void Game::update() {
 					if (quests[returnIndex]->getDestination() == closestPlanet) {
 						locals[i]->setReturnQuest(returnIndex);
 						returnIndex++;
-						//std::cout << "RETURN QUEST" << std::endl;
 						break;
 					}
 					returnIndex++;
 				}
-
-				//std::cout << returnIndex << " " << astro[closestPlanet]->getInhabitants() << std::endl;
 
 				if (returnIndex == quests.size()) {
 					if (Functions::randomInt(0, 3) == 0) {
@@ -1294,6 +1334,16 @@ void Game::update() {
 					}
 				}
 			}
+			music[0].stop();
+			music[1].stop();
+			if (closestPlanet < noPlanets) {
+				astroType = 0;
+			} else {
+				astroType = 1;
+			}
+			music[astroType].setVolume(0);
+			music[astroType].setLoop(true);
+			music[astroType].play();
 		}
 
 		// Update the view
@@ -1440,6 +1490,12 @@ void Game::render() {
 
 	/* --------------- Draw --------------- */
 
+	if (menu["shop"] || menu["map"]) {
+		window.setMouseCursorVisible(true);
+	} else {
+		window.setMouseCursorVisible(false);
+	}
+
 	if (menu["map"]) {
 		// Astro Map
 		astroMap->render(window, screen);
@@ -1566,6 +1622,8 @@ void Game::render() {
 		if (menu["shop"]) {
 			shop->render(window);
 		}
+
+		music[astroType].setVolume((int)Functions::map(Functions::dist(ships[0]->getX(), ships[0]->getY(), astro[closestPlanet]->getX(), astro[closestPlanet]->getY()) - astro[closestPlanet]->getRadius(), 0, astro[closestPlanet]->getRadius(), 100, 0));
 	}
 
 	// Draw the frameRate

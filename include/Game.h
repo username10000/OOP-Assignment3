@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <unordered_map>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <Functions.h>
 #include <memory>
 #include <cmath>
@@ -96,6 +97,11 @@ class Game {
 		sf::Text questDesc[10];
 		int startQuest;
 		std::string consoleInput;
+		sf::Music music[2];
+		std::vector<sf::SoundBuffer> buffers;
+		sf::Sound sound;
+		int astroType;
+		//std::vector<sf::Music> sounds;
 		//AstroMap astroMap(0);
 	public:
 		Game();

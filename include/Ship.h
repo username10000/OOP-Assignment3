@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <GameObject.h>
 #include <Functions.h>
 #include <cmath>
@@ -54,6 +55,8 @@ class Ship : public GameObject {
 		std::vector<std::vector<sf::Vector2f>> firePos;
 		std::vector<std::unique_ptr<sf::Sprite>> ships;
 		std::vector<std::unique_ptr<sf::Sprite>> fires;
+		sf::SoundBuffer buffer;
+		sf::Sound sound;
 	public:
 		Ship(double x, double y, float screenX, float screenY);
 		Ship();

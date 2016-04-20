@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <GameObject.h>
 #include <Functions.h>
 #include <Quest.h>
@@ -35,6 +36,8 @@ class Human : public GameObject {
 		bool hasReturn;
 		std::string questItem;
 		std::unique_ptr<Quest> quest;
+		sf::SoundBuffer buffer;
+		sf::Sound sound;
 	public:
 		Human(double x, double y, sf::Texture *texture);
 		sf::Vector2<double> getVelocity();
@@ -72,6 +75,7 @@ class Human : public GameObject {
 		void setClosestLocal(int l);
 		int getReturnQuest();
 		void setReturnQuest(int rQ);
+		void playSound();
 		//void setPlanetRotation(float r);
 		void update();
 		void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);

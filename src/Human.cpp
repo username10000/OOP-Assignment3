@@ -42,6 +42,11 @@ Human::Human(double x, double y, sf::Texture *texture) : GameObject(x, y) {
 	quest = std::unique_ptr<Quest>(new Quest(0, 0, 0, 0, 0));
 
 	returnQuest = 0;
+
+	buffer.loadFromFile("Source/resources/Audio/footstep.ogg");
+	sound.setBuffer(buffer);
+	sound.setPitch(2);
+	sound.setVolume(25);
 }
 
 sf::Vector2<double> Human::getVelocity() {
@@ -212,6 +217,12 @@ void Human::setReturnQuest(int rQ) {
 	returnQuest = rQ;
 }
 
+void Human::playSound() {
+	if (sound.getStatus() != sf::Sound::Playing) {
+		sound.play();
+	}
+}
+
 void Human::update() {
 	// Apply Force
 	float acceleration = getForce() / getMass();
@@ -229,6 +240,11 @@ void Human::update() {
 	if (hasReturn) {
 		questSprite.setColor(sf::Color::Cyan);
 	}
+
+	if (speed == 1)
+		sound.setPitch(2);
+	else
+		sound.setPitch(3);
 }
 
 void Human::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {

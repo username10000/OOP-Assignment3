@@ -43,7 +43,7 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 	fuel = maxFuel = 100000;
 
 	cargo = 0;
-	maxCargo = 20;
+	maxCargo = 50;
 
 	thrust = 0;
 	maxThrust = 75;
@@ -130,6 +130,9 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 	//distFromShip = sqrt( pow(fireLocation.x, 2) + pow(fireLocation.y, 2) );
 	////std::cout << fireLocation.x << " " << fireLocation.y << " " << distFromShip << std::endl;
 	//distFromShip *= 0.15;
+
+	buffer.loadFromFile("Source/resources/Audio/thrust.ogg");
+	sound.setBuffer(buffer);
 }
 
 Ship::Ship() : Ship(0, 0, 0, 0) {
@@ -453,6 +456,17 @@ void Ship::update() {
 				fires[i]->setTextureRect(fireRect);
 			}
 			lastChange.restart();
+		}
+
+		if (sound.getStatus() != sf::Sound::Playing) {
+			sound.setLoop(true);
+			sound.play();
+		} else {
+			sound.setVolume(Functions::map(thrust, 0, maxThrust, 0, 25));
+		}
+	} else {
+		if (sound.getStatus() == sf::Sound::Playing) {
+			sound.stop();
 		}
 	}
 

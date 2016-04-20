@@ -6,6 +6,7 @@
 #include <string>
 #include <memory>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <GameObject.h>
 #include <Human.h>
 #include <Functions.h>
@@ -73,7 +74,7 @@ class AstroObject : public GameObject {
 		void setInactive(int index);
 		void setParentPlanet(int pP);
 		int getParentPlanet();
-
+		
 		virtual void update() = 0;
 		virtual void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);
 };
