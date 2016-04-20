@@ -205,7 +205,7 @@ Game::Game() {
 	console = std::unique_ptr<Console>(new Console(screen, font));
 
 	// Pixels Per Meter
-	ppm = 1;
+	ppm = 0.05;
 
 	// FrameRate Settings
 	frameRate.setFont(font);
@@ -242,6 +242,7 @@ Game::Game() {
 	menu["shop"] = false;
 	menu["quests"] = false;
 	menu["console"] = false;
+	menu["exit"] = false;
 
 	//ppm = dist(0, 0, astro[noPlanets - 1] -> getX(), astro[noPlanets - 1] -> getY()) / (screen.height / 2);
 
@@ -386,7 +387,13 @@ Game::Game() {
 
 	astroType = 0;
 
-	window.setMouseCursorVisible(false);
+	//window.setMouseCursorVisible(false);
+
+	// Initial Settings when the Player Exits the Ship
+	onPlanet = true;
+	float theta = Functions::randomFloat(0, 2 * PI);
+	human->setX(astro[closestPlanet]->getX() + sin(theta) * astro[closestPlanet]->getRadius());
+	human->setY(astro[closestPlanet]->getY() - cos(theta) * astro[closestPlanet]->getRadius());
 }
 
 Game::~Game() {
@@ -414,7 +421,8 @@ void Game::events() {
 		case sf::Event::KeyPressed:
 			// Close the Window if Escape is pressed
 			if (event.key.code == sf::Keyboard::Escape)
-				stop = 1;
+				menu["exit"] = !menu["exit"];
+				//stop = 1;
 			
 			// ~ - Console
 			if (event.key.code == 54) {
@@ -464,6 +472,12 @@ void Game::events() {
 								break;
 							case 3:
 								ships[0]->addMaxVelocity(0.5);
+								astro[closestPlanet]->setInactive(cS);
+								break;
+							case 4:
+								ships[0]->setMaxCargo(ships[0]->getMaxCargo() + 50);
+								cargoText.setString(Functions::toStringWithComma(ships[0]->getCargo()) + " / " + Functions::toStringWithComma(ships[0]->getMaxCargo()));
+								cargoText.setOrigin(cargoText.getLocalBounds().width, 0);
 								astro[closestPlanet]->setInactive(cS);
 								break;
 							case 10:
@@ -593,6 +607,11 @@ void Game::events() {
 						//startQuest = quests.size() - 1;
 				}
 
+				// Exit
+				if (event.key.code == sf::Keyboard::Return && menu["exit"]) {
+					stop = 1;
+				}
+
 				// 0
 				if (event.key.code == 26) {
 					if (!menu["distance"] && !menu["velocity"] && !menu["infoPanel"] && !menu["thrust"] && !menu["fuel"]) {
@@ -705,6 +724,8 @@ void Game::keyPressed() {
 			s = 100;
 		}
 		ppm += (float)(0.01 * s);
+		if (ppm > 1)
+			ppm = 1;
 	}
 
 	// -
@@ -715,8 +736,11 @@ void Game::keyPressed() {
 			s = 100;
 		}
 		ppm -= (float)(0.01 * s);
-		if (ppm <= 0)
-			ppm = 0.01f;
+		if (ppm <= 0.05)
+			ppm = 0.05f;
+		//if (ppm <= 0)
+			//ppm = 0.01f;
+
 	}
 
 	// W
@@ -1003,6 +1027,9 @@ void Game::nearObjects() {
 					break;
 				case 3:
 					message->update("Press \'E\' to Increase the Durability");
+					break;
+				case 4:
+					message->update("Press '\E\' to Increase Cargo Space");
 					break;
 				case 10:
 					message->update("Press \'E\' to Enter Shop");
@@ -1471,6 +1498,32 @@ void Game::update() {
 			console->update(consoleInput);
 		}
 
+		if (!onPlanet) {
+			if (distanceObject->getHovered() && menu["distance"]) {
+				message->update(distanceObject->getDescription(), sf::Color::Yellow);
+			}
+
+			if (infoPanel->getHovered() && menu["infoPanel"]) {
+				message->update(infoPanel->getDescription(), sf::Color::Yellow);
+			}
+
+			if (thrust->getHovered() && menu["thrust"]) {
+				message->update(thrust->getDescription(), sf::Color::Yellow);
+			}
+
+			if (fuel->getHovered() && menu["fuel"]) {
+				message->update(fuel->getDescription(), sf::Color::Yellow);
+			}
+
+			if (velocityVector->getHovered() && menu["velocity"]) {
+				message->update(velocityVector->getDescription(), sf::Color::Yellow);
+			}
+		}
+
+		if (menu["exit"]) {
+			message->update("Press \'ENTER\' to Exit", sf::Color::Red);
+		}
+
 		if (gameOver) {
 			message->update("GAME OVER! Press \'Esc\' to Exit", sf::Color::Red);
 			ships[0]->cutThrust();
@@ -1490,11 +1543,11 @@ void Game::render() {
 
 	/* --------------- Draw --------------- */
 
-	if (menu["shop"] || menu["map"]) {
-		window.setMouseCursorVisible(true);
-	} else {
-		window.setMouseCursorVisible(false);
-	}
+	//if (menu["shop"] || menu["map"]) {
+	//	window.setMouseCursorVisible(true);
+	//} else {
+	//	window.setMouseCursorVisible(false);
+	//}
 
 	if (menu["map"]) {
 		// Astro Map

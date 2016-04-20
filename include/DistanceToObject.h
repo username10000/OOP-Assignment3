@@ -4,11 +4,13 @@
 // Dependencies
 #include <iostream>
 #include <string>
-#include <SFML/Graphics.hpp>
 #include <cmath>
+#include <SFML/Graphics.hpp>
+#include <Functions.h>
+#include <UI.h>
 
 // Distance To Planet
-class DistanceToObject {
+class DistanceToObject : public UI {
 	private:
 		sf::VideoMode screen;
 		sf::CircleShape circle;
@@ -22,6 +24,7 @@ class DistanceToObject {
 		sf::Vertex line[2];
 		sf::Vertex targetLine[2];
 		sf::Vertex splitLine[2];
+		sf::Mouse mouse;
 		float size;
 		float offset;
 		float angle;
@@ -34,6 +37,8 @@ class DistanceToObject {
 		void setTargetDistance(float d);
 		void setTargetAngle(float a);
 		void setTargetName(std::string n);
+		bool getHovered();
+		std::string getDescription();
 		void update(float _angle, float _distance, std::string _name, float _shipAngle);
 		void render(sf::RenderWindow &window);
 };

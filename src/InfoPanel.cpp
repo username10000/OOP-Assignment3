@@ -24,6 +24,18 @@ InfoPanel::InfoPanel(sf::VideoMode _screen, sf::Font _font) {
 	container.setSize(sf::Vector2f(screen.height / 5, lines[0].getCharacterSize() * noLines * 1.5 + offset * 2));
 }
 
+bool InfoPanel::getHovered() {
+	if (mouse.getPosition().x > container.getPosition().x && mouse.getPosition().x < container.getPosition().x + container.getSize().x
+		&& mouse.getPosition().y > container.getPosition().y && mouse.getPosition().y < container.getPosition().y + container.getSize().y)
+		return true;
+	else
+		return false;
+}
+
+std::string InfoPanel::getDescription() {
+	return "Shows detailed information about every system of the Ship";
+}
+
 void InfoPanel::update(std::string inertia, float thrust, float maxThrust, float fuel, float maxFuel, float speed, float speedToClosest, float speedToTarget, float maxSpeed, int cargo, int maxCargo) {
 	float length = 0;
 	

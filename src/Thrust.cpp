@@ -68,6 +68,18 @@ Thrust::Thrust(sf::VideoMode _screen, sf::Font _font) {
 	name.setPosition(rect.getPosition().x + rect.getSize().x / 2, rect.getPosition().y + rect.getSize().y / 2);
 }
 
+bool Thrust::getHovered() {
+	if (mouse.getPosition().x > rect.getPosition().x && mouse.getPosition().x < rect.getPosition().x + rect.getSize().x
+		&& mouse.getPosition().y > rect.getPosition().y && mouse.getPosition().y < rect.getPosition().y + rect.getSize().y)
+		return true;
+	else
+		return false;
+}
+
+std::string Thrust::getDescription() {
+	return "Shows the Power of the Thrust";
+}
+
 void Thrust::update(float percentage) {
 	indicator.setPosition(Functions::map(percentage, 0, 100, lines[0].position.x, lines[lines.getVertexCount() - 1].position.x), indicator.getPosition().y);
 }

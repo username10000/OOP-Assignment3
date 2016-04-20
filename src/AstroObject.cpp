@@ -288,7 +288,7 @@ void AstroObject::createCommonObjects(sf::Texture *cT) {
 			sObjs.push_back(std::unique_ptr<SpecialObject>(new SpecialObject(cT, col, monolithAngle, rotation, radius)));
 			sObjs[sObjs.size() - 1]->setScale(scale);
 			sObjs[sObjs.size() - 1]->setTextureRect(tR);
-			sObjs[sObjs.size() - 1]->setType(Functions::randomInt(1, 3));
+			sObjs[sObjs.size() - 1]->setType(Functions::randomInt(1, 4));
 	}
 }
 

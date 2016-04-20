@@ -85,14 +85,25 @@ void DistanceToObject::setTargetName(std::string n) {
 	targetName.setOrigin(targetName.getLocalBounds().width / 2, targetName.getLocalBounds().height / 2);
 }
 
+bool DistanceToObject::getHovered() {
+	if (Functions::dist(mouse.getPosition().x, mouse.getPosition().y, circle.getPosition().x + circle.getRadius(), circle.getPosition().y + circle.getRadius()) < circle.getRadius())
+		return true;
+	else
+		return false;
+}
+
+std::string DistanceToObject::getDescription() {
+	return "Shows the distance to the Closest Planet (RED) \nand the distance to the Target Planet (Cyan)";
+}
+
 void DistanceToObject::update(float _angle, float _distance, std::string _name, float _shipAngle) {
 	angle = _angle;
 	distance = _distance;
 
 	// Creating the string
-	char d[15];
-	sprintf_s(d, "%d km", (int)distance);
-	distanceText.setString(d);
+	//char d[15];
+	//sprintf_s(d, "%d km", (int)distance);
+	distanceText.setString(Functions::toStringWithComma((int)distance) + " km");
 	distanceText.setOrigin(distanceText.getLocalBounds().width / 2, distanceText.getLocalBounds().height / 2);
 	//distanceText.setOrigin(distanceText.getCharacterSize() * strlen(d) / 4, distanceText.getCharacterSize() / 2);
 
@@ -113,9 +124,9 @@ void DistanceToObject::update(float _angle, float _distance, std::string _name, 
 
 	if (targetDistance != -1) {
 		// Creating the string
-		char dA[15];
-		sprintf_s(dA, "%d km", (int)targetDistance);
-		targetText.setString(dA);
+		//char dA[15];
+		//sprintf_s(dA, "%d km", (int)targetDistance);
+		targetText.setString(Functions::toStringWithComma((int)targetDistance) + " km");
 		targetText.setOrigin(targetText.getLocalBounds().width / 2, targetText.getLocalBounds().height / 2);
 		//targetText.setOrigin(targetText.getCharacterSize() * strlen(dA) / 4, targetText.getCharacterSize() / 2);
 

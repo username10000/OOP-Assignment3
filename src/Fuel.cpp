@@ -34,6 +34,18 @@ Fuel::Fuel(sf::VideoMode _screen, sf::Font _font) {
 	text.setPosition(outerRect.getPosition().x + outerRect.getSize().x / 2, outerRect.getPosition().y + outerRect.getSize().y / 2);
 }
 
+bool Fuel::getHovered() {
+	if (mouse.getPosition().x > outerRect.getPosition().x && mouse.getPosition().x < outerRect.getPosition().x + outerRect.getSize().x
+		&& mouse.getPosition().y > outerRect.getPosition().y && mouse.getPosition().y < outerRect.getPosition().y + outerRect.getSize().y)
+		return true;
+	else
+		return false;
+}
+
+std::string Fuel::getDescription() {
+	return "Shows the Remaining Fuel";
+}
+
 void Fuel::update(float percentage) {
 	innerRect.setSize(sf::Vector2f(Functions::map(percentage, 0, 100, 0, outerRect.getSize().x), innerRect.getSize().y));
 	if (percentage <= 35)

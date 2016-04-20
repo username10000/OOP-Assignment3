@@ -57,6 +57,18 @@ void VelocityVector::setFont(sf::Font font) {
 	this -> font = font;
 }
 
+bool VelocityVector::getHovered() {
+	if (mouse.getPosition().x > rectangle.getPosition().x && mouse.getPosition().x < rectangle.getPosition().x + rectangle.getSize().x
+		&& mouse.getPosition().y > rectangle.getPosition().y && mouse.getPosition().y < rectangle.getPosition().y + rectangle.getSize().y)
+		return true;
+	else
+		return false;
+}
+
+std::string VelocityVector::getDescription() {
+	return "Shows the Velocity Vector \ni.e. the direction of the Velocity";
+}
+
 void VelocityVector::update(sf::Vector2<double> velocity) {
 	double x, y;
 
