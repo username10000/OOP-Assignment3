@@ -12,7 +12,7 @@ Thrust::Thrust(sf::VideoMode _screen, sf::Font _font) {
 	rect.setFillColor(sf::Color::Transparent);
 	rect.setOutlineThickness(1);
 	rect.setOutlineColor(sf::Color::White);
-	rect.setSize(sf::Vector2f(screen.height / 5, screen.height / 30));
+	rect.setSize(sf::Vector2f((float)screen.height / 5, (float)screen.height / 30));
 	rect.setPosition(screen.width - rect.getSize().x - offset, offset);
 
 	// Indicator
@@ -29,8 +29,8 @@ Thrust::Thrust(sf::VideoMode _screen, sf::Font _font) {
 	// 10 - 40 %
 	for (int i = 1; i <= 4; i++) {
 		double xPos = Functions::map(i, 0, 5, rect.getPosition().x + indicator.getRadius(), rect.getPosition().x + rect.getSize().x / 2);
-		lines.append(sf::Vertex(sf::Vector2f(xPos, rect.getPosition().y)));
-		lines.append(sf::Vertex(sf::Vector2f(xPos, rect.getPosition().y + rect.getSize().y / 4)));
+		lines.append(sf::Vertex(sf::Vector2f((float)xPos, (float)rect.getPosition().y)));
+		lines.append(sf::Vertex(sf::Vector2f((float)xPos, (float)rect.getPosition().y + (float)rect.getSize().y / 4)));
 	}
 	// 50%
 	lines.append(sf::Vertex(sf::Vector2f(rect.getPosition().x + rect.getSize().x / 2, rect.getPosition().y)));
@@ -38,8 +38,8 @@ Thrust::Thrust(sf::VideoMode _screen, sf::Font _font) {
 	// 60 - 90 %
 	for (int i = 1; i <= 4; i++) {
 		double xPos = Functions::map(i, 0, 5, rect.getPosition().x + rect.getSize().x / 2, rect.getPosition().x + rect.getSize().x - indicator.getRadius());
-		lines.append(sf::Vertex(sf::Vector2f(xPos, rect.getPosition().y)));
-		lines.append(sf::Vertex(sf::Vector2f(xPos, rect.getPosition().y + rect.getSize().y / 4)));
+		lines.append(sf::Vertex(sf::Vector2f((float)xPos, rect.getPosition().y)));
+		lines.append(sf::Vertex(sf::Vector2f((float)xPos, rect.getPosition().y + rect.getSize().y / 4)));
 	}
 	// 100 %
 	lines.append(sf::Vertex(sf::Vector2f(rect.getPosition().x + rect.getSize().x - indicator.getRadius(), rect.getPosition().y)));
@@ -81,7 +81,7 @@ std::string Thrust::getDescription() {
 }
 
 void Thrust::update(float percentage) {
-	indicator.setPosition(Functions::map(percentage, 0, 100, lines[0].position.x, lines[lines.getVertexCount() - 1].position.x), indicator.getPosition().y);
+	indicator.setPosition((float)Functions::map(percentage, 0, 100, lines[0].position.x, lines[lines.getVertexCount() - 1].position.x), indicator.getPosition().y);
 }
 
 void Thrust::render(sf::RenderWindow &window) {

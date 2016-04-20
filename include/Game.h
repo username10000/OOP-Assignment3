@@ -89,11 +89,14 @@ class Game {
 		sf::Texture humanTexture;
 		sf::Texture commonTexture;
 		sf::Texture shipTexture;
+		sf::Text loadingMessage;
 		int closestPlanet;
 		std::vector<std::string> goods;
 		sf::RectangleShape scrollBar;
 		sf::RectangleShape scrollBarBg;
 		sf::RectangleShape questRect[10];
+		sf::RectangleShape loadingBar;
+		sf::RectangleShape loadStatus;
 		sf::Text questDesc[10];
 		int startQuest;
 		std::string consoleInput;
@@ -101,6 +104,7 @@ class Game {
 		std::vector<sf::SoundBuffer> buffers;
 		sf::Sound sound;
 		int astroType;
+		int loadingState;
 		//std::vector<sf::Music> sounds;
 		//AstroMap astroMap(0);
 	public:
@@ -119,6 +123,7 @@ class Game {
 		double getRelativeVelocity();
 		double getRelativeVelocity(int index);
 		void executeCommand(std::string command);
+		void setLoadingMessage(std::string m);
 		//int randomInt(int start, int stop);
 		//float randomFloat(float start, float stop);
 		//double map(double v, double lmin, double lmax, double rmin, double rmax);

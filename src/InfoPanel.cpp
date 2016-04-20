@@ -12,7 +12,7 @@ InfoPanel::InfoPanel(sf::VideoMode _screen, sf::Font _font) {
 		sf::Text line;
 		line.setFont(font);
 		line.setCharacterSize(12);
-		line.setPosition(offset * 2, offset * 2 + i * line.getCharacterSize() * 1.5);
+		line.setPosition((float)offset * 2, (float)offset * 2 + i * (float)line.getCharacterSize() * 1.5);
 		line.setString("LINE");
 		lines.push_back(line);
 	}
@@ -21,7 +21,7 @@ InfoPanel::InfoPanel(sf::VideoMode _screen, sf::Font _font) {
 	container.setOutlineColor(sf::Color::White);
 	container.setFillColor(sf::Color::Transparent);
 	container.setPosition(offset, offset);
-	container.setSize(sf::Vector2f(screen.height / 5, lines[0].getCharacterSize() * noLines * 1.5 + offset * 2));
+	container.setSize(sf::Vector2f((float)screen.height / 5, lines[0].getCharacterSize() * noLines * 1.5 + offset * 2));
 }
 
 bool InfoPanel::getHovered() {
@@ -52,7 +52,7 @@ void InfoPanel::update(std::string inertia, float thrust, float maxThrust, float
 	lines[7].setString("Cargo: " + Functions::toStringWithComma(cargo) + " / " + Functions::toStringWithComma(maxCargo));
 
 	// Increase the Container's Size to fit the Text
-	for (int i = 0; i < lines.size(); i++) {
+	for (unsigned int i = 0; i < lines.size(); i++) {
 		if (lines[i].getLocalBounds().width > length)
 			length = lines[i].getLocalBounds().width;
 	}
@@ -61,7 +61,7 @@ void InfoPanel::update(std::string inertia, float thrust, float maxThrust, float
 
 void InfoPanel::render(sf::RenderWindow &window) {
 	window.draw(container);
-	for (int i = 0; i < lines.size(); i++) {
+	for (unsigned int i = 0; i < lines.size(); i++) {
 		window.draw(lines[i]);
 	}
 }

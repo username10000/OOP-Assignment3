@@ -23,6 +23,19 @@ Game::Game() {
 	// Open Font
 	font.loadFromFile("OpenSans-Regular.ttf");
 
+	// Loading Message
+	loadingMessage.setFont(font);
+	loadingMessage.setPosition(screen.width / 2, screen.height / 2);
+	setLoadingMessage("Loading...");
+	loadingBar.setPosition(loadingMessage.getPosition().x - screen.width / 4, loadingMessage.getPosition().y + loadingMessage.getCharacterSize() * 1.5);
+	loadingBar.setSize(sf::Vector2f(screen.width / 2, loadingMessage.getCharacterSize()));
+	loadingBar.setFillColor(sf::Color::Transparent);
+	loadingBar.setOutlineThickness(1);
+	loadStatus.setPosition(loadingBar.getPosition());
+	loadStatus.setSize(sf::Vector2f(0, 0));
+	loadStatus.setFillColor(sf::Color(127, 127, 127));
+	loadingState = 0;
+
 	// Unset the stop program variable
 	stop = 0;
 
@@ -34,6 +47,7 @@ Game::Game() {
 	srand(time(NULL));
 
 	// Load Sounds
+	setLoadingMessage("Loading Sounds");
 	music[0].openFromFile("Source/resources/Audio/planet.ogg");
 	music[1].openFromFile("Source/resources/Audio/moon.ogg");
 	music[0].setLoop(true);
@@ -53,20 +67,22 @@ Game::Game() {
 	astro.push_back(std::unique_ptr<AstroObject>(new Sun(0, 0, 1900, sf::Color(255, 255, 0), 0)));
 	
 	// Set the name of the Sun
+	setLoadingMessage("Generating the Sun");
 	astro[0]->setName("Sun");
 	astro[0]->setInhabitants(0);
 
 	noPlanets = Functions::randomInt(7, 10);
 
+	setLoadingMessage("Generating Planets");
 	float rDist = 0;
 	for (int i = 1; i < noPlanets; i++) {
 		// Generate random Distance from the Sun, random Radius and random Orbital Phase
 		if (i == 1)
-			rDist += Functions::randomInt(350000, 350000);
+			rDist += (float)Functions::randomInt(350000, 350000);
 		else
-			rDist += Functions::randomInt(150000, 175000);
-		float rR = Functions::randomInt(300, 500);
-		float angle = Functions::randomFloat(0, PI * 2);
+			rDist += (float)Functions::randomInt(150000, 175000);
+		float rR = (float)Functions::randomInt(300, 500);
+		float angle = (float)Functions::randomFloat(0, PI * 2);
 		
 		// Create the Astro Object in the generated position
 		astro.push_back(std::unique_ptr<AstroObject>(new Planet(-cos(angle) * rDist, -sin(angle) * rDist, rR, sf::Color(rand() % 256, rand() % 256, rand() % 256), Functions::randomFloat(0.005, 0.01))));
@@ -110,6 +126,7 @@ Game::Game() {
 	noMoons = 0;
 
 	// Genrate Moons
+	setLoadingMessage("Generating Moons");
 	for (int i = 1; i < noPlanets; i++) {
 		rDist = 0;
 		int noMoonsPlanet = Functions::randomInt(0, 3);
@@ -166,17 +183,20 @@ Game::Game() {
 		}
 	}
 
+	setLoadingMessage("Creating the Ship");
 	// Add Ships
 	ships.push_back(std::unique_ptr<Ship>(new Ship(astro[1]->getX(), astro[1]->getY() - astro[1]->getRadius(), (float)(screen.width / 2), (float)(screen.height / 2))));
 
 	// Set the closest Planet to the Ship
 	ships[0]->setClosestPlanet(1);
 
+	setLoadingMessage("Creating Player");
 	// Add Human
 	humanTexture.loadFromFile("Source/resources/humanSheet.png");
 	human = std::unique_ptr<Human>(new Human(0, 0, &humanTexture));
 	human->setColour(sf::Color::White);
 
+	setLoadingMessage("Creating the UI");
 	// Add Velocity Vector
 	velocityVector = std::unique_ptr<VelocityVector>(new VelocityVector(screen));
 	velocityVector -> setFont(font);
@@ -219,18 +239,18 @@ Game::Game() {
 	//distance.setString("0");
 
 	// Inertia Dampers Text
-	idText.setFont(font);
-	idText.setCharacterSize(12);
-	idText.setString("Inertia Damper: ON");
-	idText.setPosition(0, frameRate.getCharacterSize() * 1.5);
+	//idText.setFont(font);
+	//idText.setCharacterSize(12);
+	//idText.setString("Inertia Damper: ON");
+	//idText.setPosition(0, frameRate.getCharacterSize() * 1.5);
 
 	accumulator = 0;
 
-	for (unsigned int i = 0; i < 200; i++) {
-		stars[i][0] = Functions::randomInt(0, screen.width);
-		stars[i][1] = Functions::randomInt(0, screen.height);
-		stars[i][2] = Functions::randomInt(1, 3);
-	}
+	//for (unsigned int i = 0; i < 200; i++) {
+	//	stars[i][0] = Functions::randomInt(0, screen.width);
+	//	stars[i][1] = Functions::randomInt(0, screen.height);
+	//	stars[i][2] = Functions::randomInt(1, 3);
+	//}
 
 	// Menu Flags
 	menu["map"] = false;
@@ -246,6 +266,7 @@ Game::Game() {
 
 	//ppm = dist(0, 0, astro[noPlanets - 1] -> getX(), astro[noPlanets - 1] -> getY()) / (screen.height / 2);
 
+	setLoadingMessage("Creating Map");
 	// Create an Astro Map
 	astroMap = std::unique_ptr<AstroMap>(new AstroMap((float)(Functions::dist(0, 0, astro[noPlanets - 1]->getX(), astro[noPlanets - 1]->getY()) / (screen.height / 2.2)), font));
 	astroMap -> setShip(ships[0]->getX(), ships[0]->getY());
@@ -272,6 +293,7 @@ Game::Game() {
 
 	closestPlanet = 1;
 
+	setLoadingMessage("Getting Item Names");
 	std::ifstream f;
 	f.open("Source/resources/QuestItems.txt");
 	int goodsNo;
@@ -284,6 +306,7 @@ Game::Game() {
 	}
 	f.close();
 
+	setLoadingMessage("Creating Locals");
 	// Create Vector to store the Locals
 	for (int i = 0; i < 100; i++) {
 		locals.push_back(std::unique_ptr<Human>(new Human(0, 0, &humanTexture)));
@@ -297,6 +320,7 @@ Game::Game() {
 		}
 	}
 
+	setLoadingMessage("Generating Background Stars");
 	// Star Field - generate stars
 	bRenderTexture.create(screen.width, screen.height);
 	bRenderTexture.clear(sf::Color::Black);
@@ -332,6 +356,7 @@ Game::Game() {
 
 	money = 0;
 
+	setLoadingMessage("Generating More UI");
 	moneyText.setFont(font);
 	moneyText.setCharacterSize(15);
 	moneyText.setString(Functions::toStringWithComma(money) + " $");
@@ -394,6 +419,8 @@ Game::Game() {
 	float theta = Functions::randomFloat(0, 2 * PI);
 	human->setX(astro[closestPlanet]->getX() + sin(theta) * astro[closestPlanet]->getRadius());
 	human->setY(astro[closestPlanet]->getY() - cos(theta) * astro[closestPlanet]->getRadius());
+
+	setLoadingMessage("Starting");
 }
 
 Game::~Game() {
@@ -704,6 +731,18 @@ void Game::events() {
 			break;
 		}
 	}
+}
+
+void Game::setLoadingMessage(std::string m) {
+	loadingState++;
+	loadStatus.setSize(sf::Vector2f(Functions::map(loadingState, 0, 13, 0, loadingBar.getSize().x), loadingBar.getSize().y));
+	loadingMessage.setString(m);
+	loadingMessage.setOrigin(loadingMessage.getLocalBounds().width / 2, loadingMessage.getLocalBounds().height / 2);
+	window.clear(sf::Color::Black);
+	window.draw(loadingBar);
+	window.draw(loadStatus);
+	window.draw(loadingMessage);
+	window.display();
 }
 
 void Game::keyPressed() {
@@ -1486,6 +1525,11 @@ void Game::update() {
 				}
 				questDesc[i].setString(desc);
 				questDesc[i].setOrigin(questDesc[i].getLocalBounds().width / 2, questDesc[i].getLocalBounds().height / 2);
+				if (quests[startQuest + i]->getDestination() == closestPlanet) {
+					questDesc[i].setStyle(sf::Text::Bold);
+				} else {
+					questDesc[i].setStyle(sf::Text::Regular);
+				}
 			}
 			int dif = quests.size() - 10;
 			dif = dif < 0 ? 0 : dif;
