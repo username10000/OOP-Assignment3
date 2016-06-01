@@ -108,6 +108,8 @@ class Game {
 		int astroType;
 		int loadingState;
 		sf::Mouse mouse;
+		float scroll;
+		float curScroll;
 		//std::vector<sf::Music> sounds;
 		//AstroMap astroMap(0);
 	public:

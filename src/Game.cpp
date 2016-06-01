@@ -424,6 +424,9 @@ Game::Game() {
 	human->setX(astro[closestPlanet]->getX() + sin(theta) * astro[closestPlanet]->getRadius());
 	human->setY(astro[closestPlanet]->getY() - cos(theta) * astro[closestPlanet]->getRadius());
 
+	scroll = 0;
+	curScroll = 0;
+
 	setLoadingMessage("Starting");
 }
 
@@ -442,6 +445,7 @@ void Game::disableMenus() {
 }
 
 void Game::events() {
+	//scroll = 0;
 	sf::Event event;
 	while (window.pollEvent(event)) {
 		switch (event.type) {
@@ -753,16 +757,18 @@ void Game::events() {
 			break;
 		case sf::Event::MouseWheelMoved:
 			if (!menu["quests"]) {
-				ppm -= event.mouseWheel.delta * 0.05;
-				if (ppm <= 0.05)
+				//ppm -= event.mouseWheel.delta * 0.05;
+				scroll = event.mouseWheel.delta * 0.05;
+				/*if (ppm <= 0.05)
 					ppm = 0.05f;
 				if (ppm > 1)
-					ppm = 1;
+					ppm = 1;*/
 			} else {
 				if (event.mouseWheel.delta > 0 && startQuest > 0 && quests.size() > 10)
 					startQuest--;
 				if (event.mouseWheel.delta < 0 && startQuest < quests.size() - 10 && quests.size() > 10)
-					startQuest++;
+					startQuest;
+					
 				//if (startQuest < 0)
 				//	startQuest = 0;
 				//if (startQuest > quests.size() - 1)
@@ -1183,6 +1189,7 @@ void Game::nearObjects() {
 				sound.play();
 			}
 		} else if (sound.getBuffer() == &buffers[4]) {
+			sound.setLoop(false);
 			sound.stop();
 		}
 	}
@@ -1649,6 +1656,25 @@ void Game::render() {
 
 
 	/* --------------- Draw --------------- */
+
+	// Zoom
+	if (scroll != 0 && abs(abs(scroll) - abs(curScroll)) > 0.000001) {
+		float howMuch = scroll / 15;
+		ppm -= howMuch;
+		curScroll += howMuch;
+
+		if (ppm <= 0.05) {
+			ppm = 0.05f;
+			scroll = 0;
+		}
+		if (ppm > 1) {
+			ppm = 1;
+			scroll = 0;
+		}
+	} else {
+		scroll = 0;
+		curScroll = 0;
+	}
 
 	if (mouseTimeout.getElapsedTime().asSeconds() > 1) {
 		window.setMouseCursorVisible(false);
