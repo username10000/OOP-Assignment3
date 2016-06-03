@@ -28,7 +28,7 @@ Shop::Shop(sf::VideoMode screen, sf::Font font, sf::Texture *shipTextures) {
 		buttons.push_back(std::unique_ptr<Button>(new Button(shipRect)));
 		buttons[buttons.size() - 1]->setPosition(xPos, yPos);
 
-		priceNum.push_back(Functions::randomInt(1000, 10000));
+		priceNum.push_back(Functions::randomInt(4000, 10000));
 
 		sf::Text name;
 
@@ -41,9 +41,9 @@ Shop::Shop(sf::VideoMode screen, sf::Font font, sf::Texture *shipTextures) {
 
 		purchased.push_back(false);
 	}
-	purchased[0] = true;
-	prices[0].setString("Purchased");
-	prices[0].setOrigin(prices[0].getLocalBounds().width / 2, prices[0].getLocalBounds().height / 2);
+	//purchased[0] = true;
+	//prices[0].setString("Purchased");
+	//prices[0].setOrigin(prices[0].getLocalBounds().width / 2, prices[0].getLocalBounds().height / 2);
 
 	purchase = -1;
 }
@@ -69,6 +69,14 @@ void Shop::confirmPurchase() {
 		prices[purchase].setString("Purchased");
 		prices[purchase].setOrigin(prices[purchase].getLocalBounds().width / 2, prices[purchase].getLocalBounds().height / 2);
 		purchased[purchase] = true;
+	}
+}
+
+void Shop::setPrice(int purchaseNo, int price) {
+	if (purchaseNo >= 0 && purchaseNo < prices.size()) {
+		priceNum[purchaseNo] = price;
+		prices[purchaseNo].setString(Functions::toStringWithComma(priceNum[purchaseNo]));
+		prices[purchaseNo].setOrigin(prices[purchaseNo].getLocalBounds().width / 2, prices[purchaseNo].getLocalBounds().height / 2);
 	}
 }
 

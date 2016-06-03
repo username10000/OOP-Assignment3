@@ -133,6 +133,8 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 
 	buffer.loadFromFile("Source/resources/Audio/thrust.ogg");
 	sound.setBuffer(buffer);
+
+	isVisible = false;
 }
 
 Ship::Ship() : Ship(0, 0, 0, 0) {
@@ -367,10 +369,14 @@ void Ship::destroy() {
 
 void Ship::setShip(int num) {
 	if (num < texture.getSize().x / 40) {
-		sf::IntRect shipRect = sprite.getTextureRect();
-		shipRect.left = num * 41;
-		sprite.setTextureRect(shipRect);
-		curShip = num;
+		if (!isVisible && num == 0) {
+			isVisible = true;
+		} else {
+			sf::IntRect shipRect = sprite.getTextureRect();
+			shipRect.left = num * 41;
+			sprite.setTextureRect(shipRect);
+			curShip = num;
+		}
 	}
 }
 
@@ -387,6 +393,14 @@ int Ship::getMaxCargo() {
 
 void Ship::setMaxCargo(int mC) {
 	maxCargo = mC;
+}
+
+void Ship::setVisible(bool v) {
+	isVisible = v;
+}
+
+bool Ship::getVisible() {
+	return isVisible;
 }
 
 void Ship::update() {

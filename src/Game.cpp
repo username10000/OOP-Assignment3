@@ -312,6 +312,7 @@ Game::Game() {
 
 	setLoadingMessage("Creating Locals");
 	// Create Vector to store the Locals
+	int totalReward = 0;
 	for (int i = 0; i < 100; i++) {
 		locals.push_back(std::unique_ptr<Human>(new Human(0, 0, &humanTexture)));
 		int cP = closestPlanet;
@@ -319,10 +320,14 @@ Game::Game() {
 		locals[i]->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
 		locals[i]->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
 
-		if (Functions::randomInt(0, 3) == 0) {
-			locals[i]->setQuest(0, Functions::randomInt(0, goods.size() - 1), Functions::randomInt(2, 20), Functions::randomInt(1, noPlanets - 1), Functions::randomInt(100, 1000));
+		if (i % 5 == 0 && i < astro[closestPlanet]->getInhabitants()) {
+			//locals[i]->setQuest(0, Functions::randomInt(0, goods.size() - 1), Functions::randomInt(2, 20), Functions::randomInt(1, noPlanets - 1), Functions::randomInt(100, 1000));
+			int reward = Functions::randomInt(100, 300);
+			locals[i]->setQuest(0, Functions::randomInt(0, goods.size() - 1), 2, 1, reward);
+			totalReward += reward;
 		}
 	}
+	shop->setPrice(0, totalReward - Functions::randomInt(0, 75));
 
 	setLoadingMessage("Generating Background Stars");
 	// Star Field - generate stars
@@ -509,7 +514,7 @@ void Game::events() {
 						human->setX(astro[cP]->getX() - cos(theta) * astro[cP]->getRadius());
 						human->setY(astro[cP]->getY() - sin(theta) * astro[cP]->getRadius());
 					}
-					else if (onPlanet && Functions::dist(human->getX(), human->getY(), ships[0]->getX(), ships[0]->getY()) < 20 * 0.15) {
+					else if (onPlanet && ships[0]->getVisible() && Functions::dist(human->getX(), human->getY(), ships[0]->getX(), ships[0]->getY()) < 20 * 0.15) {
 						onPlanet = false;
 					}
 
@@ -758,7 +763,8 @@ void Game::events() {
 		case sf::Event::MouseWheelMoved:
 			if (!menu["quests"]) {
 				//ppm -= event.mouseWheel.delta * 0.05;
-				scroll = event.mouseWheel.delta * 0.05;
+				scroll = event.mouseWheel.delta * Functions::map(ppm, 0.05, 1, 0.03, 0.5);
+				curScroll = 0;
 				/*if (ppm <= 0.05)
 					ppm = 0.05f;
 				if (ppm > 1)
@@ -1108,7 +1114,7 @@ void Game::collisions() {
 void Game::nearObjects() {
 	message->hide();
 	if (onPlanet) {
-		if (Functions::dist(human->getX(), human->getY(), ships[0]->getX(), ships[0]->getY()) < 20 * 0.15) {
+		if (Functions::dist(human->getX(), human->getY(), ships[0]->getX(), ships[0]->getY()) < 20 * 0.15 && ships[0]->getVisible()) {
 			message->update("Press \'E\' to Enter the Ship");
 		}
 
@@ -1747,7 +1753,8 @@ void Game::render() {
 
 		// Ships
 		for (int i = 0; i < ships.size(); i++) {
-			ships[i]->render(window, view, screen, ppm);
+			if (ships[i]->getVisible())
+				ships[i]->render(window, view, screen, ppm);
 		}
 
 		// Locals

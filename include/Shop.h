@@ -22,6 +22,7 @@ class Shop {
 	public:
 		Shop(sf::VideoMode screen, sf::Font, sf::Texture *shipTextures);
 		void confirmPurchase();
+		void setPrice(int purchaseNo, int price);
 		int update(sf::RenderWindow &window);
 		void render(sf::RenderWindow &window);
 };

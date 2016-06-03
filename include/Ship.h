@@ -57,6 +57,7 @@ class Ship : public GameObject {
 		std::vector<std::unique_ptr<sf::Sprite>> fires;
 		sf::SoundBuffer buffer;
 		sf::Sound sound;
+		bool isVisible;
 	public:
 		Ship(double x, double y, float screenX, float screenY);
 		Ship();
@@ -109,6 +110,8 @@ class Ship : public GameObject {
 		void setCargo(int c);
 		int getMaxCargo();
 		void setMaxCargo(int mC);
+		void setVisible(bool v);
+		bool getVisible();
 		//float getAngleToPlanet();
 		//void setAngleToPlanet(float t);
 		//int getPlanet();
