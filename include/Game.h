@@ -16,6 +16,7 @@
 #include <Sun.h>
 #include <Planet.h>
 #include <Moon.h>
+#include <AlienObject.h>
 #include <SolarSystem.h>
 #include <Ship.h>
 #include <VelocityVector.h>

@@ -74,6 +74,7 @@ class AstroObject : public GameObject {
 		void setInactive(int index);
 		void setParentPlanet(int pP);
 		int getParentPlanet();
+		void clearObjs();
 		
 		virtual void update() = 0;
 		virtual void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);

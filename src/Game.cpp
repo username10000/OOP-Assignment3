@@ -187,6 +187,39 @@ Game::Game() {
 		}
 	}
 
+
+	// Generate the end goal object between two random Planets
+	setLoadingMessage("Creating Secret");
+	int afterPlanet = Functions::randomInt(1, noPlanets - 2);
+
+	// Generate random Distance from the Sun, random Radius and random Orbital Phase
+	rDist = ( sqrt( pow(astro[afterPlanet]->getX(), 2) + pow(astro[afterPlanet]->getY(), 2) ) + sqrt( pow(astro[afterPlanet + 1]->getX(), 2) + pow(astro[afterPlanet + 1]->getY(), 2) ) ) / 2;
+	float rR = (float)Functions::randomInt(50, 50);
+	float angle = (float)Functions::randomFloat(0, PI * 2);
+
+	// Create the Astro Object in the generated position
+	astro.push_back(std::unique_ptr<AstroObject>(new AlienObject(-cos(angle) * rDist, -sin(angle) * rDist, rR, sf::Color::Black, 0)));
+
+	// Create Common Textures
+	astro[astro.size() - 1]->createCommonObjects(&commonTexture);
+
+	// Set number of Inhabitants
+	astro[astro.size() - 1]->setInhabitants(0);
+
+	// Increase the Angle to match the Direction of the Velocity Vector
+	angle += PI / 2;
+
+	// Calculate the Velocity needed to stay in Circular Orbit
+	float aV = sqrt(astro[0]->getG() * astro[0]->getMass() / Functions::dist(astro[0]->getX(), astro[0]->getY(), astro[astro.size() - 1]->getX(), astro[astro.size() - 1]->getY()));
+
+	// Set the velocity of the Astro Object
+	astro[astro.size() - 1]->addVelocity(-cos(angle) * aV, -sin(angle) * aV);
+
+	// Set the name of the Planets
+	astro[astro.size() - 1]->setName("Unknown");
+
+
+
 	setLoadingMessage("Creating the Ship");
 	// Add Ships
 	ships.push_back(std::unique_ptr<Ship>(new Ship(astro[1]->getX(), astro[1]->getY() - astro[1]->getRadius(), (float)(screen.width / 2), (float)(screen.height / 2))));
@@ -274,7 +307,7 @@ Game::Game() {
 	// Create an Astro Map
 	astroMap = std::unique_ptr<AstroMap>(new AstroMap((float)(Functions::dist(0, 0, astro[noPlanets - 1]->getX(), astro[noPlanets - 1]->getY()) / (screen.height / 2.2)), font));
 	astroMap -> setShip(ships[0]->getX(), ships[0]->getY());
-	for (unsigned i = 0; i < astro.size(); i++) {
+	for (unsigned i = 0; i < astro.size() - 1; i++) {
 		astroMap -> addAstro(screen, astro[i] -> getX(), astro[i] -> getY(), astro[i] -> getColour(), astro[i] -> getRadius());
 		if (i >= noPlanets) {
 			astroMap -> setParent(i, astro[i]->getParentPlanet());
@@ -500,7 +533,7 @@ void Game::events() {
 				}
 
 				// E - Exit / Enter
-				if (event.key.code == 4 && !menu["quests"] && !gameOver) {
+				if (event.key.code == 4 && !menu["quests"] && !gameOver && !human->getOnHoverboard()) {
 
 					if (!onPlanet && ships[0]->getLanded()) {
 						// Initial Settings when the Player Exits the Ship
@@ -806,7 +839,7 @@ void Game::events() {
 
 void Game::setLoadingMessage(std::string m) {
 	loadingState++;
-	loadStatus.setSize(sf::Vector2f(Functions::map(loadingState, 0, 14, 0, loadingBar.getSize().x), loadingBar.getSize().y));
+	loadStatus.setSize(sf::Vector2f(Functions::map(loadingState, 0, 15, 0, loadingBar.getSize().x), loadingBar.getSize().y));
 	loadingMessage.setString(m);
 	loadingMessage.setOrigin(loadingMessage.getLocalBounds().width / 2, loadingMessage.getLocalBounds().height / 2);
 	window.clear(sf::Color::Black);
@@ -946,7 +979,7 @@ void Game::keyPressed() {
 	// SPACE
 	if (keys[57]) {
 		if (onPlanet) {
-			if (!human->getJump()) {
+			if (!human->getJump() && !human->getOnHoverboard()) {
 				// Human
 				float f = 0.0025;
 				int cP = ships[0]->getClosestPlanet();
@@ -1129,7 +1162,6 @@ void Game::collisions() {
 }
 
 void Game::nearObjects() {
-	message->hide();
 	if (onPlanet) {
 		if (Functions::dist(human->getX(), human->getY(), ships[0]->getX(), ships[0]->getY()) < 20 * 0.15 && ships[0]->getVisible()) {
 			message->update("Press \'E\' to Enter the Ship");
@@ -1438,7 +1470,13 @@ void Game::update() {
 		collisions();
 
 		// Check for Near Objects
-		nearObjects();
+		message->hide();
+		if (!human->getOnHoverboard()) {
+			nearObjects();
+		} else {
+			human->setClosestSpecial(-1);
+			human->setClosestLocal(-1);
+		}
 
 		// Unset the Landed Flag
 		if (ships[0]->getLanded() && Functions::dist(astro[closestPlanet]->getX(), astro[closestPlanet]->getY(), ships[0]->getX(), ships[0]->getY()) > astro[closestPlanet]->getRadius() + 20 * 0.15 + 0.1) {
@@ -1507,7 +1545,7 @@ void Game::update() {
 
 		// Update the position of the Astro Object and Ship if the map is opened
 		if (menu["map"]) {
-			for (unsigned i = 0; i < astro.size(); i++) {
+			for (unsigned i = 0; i < astro.size() - 1; i++) {
 				astroMap->setAstro(window, screen, i, astro[i] -> getX(), astro[i] -> getY());
 			}
 			astroMap -> setShip(ships[0] -> getX(), ships[0] -> getY());

@@ -8,7 +8,10 @@ Planet::Planet(double x, double y, float _radius, sf::Color _colour, float _rota
 
 	rTexture.create(getRadius(), getRadius());
 	rTexture.clear(_colour);
-	_colour = sf::Color(Functions::randomInt(0, 255), Functions::randomInt(0, 255), Functions::randomInt(0, 255));
+	if (_rotation != 0)
+		_colour = sf::Color(Functions::randomInt(0, 255), Functions::randomInt(0, 255), Functions::randomInt(0, 255));
+	else
+		_colour = sf::Color::Black;
 	setSecondColour(_colour);
 
 	// Create Texture

@@ -326,6 +326,11 @@ int AstroObject::getParentPlanet() {
 	return parentPlanet;
 }
 
+void AstroObject::clearObjs() {
+	objs.clear();
+	sObjs.clear();
+}
+
 void AstroObject::update() {
 	//circle.rotate(rotation);
 }
