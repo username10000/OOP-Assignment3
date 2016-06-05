@@ -17,6 +17,11 @@ Human::Human(double x, double y, sf::Texture *texture) : GameObject(x, y) {
 	questSprite.setTextureRect(textureRect);
 	questSprite.setOrigin(questSprite.getLocalBounds().width / 2, questSprite.getLocalBounds().height / 2);
 
+	hoverboard.setTexture(*texture);
+	textureRect.left = 16;
+	hoverboard.setTextureRect(textureRect);
+	hoverboard.setOrigin(hoverboard.getLocalBounds().width / 2, hoverboard.getLocalBounds().height / 2);
+
 	mass = 0.01;
 	velocity.x = velocity.y = 0;
 	direction.x = direction.y = 0;
@@ -47,6 +52,10 @@ Human::Human(double x, double y, sf::Texture *texture) : GameObject(x, y) {
 	sound.setBuffer(buffer);
 	sound.setPitch(2);
 	sound.setVolume(25);
+
+	onHoverboard = false;
+	heightFromPlanet = 0;
+	hoverDir = 1;
 }
 
 sf::Vector2<double> Human::getVelocity() {
@@ -94,7 +103,7 @@ void Human::setAngle(float a) {
 void Human::setDir(int d) {
 	sf::IntRect tR = sprite.getTextureRect();
 	if (dir == d) {
-		if (clock.getElapsedTime().asSeconds() > 0.1 * speed) {
+		if (clock.getElapsedTime().asSeconds() > 0.1 * speed && !onHoverboard) {
 			tR.left = tR.left + 16;
 			if (tR.left >= sprite.getTexture()->getSize().x)
 				tR.left = 16;
@@ -218,9 +227,17 @@ void Human::setReturnQuest(int rQ) {
 }
 
 void Human::playSound() {
-	if (sound.getStatus() != sf::Sound::Playing) {
+	if (sound.getStatus() != sf::Sound::Playing && !onHoverboard) {
 		sound.play();
 	}
+}
+
+void Human::setOnHoverboard(bool b) {
+	onHoverboard = b;
+}
+
+bool Human::getOnHoverboard() {
+	return onHoverboard;
 }
 
 void Human::update() {
@@ -248,10 +265,39 @@ void Human::update() {
 }
 
 void Human::render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm) {
+	// Hovering Animation
+	if (!onHoverboard) {
+		heightFromPlanet = 0;
+	} else {
+		if (heightFromPlanet < 0.5) {
+			hoverDir = 1;
+		}
+		if (heightFromPlanet > 1) {
+			hoverDir = -1;
+		}
+		heightFromPlanet += hoverDir * 0.01;
+	}
+
+	float xHeight = sin(angle * PI / 180) * heightFromPlanet;
+	float yHeight = -cos(angle * PI / 180) * heightFromPlanet;
+
 	sprite.setRotation(angle);
+	if (onHoverboard && jump) {
+		sprite.setRotation(angle + -dir * 15);
+	}
 	sprite.setScale((double)0.07 * dir / ppm, (double)0.07 / ppm);
-	sprite.setPosition((double)(((double)screen.width / 2) + (getX() - view.x) / (double)ppm - 20), (double)(((double)screen.height / 2) + (getY() - view.y) / (double)ppm - 20));
+	sprite.setPosition((double)(((double)screen.width / 2) + (getX() + xHeight - view.x) / (double)ppm - 20), (double)(((double)screen.height / 2) + (getY() + yHeight - view.y) / (double)ppm - 20));
 	window.draw(sprite);
+
+	if (onHoverboard) {
+		xHeight = sin(sprite.getRotation() * PI / 180 - dir * 0.2) * (heightFromPlanet - 20 * 0.07);
+		yHeight = -cos(sprite.getRotation() * PI / 180 - dir * 0.2) * (heightFromPlanet - 20 * 0.07);
+
+		hoverboard.setRotation(sprite.getRotation() - dir * 0.2);
+		hoverboard.setScale(sprite.getScale());
+		hoverboard.setPosition((double)(((double)screen.width / 2) + (getX() + xHeight - view.x) / (double)ppm - 20), (double)(((double)screen.height / 2) + (getY() + yHeight - view.y) / (double)ppm - 20));
+		window.draw(hoverboard);
+	}
 
 	if (hasQuest || hasReturn) {
 		questSprite.setRotation(sprite.getRotation());

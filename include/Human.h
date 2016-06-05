@@ -16,6 +16,7 @@ class Human : public GameObject {
 		//sf::Texture texture;
 		sf::Sprite sprite;
 		sf::Sprite questSprite;
+		sf::Sprite hoverboard;
 		sf::Vector2<double> velocity;
 		sf::Vector2<double> direction;
 		sf::Clock clock;
@@ -34,6 +35,9 @@ class Human : public GameObject {
 		bool jump;
 		bool hasQuest;
 		bool hasReturn;
+		bool onHoverboard;
+		float heightFromPlanet;
+		float hoverDir;
 		std::string questItem;
 		std::unique_ptr<Quest> quest;
 		sf::SoundBuffer buffer;
@@ -76,6 +80,8 @@ class Human : public GameObject {
 		int getReturnQuest();
 		void setReturnQuest(int rQ);
 		void playSound();
+		void setOnHoverboard(bool b);
+		bool getOnHoverboard();
 		//void setPlanetRotation(float r);
 		void update();
 		void render(sf::RenderWindow &window, sf::Vector2<double> view, sf::VideoMode screen, float ppm);

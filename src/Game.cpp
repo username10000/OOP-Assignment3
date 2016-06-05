@@ -661,6 +661,11 @@ void Game::events() {
 					//}
 				}
 
+				// H - Hoverboard
+				if (event.key.code == sf::Keyboard::H) {
+					human->setOnHoverboard(!human->getOnHoverboard());
+				}
+
 				// Q - Quest Menu
 				if (event.key.code == 16) {
 					menu["quests"] = !menu["quests"];
@@ -814,11 +819,16 @@ void Game::setLoadingMessage(std::string m) {
 void Game::keyPressed() {
 	float speedMult = 1;
 	// Shift
-	if (keys[38]) {
-		speedMult = 5;
+	if (keys[38] && !human->getOnHoverboard()) {
+		speedMult = 2;
 		human->setSpeed(0.5);
 	} else {
-		human->setSpeed(1);
+		if (human->getOnHoverboard()) {
+			speedMult = 10;
+			human->setSpeed(0.2);
+		} else {
+			human->setSpeed(1);
+		}
 	}
 
 	// +
@@ -871,7 +881,7 @@ void Game::keyPressed() {
 		} else {
 			// Human
 			float f;
-			if (!jump) {
+			if (!human->getJump()) {
 				f = 0.001 * speedMult;
 				human->setDir(-1);
 			} else {
@@ -898,7 +908,7 @@ void Game::keyPressed() {
 		} else {
 			// Human
 			float f;
-			if (!jump) {
+			if (!human->getJump()) {
 				f = 0.001 * speedMult;
 				human->setDir(1);
 			} else {
@@ -919,19 +929,24 @@ void Game::keyPressed() {
 	}
 
 	// Reset the Sprite if the Human is not moving and he's not mid air
-	if (!moved && !jump) {
+	if (!moved && !human->getJump()) {
+		human->resetSprite();
+	}
+
+	// Reset the Sprite if the Human is not mid air and is on the Hoverboard
+	if (human->getOnHoverboard() && !human->getJump()) {
 		human->resetSprite();
 	}
 
 	// If the human moved play footsteps
-	if (moved && !jump) {
+	if (moved && !human->getJump()) {
 		human->playSound();
 	}
 
 	// SPACE
 	if (keys[57]) {
 		if (onPlanet) {
-			if (!jump) {
+			if (!human->getJump()) {
 				// Human
 				float f = 0.0025;
 				int cP = ships[0]->getClosestPlanet();
@@ -942,7 +957,8 @@ void Game::keyPressed() {
 				//theta += PI;
 				float acceleration = f / human->getMass();
 				human->addVelocity(-cos(theta) * acceleration, -sin(theta) * acceleration);
-				jump = true;
+				human->setJump(true);
+				//jump = true;
 
 				// Add the Velocity that is caused by the Rotation of the Object to the Human
 				double circumference = (double)(2.0f * (double)PI * (double)astro[cP]->getRadius());
@@ -1071,7 +1087,7 @@ void Game::collisions() {
 			float theta = atan2(dy, dx);
 			theta = theta >= 0 ? theta : theta + 2 * PI;
 
-			if (!jump)
+			if (!human->getJump())
 				theta += astro[i]->getRotation() * PI / 180;
 
 			// Reset the Velocity of the Human
@@ -1091,7 +1107,8 @@ void Game::collisions() {
 			human->setY(astro[i]->getY() - sin(theta) * (astro[i]->getRadius() + 20 * 0.07));
 
 			// Reset the Jump Flag
-			jump = false;
+			human->setJump(false);
+			//jump = false;
 		}
 		for (int j = 0; j < astro[closestPlanet]->getInhabitants(); j++) {
 			if (Functions::dist(astro[i]->getX(), astro[i]->getY(), locals[j]->getX(), locals[j]->getY()) < astro[i]->getRadius() + 20 * 0.07) {
