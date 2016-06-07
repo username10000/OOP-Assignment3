@@ -111,6 +111,10 @@ class Game {
 		sf::Mouse mouse;
 		float scroll;
 		float curScroll;
+		int tutorialStep;
+		bool tutCond[5];
+		sf::Color tutColour;
+		sf::Clock tutClock;
 		//std::vector<sf::Music> sounds;
 		//AstroMap astroMap(0);
 	public:
@@ -130,6 +134,7 @@ class Game {
 		double getRelativeVelocity(int index);
 		void executeCommand(std::string command);
 		void setLoadingMessage(std::string m);
+		void resetConditions();
 		//int randomInt(int start, int stop);
 		//float randomFloat(float start, float stop);
 		//double map(double v, double lmin, double lmax, double rmin, double rmax);

@@ -464,6 +464,9 @@ Game::Game() {
 
 	scroll = 0;
 	curScroll = 0;
+	tutorialStep = 0;
+	tutColour = sf::Color::White;
+	resetConditions();
 
 	setLoadingMessage("Starting");
 }
@@ -480,6 +483,11 @@ void Game::disableMenus() {
 	for (auto el = menu.begin(); el != menu.end(); el++) {
 		menu[el->first] = false;
 	}
+}
+
+void Game::resetConditions() {
+	for (int i = 0; i < 5; i++)	
+		tutCond[i] = false;
 }
 
 void Game::events() {
@@ -608,7 +616,6 @@ void Game::events() {
 											break;
 										}
 									}
-									std::cout << "QUEST ON THE SAME PLANET" << std::endl;
 								}
 								
 								// Play Sound
@@ -1685,6 +1692,96 @@ void Game::update() {
 			if (velocityVector->getHovered() && menu["velocity"]) {
 				message->update(velocityVector->getDescription(), sf::Color::Yellow);
 			}
+		}
+
+		// Tutorial Messages
+		switch (tutorialStep) {
+			case 0:
+				message->update("A / D to Move\nHold Shift to run\nSpace to Jump", tutColour);
+				if (keys[0])
+					tutCond[0] = true;
+				if (keys[3])
+					tutCond[1] = true;
+				if ((keys[38] && keys[0]) || (keys[38] && keys[3]))
+					tutCond[2] = true;
+				if (keys[57])
+					tutCond[3] = true;
+				if (tutCond[0] && tutCond[1] && tutCond[2] && tutCond[3]) {
+					tutorialStep++;
+					resetConditions();
+				}
+				break;
+			case 1:
+				message->update("Use the Scroll Wheel or + / - to Zoom In and Out");
+				if (scroll != 0 || keys[68] || keys[67]) {
+					tutorialStep++;
+					tutClock.restart();
+				}
+				break;
+			case 2:
+				message->update("You can get Missions from People with a Green \'!\' above them", tutColour);
+				if (tutClock.getElapsedTime().asSeconds() > 5) {
+					tutorialStep++;
+				}
+				break;
+			case 3:
+				if (quests.size() > 0) {
+					message->update("Press Q to see all the Active Missions");
+					if (menu["quests"]) {
+						tutorialStep++;
+					}
+				}
+				break;
+			case 4:
+				if (!menu["quests"]) {
+					message->update("You have to Deliver the Objects to the People with a Cyan \'!\' above them");
+					if (tutClock.getElapsedTime().asSeconds() > 5 && !tutCond[0]) {
+						tutClock.restart();
+						tutCond[0] = 1;
+					}
+					if (tutClock.getElapsedTime().asSeconds() > 5) {
+						tutorialStep++;
+						resetConditions();
+						tutClock.restart();
+					}
+				}
+				break;
+			case 5:
+				if (tutClock.getElapsedTime().asSeconds() > 10) {
+					message->update("Tired of Running?\nPress 'H' to get on your Hoverboard\nNote: You cannot interact with objects while on the Hoverboard");
+				}
+				if (keys[sf::Keyboard::H]) {
+					tutorialStep++;
+				}
+				break;
+			case 6:
+				if (money > 0) {
+					if (!tutCond[0]) {
+						tutCond[0] = true;
+						tutClock.restart();
+					}
+					message->update("Your Money is displayed in the Top Left Corner\nWhen you have enough Money go buy a Ship from the Shop\nTo buy a Ship use the Mouse to Select one and Click on it");
+					if (tutCond[0] && tutClock.getElapsedTime().asSeconds() > 10) {
+						tutorialStep++;
+						resetConditions();
+					}
+				}
+				break;
+			case 7:
+				if (ships[0]->getVisible() && !menu["shop"]) {
+					if (!tutCond[0]) {
+						tutCond[0] = true;
+						tutClock.restart();
+					}
+					message->update("Find the Ship");
+					if (tutCond[0] && tutClock.getElapsedTime().asSeconds() > 5) {
+						tutorialStep++;
+						resetConditions();
+					}
+				}
+				break;
+			default:
+				break;
 		}
 
 		if (menu["exit"]) {
