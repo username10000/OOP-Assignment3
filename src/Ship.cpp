@@ -50,7 +50,7 @@ Ship::Ship(double x, double y, float screenX, float screenY) : GameObject(x, y) 
 
 	inertiaDamper = true;
 
-	maxVelocity = 1;
+	maxVelocity = 1.5;
 
 	leftRotate = 0;
 
@@ -388,6 +388,8 @@ void Ship::setCargo(int c) {
 	cargo = c;
 }
 int Ship::getMaxCargo() {
+	if (!isVisible)
+		return 2;
 	return maxCargo;
 }
 

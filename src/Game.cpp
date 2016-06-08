@@ -21,7 +21,7 @@ Game::Game() {
 	window.setVerticalSyncEnabled(true);
 
 	// Open Font
-	font.loadFromFile("OpenSans-Regular.ttf");
+	font.loadFromFile("Source/resources/OpenSans-Regular.ttf");
 
 	oldMouse.x = mouse.getPosition().x;
 	oldMouse.y = mouse.getPosition().y;
@@ -134,6 +134,8 @@ Game::Game() {
 	for (int i = 1; i < noPlanets; i++) {
 		rDist = 0;
 		int noMoonsPlanet = Functions::randomInt(0, 3);
+		if (i == 1 && noMoonsPlanet == 0)
+			noMoonsPlanet = 1;
 		for (int j = 1; j <= noMoonsPlanet; j++) {
 			// Generate random Distance from the Sun, random Radius and random Orbital Phase
 			if (j == 1) {
@@ -300,6 +302,7 @@ Game::Game() {
 	menu["quests"] = false;
 	menu["console"] = false;
 	menu["exit"] = false;
+	menu["FPS"] = false;
 
 	//ppm = dist(0, 0, astro[noPlanets - 1] -> getX(), astro[noPlanets - 1] -> getY()) / (screen.height / 2);
 
@@ -666,8 +669,8 @@ void Game::events() {
 					//}
 				}
 
-				// F - Set Ship Straight
-				if (event.key.code == 5 && onPlanet && !gameOver) {
+				// V - Set Ship Straight
+				if (event.key.code == sf::Keyboard::V && onPlanet && !gameOver) {
 					// Get the Angle between the Ship and the Object
 					float dy = astro[closestPlanet]->getY() - ships[0]->getY();
 					float dx = astro[closestPlanet]->getX() - ships[0]->getX();
@@ -701,8 +704,8 @@ void Game::events() {
 					//}
 				}
 
-				// H - Hoverboard
-				if (event.key.code == sf::Keyboard::H) {
+				// F - Hoverboard
+				if (event.key.code == sf::Keyboard::F) {
 					human->setOnHoverboard(!human->getOnHoverboard());
 				}
 
@@ -860,7 +863,7 @@ void Game::keyPressed() {
 	float speedMult = 1;
 	// Shift
 	if (keys[38] && !human->getOnHoverboard()) {
-		speedMult = 2;
+		speedMult = 4;
 		human->setSpeed(0.5);
 	} else {
 		if (human->getOnHoverboard()) {
@@ -1053,6 +1056,11 @@ void Game::executeCommand(std::string command) {
 		ships[0]->refuel();
 	}
 
+	com = "FPS";
+	if (command.compare(com) == 0) {
+		menu["FPS"] = !menu["FPS"];
+	}
+
 	com = "exit";
 	if (command.compare(com) == 0) {
 		stop = 1;
@@ -1243,7 +1251,12 @@ void Game::nearObjects() {
 	}
 
 	if (!onPlanet) {
-		if (Functions::dist(ships[0]->getX(), ships[0]->getY(), astro[closestPlanet]->getX(), astro[closestPlanet]->getY()) - astro[closestPlanet]->getRadius() - 20 * 0.15 < 1000 && getRelativeVelocity() > ships[0]->getMaxVelocity()) {
+		float shipPlanetAngle = atan2(astro[closestPlanet]->getY() - ships[0]->getY(), astro[closestPlanet]->getX() - ships[0]->getX());
+		shipPlanetAngle = shipPlanetAngle >= 0 ? shipPlanetAngle : shipPlanetAngle + 2 * PI;
+		float velocityAngle = atan2(ships[0]->getVelocity().y, ships[0]->getVelocity().x);
+		velocityAngle = velocityAngle >= 0 ? velocityAngle : velocityAngle + 2 * PI;
+		float difAngles = PI - abs(PI - abs(shipPlanetAngle - velocityAngle));
+		if (Functions::dist(ships[0]->getX(), ships[0]->getY(), astro[closestPlanet]->getX(), astro[closestPlanet]->getY()) - astro[closestPlanet]->getRadius() - 20 * 0.15 < 1000 && getRelativeVelocity() > ships[0]->getMaxVelocity() && difAngles < PI / 2) {
 			message->update("WARNING! HIGH SPEED!", sf::Color::Red);
 			if (sound.getBuffer() != &buffers[4] || sound.getStatus() != sf::Sound::Playing) {
 				sound.setBuffer(buffers[4]);
@@ -1604,6 +1617,9 @@ void Game::update() {
 			if (shopStatus <= 100 && shopStatus >= 0) {
 				// Use Item
 				ships[0]->setShip(shopStatus);
+				cargoText.setString("Cargo: " + Functions::toStringWithComma(ships[0]->getCargo()) + " / " + Functions::toStringWithComma(ships[0]->getMaxCargo()));
+				cargoText.setPosition(screen.width, 0);
+				cargoText.setOrigin(cargoText.getLocalBounds().width, 0);
 			}
 			if (shopStatus > 100) {
 				if (money >= shopStatus) {
@@ -1706,7 +1722,7 @@ void Game::update() {
 					tutCond[2] = true;
 				if (keys[57])
 					tutCond[3] = true;
-				if (tutCond[0] && tutCond[1] && tutCond[2] && tutCond[3]) {
+				if ((tutCond[0] || tutCond[1]) && tutCond[2] && tutCond[3]) {
 					tutorialStep++;
 					resetConditions();
 				}
@@ -1748,9 +1764,9 @@ void Game::update() {
 				break;
 			case 5:
 				if (tutClock.getElapsedTime().asSeconds() > 10) {
-					message->update("Tired of Running?\nPress 'H' to get on your Hoverboard\nNote: You cannot interact with objects while on the Hoverboard", tutColour);
+					message->update("Tired of Running?\nPress F to get on your Hoverboard\nNote: You cannot interact with objects while on the Hoverboard", tutColour);
 				}
-				if (keys[sf::Keyboard::H]) {
+				if (keys[sf::Keyboard::F]) {
 					tutorialStep++;
 				}
 				break;
@@ -1811,7 +1827,8 @@ void Game::update() {
 				if (targetAstro != -1) {
 					float checkAngle = atan2(ships[0]->getY() - astro[targetAstro]->getY(), ships[0]->getX() - astro[targetAstro]->getX()) - PI / 2;
 					checkAngle = checkAngle >= 0 ? checkAngle : checkAngle + 2 * PI;
-					if (abs(checkAngle - ships[0]->getAngle()) < PI / 8) {
+					float difAngles = PI - abs(PI - abs(checkAngle - ships[0]->getAngle()));
+					if (difAngles < PI / 8) {
 						tutorialStep++;
 					}
 				}
@@ -1833,7 +1850,7 @@ void Game::update() {
 				break;
 			case 15:
 				menu["velocity"] = true;
-				message->update("In the Bottom Left Corner you have the Velocity Vector which shows which way you are going", tutColour);
+				message->update("In the Bottom Right Corner you have the Velocity Vector which shows which way you are going", tutColour);
 				if (tutClock.getElapsedTime().asSeconds() > 5) {
 					tutorialStep++;
 					tutClock.restart();
@@ -1999,7 +2016,8 @@ void Game::render() {
 		if (onPlanet) {
 			human->render(window, view, screen, ppm);
 			window.draw(moneyText);
-			window.draw(cargoText);
+			if (ships[0]->getVisible())
+				window.draw(cargoText);
 		} else {
 			// Velocity Vector
 			if (menu["velocity"]) {
@@ -2050,7 +2068,8 @@ void Game::render() {
 	}
 
 	// Draw the frameRate
-	window.draw(frameRate);
+	if (menu["FPS"])
+		window.draw(frameRate);
 
 	// Draw the Console
 	if (menu["console"]) {
