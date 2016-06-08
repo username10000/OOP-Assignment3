@@ -291,11 +291,11 @@ Game::Game() {
 
 	// Menu Flags
 	menu["map"] = false;
-	menu["infoPanel"] = true;
-	menu["thrust"] = true;
-	menu["fuel"] = true;
-	menu["distance"] = true;
-	menu["velocity"] = true;
+	menu["infoPanel"] = false;
+	menu["thrust"] = false;
+	menu["fuel"] = false;
+	menu["distance"] = false;
+	menu["velocity"] = false;
 	menu["shop"] = false;
 	menu["quests"] = false;
 	menu["console"] = false;
@@ -1734,7 +1734,7 @@ void Game::update() {
 				break;
 			case 4:
 				if (!menu["quests"]) {
-					message->update("You have to Deliver the Objects to the People with a Cyan \'!\' above them");
+					message->update("You have to Deliver the Objects to the People with a Cyan \'!\' above them", tutColour);
 					if (tutClock.getElapsedTime().asSeconds() > 5 && !tutCond[0]) {
 						tutClock.restart();
 						tutCond[0] = 1;
@@ -1748,7 +1748,7 @@ void Game::update() {
 				break;
 			case 5:
 				if (tutClock.getElapsedTime().asSeconds() > 10) {
-					message->update("Tired of Running?\nPress 'H' to get on your Hoverboard\nNote: You cannot interact with objects while on the Hoverboard");
+					message->update("Tired of Running?\nPress 'H' to get on your Hoverboard\nNote: You cannot interact with objects while on the Hoverboard", tutColour);
 				}
 				if (keys[sf::Keyboard::H]) {
 					tutorialStep++;
@@ -1760,7 +1760,7 @@ void Game::update() {
 						tutCond[0] = true;
 						tutClock.restart();
 					}
-					message->update("Your Money is displayed in the Top Left Corner\nWhen you have enough Money go buy a Ship from the Shop\nTo buy a Ship use the Mouse to Select one and Click on it");
+					message->update("Your Money is displayed in the Top Left Corner\nWhen you have enough Money go buy a Ship from the Shop\nTo buy a Ship use the Mouse to Select one and Click on it", tutColour);
 					if (tutCond[0] && tutClock.getElapsedTime().asSeconds() > 10) {
 						tutorialStep++;
 						resetConditions();
@@ -1768,16 +1768,96 @@ void Game::update() {
 				}
 				break;
 			case 7:
-				if (ships[0]->getVisible() && !menu["shop"]) {
+				if (ships[0]->getVisible() && !menu["shop"]){ 
 					if (!tutCond[0]) {
 						tutCond[0] = true;
 						tutClock.restart();
 					}
-					message->update("Find the Ship");
-					if (tutCond[0] && tutClock.getElapsedTime().asSeconds() > 5) {
+					message->update("Find the Ship", tutColour);
+					if ((tutCond[0] && tutClock.getElapsedTime().asSeconds() > 5) || !onPlanet) {
 						tutorialStep++;
 						resetConditions();
 					}
+				}
+				break;
+			case 8:
+				if (!onPlanet) {
+					menu["distance"] = true;
+					message->update("Press M and select a Planet or Moon as Target\nThe Distance and Direction of the Target can be seen in the Bottom Left Corner in Cyan", tutColour);
+					if (targetAstro != -1)
+						tutorialStep++;
+				}
+				break;
+			case 9:
+				if (!menu["map"] && !onPlanet)
+					menu["thrust"] = true;
+					message->update("W / S to Control the Thrust\nThe Thrust Power can be seen in the Top Right Corner", tutColour);
+				if (keys[sf::Keyboard::W] && !onPlanet)
+					tutorialStep++;
+				break;
+			case 10:
+				message->update("Accelerate until you are over 1000 Km away from the Planet\nThe Distance can be seen in the Bottom Left Corner in Red", tutColour);
+				if (Functions::dist(ships[0]->getX(), ships[0]->getY(), astro[closestPlanet]->getX(), astro[closestPlanet]->getY()) - astro[closestPlanet]->getRadius() - 20 * 0.15 >= 1000) {
+					tutorialStep++;
+				}
+				break;
+			case 11:
+				message->update("Press X to cut the Engine", tutColour);
+				if (keys[sf::Keyboard::X])
+					tutorialStep++;
+				break;
+			case 12:
+				message->update("Now Point the Ship in the Direction of the Target\nThe Current Direction is indicated by the White Triangle in the Bottom Left Corner", tutColour);
+				if (targetAstro != -1) {
+					float checkAngle = atan2(ships[0]->getY() - astro[targetAstro]->getY(), ships[0]->getX() - astro[targetAstro]->getX()) - PI / 2;
+					checkAngle = checkAngle >= 0 ? checkAngle : checkAngle + 2 * PI;
+					if (abs(checkAngle - ships[0]->getAngle()) < PI / 8) {
+						tutorialStep++;
+					}
+				}
+				break;
+			case 13:
+				message->update("Increase the Thrust to at least 50%", tutColour);
+				if (ships[0]->getThrustPercentage() >= 50) {
+					tutorialStep++;
+					tutClock.restart();
+				}
+				break;
+			case 14:
+				menu["fuel"] = true;
+				message->update("You have a limited amount of Fuel seen in the Top Right Corner", tutColour);
+				if (tutClock.getElapsedTime().asSeconds() > 5) {
+					tutorialStep++;
+					tutClock.restart();
+				}
+				break;
+			case 15:
+				menu["velocity"] = true;
+				message->update("In the Bottom Left Corner you have the Velocity Vector which shows which way you are going", tutColour);
+				if (tutClock.getElapsedTime().asSeconds() > 5) {
+					tutorialStep++;
+					tutClock.restart();
+				}
+				break;
+			case 16:
+				menu["infoPanel"] = true;
+				message->update("More detailed information can be seen in the Top Left Corner\nInformation about each panel can be seen by Hovering over them with the Mouse", tutColour);
+				if (tutClock.getElapsedTime().asSeconds() > 5) {
+					tutorialStep++;
+					tutClock.restart();
+				}
+				break;
+			case 17:
+				message->update("Press X to cut the stop the Thrust as the Velocity will get you there", tutColour);
+				if (tutClock.getElapsedTime().asSeconds() > 5) {
+					tutorialStep++;
+					tutClock.restart();
+				}
+				break;
+			case 18:
+				message->update("Before reaching the Destination you have to reduce you velocity\nYou do this by Accelerating the other way", tutColour);
+				if (tutClock.getElapsedTime().asSeconds() > 10) {
+					tutorialStep++;
 				}
 				break;
 			default:
